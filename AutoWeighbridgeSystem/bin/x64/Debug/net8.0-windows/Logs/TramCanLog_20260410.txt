@@ -1,0 +1,1215 @@
+2026-04-10 07:35:31.969 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:36:01.573 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:36:01.596 [INF] Đã kết nối đầu đọc RFID [ScaleIn] tại COM3
+2026-04-10 07:36:01.630 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:36:01.667 [ERR] Không thể mở cổng COM9 cho đầu đọc Desk
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:37:01.774 [INF] Đã kết nối đầu đọc RFID [ScaleIn] tại COM3
+2026-04-10 07:37:01.782 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:37:01.789 [ERR] Không thể mở cổng COM9 cho đầu đọc Desk
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:39:01.856 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:39:07.799 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:39:07.816 [INF] Đã kết nối đầu đọc RFID [ScaleIn] tại COM3
+2026-04-10 07:39:07.847 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:39:07.885 [ERR] Không thể mở cổng COM9 cho đầu đọc Desk
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:40:33.705 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:40:39.527 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:40:39.545 [INF] Đã kết nối đầu đọc RFID [ScaleIn] tại COM3
+2026-04-10 07:40:39.575 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:40:39.610 [ERR] Không thể mở cổng COM9 cho đầu đọc Desk
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:40:56.077 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 07:42:27.507 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:42:33.168 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:42:33.186 [INF] Đã kết nối đầu đọc RFID [ScaleIn] tại COM3
+2026-04-10 07:42:33.217 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:42:33.256 [ERR] Không thể mở cổng COM9 cho đầu đọc Desk
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:43:13.674 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:43:20.952 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:43:20.969 [INF] Đã kết nối đầu đọc RFID [ScaleIn] tại COM3
+2026-04-10 07:43:20.999 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:43:21.035 [ERR] Không thể mở cổng COM9 cho đầu đọc Desk
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:51:19.994 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:51:27.014 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:51:27.024 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:51:27.032 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:51:27.033 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 07:51:55.000 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 07:52:57.015 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:53:06.204 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:53:06.251 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:53:06.290 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:53:06.294 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 07:53:55.090 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 07:55:56.418 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 07:56:04.732 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 07:56:04.787 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:56:04.830 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 07:56:04.834 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:04:18.490 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 08:04:25.629 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 08:04:25.677 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:04:25.716 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:04:25.719 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:05:25.840 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:05:25.849 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:05:25.851 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:05:30.623 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 08:29:38.146 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 08:29:46.521 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 08:29:46.676 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:29:46.718 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:29:46.722 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:30:46.941 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:30:46.948 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:30:46.949 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:31:46.982 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:31:46.991 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:31:46.993 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:31:51.081 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 08:32:58.603 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 08:33:05.422 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 08:33:05.472 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:33:05.514 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 08:33:05.530 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 08:33:19.578 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 09:09:16.061 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 09:09:25.539 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 09:09:25.584 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:09:25.619 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:09:25.623 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:10:25.727 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:10:25.734 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:10:25.735 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:11:25.768 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:11:25.775 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:11:25.776 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:23:23.393 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 09:23:29.427 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 09:23:29.569 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:23:29.606 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:23:29.609 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:24:29.848 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:24:29.855 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:24:29.856 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:25:29.901 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:25:29.907 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:25:29.908 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:26:29.953 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:26:29.960 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:26:29.962 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:27:30.013 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:27:30.020 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:27:30.021 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:28:30.071 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:28:30.077 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:28:30.078 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:29:30.108 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:29:30.114 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:29:30.115 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:30:30.146 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:30:30.156 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:30:30.157 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:31:30.191 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:31:30.200 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:31:30.201 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:32:30.238 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:32:30.247 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:32:30.247 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:33:30.275 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:33:30.282 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:33:30.283 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:34:30.314 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:34:30.321 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:34:30.322 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:35:30.349 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:35:30.356 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:35:30.357 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:36:30.387 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:36:30.394 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:36:30.395 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:37:30.425 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:37:30.431 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:37:30.432 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:38:16.759 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 09:38:22.509 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 09:38:22.518 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:38:22.524 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:38:22.525 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:38:35.520 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 09:51:13.342 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 09:51:32.130 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 09:51:32.176 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:51:32.213 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:51:32.216 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:52:32.324 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:52:32.332 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:52:32.333 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:53:32.359 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:53:32.366 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:53:32.367 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 09:54:32.396 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:54:32.404 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 09:54:32.405 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:00:10.179 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:00:18.004 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:00:18.053 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:00:18.094 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:00:18.098 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:01:18.212 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:01:18.220 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:01:18.221 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:02:18.254 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:02:18.262 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:02:18.264 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:02:29.708 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 10:03:12.679 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:03:23.924 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:03:23.972 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:03:24.012 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:03:24.016 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:03:31.026 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 10:09:24.450 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:09:30.942 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:09:30.992 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:09:31.043 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:09:31.047 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:10:31.164 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:10:31.172 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:10:31.173 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:13:09.512 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:13:17.347 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:13:17.394 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:13:17.434 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:13:17.438 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:14:17.564 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:14:17.571 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:14:17.573 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:15:17.605 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:15:17.614 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:15:17.615 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:16:17.644 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:16:17.651 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:16:17.652 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:16:39.537 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 10:18:01.682 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:18:07.997 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:18:08.042 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:18:08.080 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:18:08.084 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:19:25.625 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:19:31.913 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:19:31.958 [ERR] Không thể mở cổng COM9 cho đầu đọc ScaleIn
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:19:31.995 [ERR] Không thể mở cổng COM8 cho đầu đọc ScaleOut
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.Initialize(Dictionary`2 portConfig, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 54
+2026-04-10 10:19:31.998 [INF] Đã kết nối đầu đọc RFID [Desk] tại COM2
+2026-04-10 10:43:45.712 +07:00 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:43:47.794 +07:00 [FTL] Lỗi nghiêm trọng khi khởi động!
+System.InvalidOperationException: Unable to resolve service for type 'AutoWeighbridgeSystem.ViewModels.MainViewModel' while attempting to activate 'AutoWeighbridgeSystem.Views.MainWindow'.
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateArgumentCallSites(ServiceIdentifier serviceIdentifier, Type implementationType, CallSiteChain callSiteChain, ParameterInfo[] parameters, Boolean throwIfCallSiteNotFound)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateConstructorCallSite(ResultCache lifetime, ServiceIdentifier serviceIdentifier, Type implementationType, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.TryCreateExact(ServiceDescriptor descriptor, ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain, Int32 slot)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.TryCreateExact(ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateCallSite(ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.GetCallSite(ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.CreateServiceAccessor(ServiceIdentifier serviceIdentifier)
+   at System.Collections.Concurrent.ConcurrentDictionary`2.GetOrAdd(TKey key, Func`2 valueFactory)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(ServiceIdentifier serviceIdentifier, ServiceProviderEngineScope serviceProviderEngineScope)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at AutoWeighbridgeSystem.App.OnStartup(StartupEventArgs e) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml.cs:line 49
+2026-04-10 10:43:53.962 +07:00 [INF] === HỆ THỐNG ĐÓNG KẾT NỐI ===
+2026-04-10 10:44:27.101 +07:00 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:44:29.106 +07:00 [FTL] Lỗi nghiêm trọng khi khởi động!
+System.InvalidOperationException: Unable to resolve service for type 'AutoWeighbridgeSystem.ViewModels.MainViewModel' while attempting to activate 'AutoWeighbridgeSystem.Views.MainWindow'.
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateArgumentCallSites(ServiceIdentifier serviceIdentifier, Type implementationType, CallSiteChain callSiteChain, ParameterInfo[] parameters, Boolean throwIfCallSiteNotFound)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateConstructorCallSite(ResultCache lifetime, ServiceIdentifier serviceIdentifier, Type implementationType, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.TryCreateExact(ServiceDescriptor descriptor, ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain, Int32 slot)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.TryCreateExact(ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateCallSite(ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.GetCallSite(ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.CreateServiceAccessor(ServiceIdentifier serviceIdentifier)
+   at System.Collections.Concurrent.ConcurrentDictionary`2.GetOrAdd(TKey key, Func`2 valueFactory)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(ServiceIdentifier serviceIdentifier, ServiceProviderEngineScope serviceProviderEngineScope)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at AutoWeighbridgeSystem.App.OnStartup(StartupEventArgs e) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml.cs:line 49
+2026-04-10 10:44:36.336 +07:00 [INF] === HỆ THỐNG ĐÓNG KẾT NỐI ===
+2026-04-10 10:50:34.739 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:50:42.614 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:50:42.744 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:50:42.784 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:51:05.242 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 10:51:05.270 [INF] [RFID] Đã đóng tất cả các cổng COM.
+2026-04-10 10:51:19.389 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:51:30.981 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:51:31.020 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:51:31.049 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:51:43.818 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 10:51:43.843 [INF] [RFID] Đã đóng tất cả các cổng COM.
+2026-04-10 10:56:46.625 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:56:53.168 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:56:53.207 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:56:53.250 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:59:33.004 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 10:59:40.492 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 10:59:40.536 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 10:59:40.571 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 11:00:55.052 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 11:00:55.090 [INF] [RFID] Đã đóng tất cả các cổng COM.
+2026-04-10 11:04:41.974 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 11:04:48.681 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 11:04:48.694 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortDesk
+2026-04-10 11:04:48.721 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 11:04:48.756 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 11:05:34.646 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 11:05:34.687 [INF] [RFID] Đã đóng tất cả các cổng COM.
+2026-04-10 11:06:28.846 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 11:06:35.362 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 11:06:35.374 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 11:06:35.402 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 11:06:35.432 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 40
+2026-04-10 11:10:46.701 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 11:10:46.736 [INF] [RFID] Đã đóng tất cả các cổng COM.
+2026-04-10 13:22:43.392 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:22:51.047 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:22:51.183 [ERR] Không thể mở cổng COM3 cho đầu đọc PortDesk. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.UnauthorizedAccessException: Access to the path 'COM3' is denied.
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:22:51.220 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:22:51.232 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:24:46.301 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:24:53.367 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:24:53.407 [ERR] Không thể mở cổng COM3 cho đầu đọc PortDesk. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.UnauthorizedAccessException: Access to the path 'COM3' is denied.
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:24:53.438 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:24:53.451 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:25:55.366 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:26:01.735 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:26:01.748 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 13:26:01.777 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:26:01.808 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:26:06.820 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 13:26:06.821 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 13:26:55.068 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 13:26:55.068 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 13:28:27.255 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 13:28:27.280 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 13:36:33.436 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:36:46.821 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:36:46.922 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 13:36:46.949 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:36:46.984 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:36:52.291 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 13:36:52.292 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 13:41:37.586 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 13:41:37.613 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 13:43:19.057 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:43:25.907 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:43:25.921 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 13:43:25.952 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:43:25.989 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:44:15.949 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 13:44:15.950 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 13:44:22.088 [DBG] [RFID] PortDesk nhận mã sạch: 18139063
+2026-04-10 13:44:22.093 [INF] Nhận thẻ 18139063 từ PortDesk
+2026-04-10 13:44:36.098 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 13:44:36.124 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 13:50:35.102 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:50:41.264 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:50:41.277 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 13:50:41.308 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:50:41.349 [ERR] Không thể mở cổng COM8 cho đầu đọc PortScaleOut. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM8'.
+File name: 'COM8'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:52:40.147 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 13:52:40.171 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 13:54:54.203 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 13:55:00.007 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 13:55:00.015 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 13:55:00.016 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 13:55:00.022 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 13:56:01.570 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 13:56:01.571 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 13:57:06.757 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 13:57:06.758 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 13:57:24.611 [DBG] [RFID] PortDesk nhận mã sạch: 18139061
+2026-04-10 13:57:24.612 [INF] Nhận thẻ 18139061 từ PortDesk
+2026-04-10 13:58:15.987 [DBG] [RFID] PortDesk nhận mã sạch: 18139061
+2026-04-10 13:58:15.988 [INF] Nhận thẻ 18139061 từ PortDesk
+2026-04-10 13:58:48.178 [DBG] [RFID] PortDesk nhận mã sạch: 18139063
+2026-04-10 13:58:48.179 [INF] Nhận thẻ 18139063 từ PortDesk
+2026-04-10 13:59:06.076 [DBG] [RFID] PortDesk nhận mã sạch: 18139061
+2026-04-10 13:59:06.078 [INF] Nhận thẻ 18139061 từ PortDesk
+2026-04-10 13:59:09.049 [DBG] [RFID] PortDesk nhận mã sạch: 18139063
+2026-04-10 14:01:37.816 [DBG] [RFID] PortDesk nhận mã sạch: 18139063
+2026-04-10 14:01:37.817 [INF] Nhận thẻ 18139063 từ PortDesk
+2026-04-10 14:01:42.021 [DBG] [RFID] PortDesk nhận mã sạch: 18139061
+2026-04-10 14:01:42.023 [INF] Nhận thẻ 18139061 từ PortDesk
+2026-04-10 14:01:45.334 [DBG] [RFID] PortDesk nhận mã sạch: 18136934
+2026-04-10 14:01:45.335 [INF] Nhận thẻ 18136934 từ PortDesk
+2026-04-10 14:02:25.112 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:02:25.150 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:18:04.523 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:18:11.046 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:18:11.058 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:18:11.087 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:18:11.108 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:18:31.210 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:18:31.249 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:19:30.436 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:19:41.385 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:19:41.401 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:19:41.433 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:19:41.453 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:32:57.734 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:32:57.775 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:35:37.239 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:35:46.501 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:35:46.514 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:35:46.541 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:35:46.563 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:39:09.666 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:39:09.706 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:40:39.615 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:40:46.152 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:40:46.165 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:40:46.192 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:40:46.214 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:42:09.355 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:42:15.825 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:42:15.837 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:42:15.863 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:42:15.884 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:45:56.403 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:46:02.883 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:46:02.897 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:46:02.924 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:46:02.948 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:46:50.143 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:46:50.186 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:47:31.978 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:47:37.906 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:47:37.918 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:47:37.948 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:47:37.971 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:47:54.475 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:47:54.513 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:48:29.246 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:48:35.640 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:48:35.652 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:48:35.678 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:48:35.701 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:49:08.606 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:49:08.645 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:56:20.982 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:56:27.421 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:56:27.433 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:56:27.459 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:56:27.481 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:56:48.269 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:56:48.311 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 14:57:03.393 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 14:57:11.102 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 14:57:11.116 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 14:57:11.145 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 14:57:11.170 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 14:58:05.767 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 14:58:05.808 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 15:39:11.420 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 15:39:18.573 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 15:39:18.596 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 15:39:18.624 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 15:39:18.650 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:13:04.030 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:13:11.081 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:13:11.178 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:13:11.209 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:13:11.231 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:13:43.403 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 16:13:43.444 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 16:15:57.587 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:16:03.833 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:16:03.846 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:16:03.874 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:16:03.899 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:16:30.454 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:16:40.368 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:16:40.469 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:16:40.497 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:16:40.520 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:23:44.755 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:23:52.134 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:23:52.237 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:23:52.269 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:23:52.293 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:29:46.081 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:29:54.005 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:29:54.026 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:29:54.056 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:29:54.080 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:31:54.237 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 16:31:54.275 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 16:42:37.375 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:43:22.327 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:43:22.339 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:43:22.365 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:43:22.385 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:45:11.312 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 16:45:11.352 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 16:49:20.353 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:49:26.779 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:49:26.795 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:49:26.826 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:49:26.852 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:49:48.223 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 16:49:48.265 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-10 16:52:24.502 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:52:32.093 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:52:32.108 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:52:32.135 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:52:32.161 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:54:33.610 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:54:40.139 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:54:40.152 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:54:40.179 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:54:40.205 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:58:16.926 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-10 16:58:25.491 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-10 16:58:25.504 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-10 16:58:25.533 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-10 16:58:25.557 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-10 16:59:49.079 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-10 16:59:49.117 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.

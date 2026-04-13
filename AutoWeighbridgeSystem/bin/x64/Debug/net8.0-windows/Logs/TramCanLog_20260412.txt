@@ -1,0 +1,228 @@
+2026-04-12 11:16:29.028 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 11:16:37.801 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 11:17:17.924 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 11:17:17.931 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 11:44:18.118 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 11:44:28.933 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 11:45:23.916 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 11:45:23.925 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 11:48:02.203 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 11:48:09.058 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 11:48:34.206 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 11:48:34.208 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 11:52:57.235 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 11:53:04.032 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 11:53:29.111 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 11:53:29.113 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 12:07:35.280 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:07:43.312 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:12:37.174 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:12:45.645 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:21:12.102 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:21:24.023 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:21:52.677 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 12:21:52.678 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 12:24:19.834 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:24:27.303 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:26:23.821 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 12:26:23.827 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 12:36:19.727 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:36:26.666 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:37:25.422 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 12:37:25.425 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 12:49:34.212 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:51:10.342 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:51:18.245 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:52:46.617 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:53:15.887 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:55:37.435 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:55:44.051 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:58:29.563 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:58:36.775 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 12:59:41.463 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 12:59:48.221 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:00:43.293 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 13:00:49.983 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:01:25.300 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 13:01:34.946 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:02:05.766 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 13:02:12.898 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:02:47.445 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 13:02:53.840 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:03:34.865 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 13:03:41.812 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:04:53.766 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 13:04:53.772 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 13:07:39.725 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 13:07:46.976 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 13:31:37.082 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 13:31:37.084 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 14:14:35.724 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 14:14:43.994 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 14:17:19.109 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 14:17:26.244 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 14:18:07.274 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 14:18:07.282 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 14:20:12.868 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 14:20:13.794 [FTL] Lỗi nghiêm trọng khi khởi động ứng dụng!
+Microsoft.Data.SqlClient.SqlException (0x80131904): The object 'FK_Vehicles_Customers_CustomerId' is dependent on column 'CustomerId'.
+ALTER TABLE ALTER COLUMN CustomerId failed because one or more objects access this column.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean isAsync, Int32 timeout, Boolean asyncWrite)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String methodName)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQuery(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Migrations.MigrationCommand.ExecuteNonQuery(IRelationalConnection connection, IReadOnlyDictionary`2 parameterValues)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQuery(IEnumerable`1 migrationCommands, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.Migrate(DatabaseFacade databaseFacade)
+   at AutoWeighbridgeSystem.App.OnStartup(StartupEventArgs e) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml.cs:line 56
+ClientConnectionId:1d9fd7bb-4949-4c80-bb0e-b37fbcf677fa
+Error Number:5074,State:1,Class:16
+2026-04-12 14:20:17.221 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 14:24:07.582 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 14:24:08.503 [FTL] Lỗi nghiêm trọng khi khởi động ứng dụng!
+Microsoft.Data.SqlClient.SqlException (0x80131904): Column names in each table must be unique. Column name 'IsVoid' in table 'WeighingTickets' is specified more than once.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean isAsync, Int32 timeout, Boolean asyncWrite)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String methodName)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQuery(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Migrations.MigrationCommand.ExecuteNonQuery(IRelationalConnection connection, IReadOnlyDictionary`2 parameterValues)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQuery(IEnumerable`1 migrationCommands, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.Migrate(DatabaseFacade databaseFacade)
+   at AutoWeighbridgeSystem.App.OnStartup(StartupEventArgs e) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml.cs:line 56
+ClientConnectionId:5d2d7ba4-cf46-47b2-ba1d-d6a745d4cdf8
+Error Number:2705,State:4,Class:16
+2026-04-12 17:29:54.439 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 17:39:45.672 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 17:39:52.462 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 17:40:02.004 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 17:40:02.013 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:12:03.374 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:12:10.632 [ERR] Lỗi khi đăng nhập
+Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'Users'.
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__211_0(Task`1 result)
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at AutoWeighbridgeSystem.ViewModels.LoginViewModel.LoginAsync(Object parameter) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\ViewModels\LoginViewModel.cs:line 70
+ClientConnectionId:32a90539-04cd-4224-9702-ba2fd8a791de
+Error Number:208,State:1,Class:16
+2026-04-12 18:15:51.603 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:15:57.638 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 18:17:32.956 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 18:17:32.957 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:21:44.837 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:21:51.584 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 18:22:10.161 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 18:22:10.162 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:22:11.699 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:22:18.377 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 18:30:54.151 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 18:30:54.152 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:31:09.528 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:31:16.054 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 18:33:24.349 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 18:33:24.357 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:50:28.419 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:50:35.003 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 18:51:35.621 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 18:51:35.626 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:53:38.095 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:53:45.348 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 18:54:38.567 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 18:54:38.568 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 18:58:08.504 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 18:58:15.851 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 19:00:03.726 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 19:00:03.727 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 19:04:34.941 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 19:04:42.025 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 19:07:29.219 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 19:07:29.233 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 21:41:49.088 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 21:41:57.573 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 21:43:04.949 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 21:43:04.951 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 21:44:04.374 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 21:44:11.221 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 21:47:19.646 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 21:47:19.649 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 21:51:27.522 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 21:51:34.641 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 21:52:11.791 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 21:52:11.792 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 21:53:56.770 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 21:54:05.151 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 21:54:45.470 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 21:54:45.471 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 21:58:04.965 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 21:58:11.877 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:00:05.001 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:00:05.013 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:02:01.866 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:02:08.917 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:03:48.866 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:03:48.872 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:06:10.511 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:06:18.515 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:08:02.473 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:08:02.483 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:09:10.141 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:09:19.579 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:09:50.284 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:09:50.285 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:11:58.703 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:12:07.835 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:12:36.616 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:12:36.618 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:13:25.135 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:13:32.551 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:14:39.529 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:14:39.540 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:15:29.498 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:15:36.384 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:15:47.130 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:15:47.132 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:18:44.198 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:18:51.700 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:19:05.456 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:19:05.457 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:19:33.582 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:19:42.957 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:19:57.233 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:19:57.234 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:20:48.290 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:20:55.079 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:21:07.897 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:21:07.906 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:21:42.029 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:21:49.032 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:22:02.379 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:22:02.380 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:23:04.602 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:23:12.709 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:23:38.559 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:23:38.561 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-12 22:25:06.704 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-12 22:25:13.812 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-12 22:25:37.854 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-12 22:25:37.855 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.

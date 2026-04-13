@@ -1,0 +1,26 @@
+2026-04-11 06:56:34.330 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-11 06:57:20.543 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-11 06:57:20.648 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-11 06:57:20.680 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-11 06:57:20.703 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-11 07:01:27.143 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-11 07:01:27.179 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-11 07:01:33.010 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-11 07:01:40.411 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-11 07:01:40.425 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM3 cho đầu đọc PortDesk
+2026-04-11 07:01:40.454 [ERR] Không thể mở cổng COM9 cho đầu đọc PortScaleIn. Hãy kiểm tra Driver hoặc cáp kết nối.
+System.IO.FileNotFoundException: Could not find file 'COM9'.
+File name: 'COM9'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 66
+2026-04-11 07:01:40.472 [INF] [RFID] ĐÃ MỞ THÀNH CÔNG cổng COM2 cho đầu đọc PortScaleOut
+2026-04-11 07:01:48.942 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
+2026-04-11 07:01:49.003 [INF] [RFID] Đã đóng và giải phóng toàn bộ các cổng COM.
+2026-04-11 07:29:47.515 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-11 07:29:56.382 [INF] Người dùng admin đã đăng nhập thành công
