@@ -1,4 +1,5 @@
 ﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -23,6 +24,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         // Đã khai báo RfidBusinessService
         private readonly RfidBusinessService _rfidBusiness;
+        private readonly IUserNotificationService _notificationService;
 
         [ObservableProperty] private Vehicle _newVehicle = new();
         [ObservableProperty] private ObservableCollection<Vehicle> _registeredVehicles = new();
@@ -37,12 +39,14 @@ namespace AutoWeighbridgeSystem.ViewModels
             RfidMultiService rfidService,
             ScaleService scaleService,
             IConfiguration configuration,
-            RfidBusinessService rfidBusiness)
+            RfidBusinessService rfidBusiness,
+            IUserNotificationService notificationService)
         {
             _dbContextFactory = dbContextFactory;
             _rfidService = rfidService;
             _scaleService = scaleService;
             _rfidBusiness = rfidBusiness; // Gán giá trị tiêm vào
+            _notificationService = notificationService;
 
             if (!decimal.TryParse(configuration["ScaleSettings:MinWeightThreshold"], out _minWeightThreshold))
             {
@@ -78,8 +82,9 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             if (currentWeight < _minWeightThreshold)
             {
-                MessageBox.Show($"Khối lượng hiện tại ({currentWeight:N0} kg) thấp hơn ngưỡng tối thiểu ({_minWeightThreshold:N0} kg).",
-                                "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _notificationService.ShowWarning(
+                    UiText.Messages.ScaleBelowThreshold(currentWeight, _minWeightThreshold),
+                    UiText.Titles.Warning);
                 return;
             }
 
@@ -150,12 +155,12 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             if (string.IsNullOrWhiteSpace(NewVehicle.LicensePlate))
             {
-                MessageBox.Show("Vui lòng nhập biển số!"); return;
+                _notificationService.ShowWarning(UiText.Messages.EnterLicensePlate); return;
             }
 
             if (SelectedCustomer == null)
             {
-                MessageBox.Show("Vui lòng chọn khách hàng từ danh sách!"); return;
+                _notificationService.ShowWarning(UiText.Messages.SelectCustomerFromList); return;
             }
             NewVehicle.CustomerId = SelectedCustomer.CustomerId;
 
@@ -172,7 +177,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                     {
                         if (existing.IsDeleted)
                         {
-                            if (MessageBox.Show("Xe này đã bị xóa trước đó. Khôi phục?", "Xác nhận", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            if (_notificationService.Confirm(UiText.Messages.RestoreDeletedVehicleConfirm, UiText.Titles.Confirm))
                             {
                                 existing.IsDeleted = false;
                                 existing.TareWeight = NewVehicle.TareWeight;
@@ -183,7 +188,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                         }
                         else
                         {
-                            MessageBox.Show("Xe này đã tồn tại!"); return;
+                            _notificationService.ShowWarning(UiText.Messages.VehicleAlreadyExists); return;
                         }
                     }
                     else
@@ -206,9 +211,9 @@ namespace AutoWeighbridgeSystem.ViewModels
                 await db.SaveChangesAsync();
                 await LoadDataAsync();
                 ClearForm();
-                MessageBox.Show("Lưu thông tin thành công!");
+                _notificationService.ShowInfo(UiText.Messages.VehicleSaveSuccess);
             }
-            catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
+            catch (Exception ex) { _notificationService.ShowError(UiText.Messages.GenericError(ex.Message)); }
         }
 
         private async Task<Customer> GetOrCreateCustomerAsync(AppDbContext db, string customerName)
@@ -236,7 +241,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private async Task DeleteAsync()
         {
             if (NewVehicle.VehicleId == 0) return;
-            if (MessageBox.Show("Xác nhận xóa?", "Xác nhận", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (_notificationService.Confirm(UiText.Messages.VehicleDeleteConfirm, UiText.Titles.Confirm))
             {
                 using var db = _dbContextFactory.CreateDbContext();
                 var v = await db.Vehicles.FindAsync(NewVehicle.VehicleId);

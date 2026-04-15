@@ -1,4 +1,5 @@
 ﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services; // Thêm namespace service
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,13 +18,16 @@ namespace AutoWeighbridgeSystem.ViewModels
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactory;
         private readonly IExportService _exportService; // Khai báo Service
+        private readonly IUserNotificationService _notificationService;
 
         public WeighingHistoryViewModel(
             IDbContextFactory<AppDbContext> contextFactory,
-            IExportService exportService) // Inject thông qua Constructor
+            IExportService exportService,
+            IUserNotificationService notificationService) // Inject thông qua Constructor
         {
             _contextFactory = contextFactory;
             _exportService = exportService;
+            _notificationService = notificationService;
 
             _fromDate = DateTime.Today;
             _toDate = DateTime.Today.AddDays(1).AddSeconds(-1);
@@ -66,7 +70,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi truy xuất dữ liệu: {ex.Message}", "Lỗi Hệ Thống", MessageBoxButton.OK, MessageBoxImage.Error);
+                _notificationService.ShowError(UiText.Messages.DataQueryError(ex.Message), UiText.Titles.SystemError);
             }
         }
 
@@ -84,8 +88,11 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             if (ticket == null || ticket.IsVoid) return;
 
-            var confirm = MessageBox.Show($"Xác nhận HỦY phiếu: {ticket.TicketID}?", "Cảnh báo", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (confirm == MessageBoxResult.Yes)
+            if (_notificationService.Confirm(
+                UiText.Messages.VoidTicketConfirm(ticket.TicketID),
+                UiText.Titles.Warning,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning))
             {
                 using var context = _contextFactory.CreateDbContext();
                 var ticketInDb = await context.WeighingTickets.IgnoreQueryFilters()
@@ -106,7 +113,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private void PrintTicket(WeighingTicket ticket)
         {
             if (ticket == null) return;
-            MessageBox.Show($"Đang in lại phiếu {ticket.TicketID}...", "Máy in");
+            _notificationService.ShowInfo(UiText.Messages.PrintTicketInfo(ticket.TicketID), UiText.Titles.Printer);
         }
 
         [RelayCommand]
@@ -114,7 +121,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             if (Tickets == null || !Tickets.Any())
             {
-                MessageBox.Show("Không có dữ liệu để xuất!", "Thông báo");
+                _notificationService.ShowInfo(UiText.Messages.NoDataToExport, UiText.Titles.Info);
                 return;
             }
 

@@ -1,5 +1,7 @@
 ﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +16,19 @@ namespace AutoWeighbridgeSystem.ViewModels
     public partial class CustomerViewModel : ObservableObject
     {
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
+        private readonly IUserNotificationService _notificationService;
 
         [ObservableProperty] private Customer _selectedCustomer = new() { CustomerId = string.Empty };
         [ObservableProperty] private ObservableCollection<Customer> _customerList = new();
         [ObservableProperty] private Customer _gridSelectedItem;
         [ObservableProperty] private bool _isEditMode = false;
 
-        public CustomerViewModel(IDbContextFactory<AppDbContext> dbContextFactory)
+        public CustomerViewModel(
+            IDbContextFactory<AppDbContext> dbContextFactory,
+            IUserNotificationService notificationService)
         {
             _dbContextFactory = dbContextFactory;
+            _notificationService = notificationService;
             _ = LoadDataAsync();
         }
 
@@ -55,7 +61,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             // 2. VALIDATION
             if (string.IsNullOrWhiteSpace(SelectedCustomer.CustomerId))
             {
-                MessageBox.Show("Mã khách hàng không được để trống!", "Cảnh báo");
+                _notificationService.ShowWarning(UiText.Messages.CustomerIdRequired, UiText.Titles.Warning);
                 return;
             }
 
@@ -73,8 +79,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                     {
                         if (existing.IsDeleted)
                         {
-                            var resume = MessageBox.Show($"Mã [{SelectedCustomer.CustomerId}] đã bị xóa trước đó. Khôi phục?", "Thông báo", MessageBoxButton.YesNo);
-                            if (resume == MessageBoxResult.Yes)
+                            if (_notificationService.Confirm(UiText.Messages.RestoreDeletedCustomerConfirm(SelectedCustomer.CustomerId), UiText.Titles.Info))
                             {
                                 existing.IsDeleted = false;
                                 existing.CustomerName = SelectedCustomer.CustomerName;
@@ -84,7 +89,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                         }
                         else
                         {
-                            MessageBox.Show("Mã khách hàng này đã tồn tại!");
+                            _notificationService.ShowWarning(UiText.Messages.CustomerAlreadyExists);
                             return;
                         }
                     }
@@ -103,11 +108,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 }
 
                 await db.SaveChangesAsync();
-                MessageBox.Show("Lưu thành công!");
+                _notificationService.ShowInfo(UiText.Messages.CustomerSaveSuccess);
                 await LoadDataAsync();
                 ClearForm();
             }
-            catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
+            catch (Exception ex) { _notificationService.ShowError(UiText.Messages.GenericError(ex.Message)); }
         }
 
         // --- XÓA MỀM ---
@@ -116,10 +121,11 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             if (string.IsNullOrEmpty(SelectedCustomer.CustomerId)) return;
 
-            var result = MessageBox.Show($"Xác nhận xóa khách hàng: {SelectedCustomer.CustomerName}?\n(Mã: {SelectedCustomer.CustomerId})",
-                                        "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.Yes)
+            if (_notificationService.Confirm(
+                UiText.Messages.DeleteCustomerConfirm(SelectedCustomer.CustomerName, SelectedCustomer.CustomerId),
+                "Xác nhận xóa",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning))
             {
                 try
                 {
@@ -134,10 +140,10 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                         await LoadDataAsync();
                         ClearForm();
-                        MessageBox.Show("Đã xóa khách hàng thành công!");
+                        _notificationService.ShowInfo(UiText.Messages.CustomerDeleteSuccess);
                     }
                 }
-                catch (Exception ex) { MessageBox.Show("Lỗi khi xóa: " + ex.Message); }
+                catch (Exception ex) { _notificationService.ShowError(UiText.Messages.DeleteError(ex.Message)); }
             }
         }
 
@@ -164,7 +170,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                     CustomerList = new ObservableCollection<Customer>(list);
                 });
             }
-            catch (Exception ex) { Console.WriteLine("Lỗi load dữ liệu: " + ex.Message); }
+            catch (Exception ex) { _notificationService.LogError(ex, "Lỗi load dữ liệu khách hàng"); }
         }
     }
 }

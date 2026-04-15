@@ -106,6 +106,11 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<RfidBusinessService>();
             services.AddSingleton<AlarmService>();
             services.AddSingleton<WeighingBusinessService>();
+            services.AddSingleton<DashboardWorkflowService>();
+            services.AddSingleton<DashboardSaveService>();
+            services.AddSingleton<DashboardDataService>();
+            services.AddSingleton<HardwareWatchdogService>();
+            services.AddSingleton<IUserNotificationService, UserNotificationService>();
 
             services.AddSingleton<ScaleService>(provider =>
             {

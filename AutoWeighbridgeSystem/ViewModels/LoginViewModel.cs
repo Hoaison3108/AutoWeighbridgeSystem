@@ -1,17 +1,15 @@
 ﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Services;
 using AutoWeighbridgeSystem.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace AutoWeighbridgeSystem.ViewModels
 {
@@ -20,6 +18,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly AppSession _appSession;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IUserNotificationService _notificationService;
 
         [ObservableProperty]
         private string _username = "";
@@ -35,11 +34,13 @@ namespace AutoWeighbridgeSystem.ViewModels
         public LoginViewModel(
             IDbContextFactory<AppDbContext> dbContextFactory,
             AppSession appSession,
-            IServiceProvider serviceProvider) // Dùng để gọi MainWindow sau khi login
+            IServiceProvider serviceProvider,
+            IUserNotificationService notificationService) // Dùng để gọi MainWindow sau khi login
         {
             _dbContextFactory = dbContextFactory;
             _appSession = appSession;
             _serviceProvider = serviceProvider;
+            _notificationService = notificationService;
         }
 
         [RelayCommand]
@@ -78,7 +79,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                     // Đăng nhập thành công -> Lưu vào Session
                     _appSession.SetUser(user.Id, user.FullName, user.Role);
-                    Log.Information("Người dùng {User} đã đăng nhập thành công", user.Username);
+                    _notificationService.LogInformation("Người dùng {User} đã đăng nhập thành công", user.Username);
 
                     OpenMainWindow();
 
@@ -88,7 +89,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Lỗi khi đăng nhập");
+                _notificationService.LogError(ex, "Lỗi khi đăng nhập");
                 ErrorMessage = "Lỗi kết nối cơ sở dữ liệu!";
 
                 // BỔ SUNG MESSAGEBOX ĐỂ HIỆN LỖI CHI TIẾT KỸ THUẬT
@@ -98,8 +99,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                     detailedError += $"\n\nNội dung gốc: {ex.InnerException.Message}";
                 }
 
-                MessageBox.Show(detailedError, "Lỗi Hệ Thống - SQL Connection",
-                                MessageBoxButton.OK, MessageBoxImage.Error);
+                _notificationService.ShowError(detailedError, UiText.Messages.SqlConnectionErrorTitle());
             }
             finally
             {

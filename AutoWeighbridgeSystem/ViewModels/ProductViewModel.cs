@@ -1,5 +1,7 @@
 ﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +16,19 @@ namespace AutoWeighbridgeSystem.ViewModels
     public partial class ProductViewModel : ObservableObject
     {
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
+        private readonly IUserNotificationService _notificationService;
 
         [ObservableProperty] private Product _selectedProduct = new() { ProductId = string.Empty };
         [ObservableProperty] private ObservableCollection<Product> _productList = new();
         [ObservableProperty] private Product _gridSelectedItem;
         [ObservableProperty] private bool _isEditMode = false;
 
-        public ProductViewModel(IDbContextFactory<AppDbContext> dbContextFactory)
+        public ProductViewModel(
+            IDbContextFactory<AppDbContext> dbContextFactory,
+            IUserNotificationService notificationService)
         {
             _dbContextFactory = dbContextFactory;
+            _notificationService = notificationService;
             _ = LoadDataAsync();
         }
 
@@ -63,13 +69,13 @@ namespace AutoWeighbridgeSystem.ViewModels
             // -------------------------------------------------------------------------
             if (string.IsNullOrWhiteSpace(SelectedProduct.ProductId))
             {
-                MessageBox.Show("Mã sản phẩm không được để trống!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _notificationService.ShowWarning(UiText.Messages.ProductIdRequired, UiText.Titles.Info);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(SelectedProduct.ProductName))
             {
-                MessageBox.Show("Tên sản phẩm không được để trống!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _notificationService.ShowWarning(UiText.Messages.ProductNameRequired, UiText.Titles.Info);
                 return;
             }
 
@@ -89,8 +95,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                         if (existing.IsDeleted)
                         {
                             // Logic khôi phục (giữ nguyên như cũ)
-                            var resume = MessageBox.Show($"Mã [{SelectedProduct.ProductId}] đã bị xóa. Khôi phục?", "Thông báo", MessageBoxButton.YesNo);
-                            if (resume == MessageBoxResult.Yes)
+                            if (_notificationService.Confirm(UiText.Messages.RestoreDeletedProductConfirm(SelectedProduct.ProductId), UiText.Titles.Info))
                             {
                                 existing.IsDeleted = false;
                                 existing.ProductName = SelectedProduct.ProductName;
@@ -100,7 +105,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                         }
                         else
                         {
-                            MessageBox.Show("Mã sản phẩm đã tồn tại!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                            _notificationService.ShowError(UiText.Messages.ProductAlreadyExists, UiText.Titles.Error);
                             return;
                         }
                     }
@@ -120,20 +125,20 @@ namespace AutoWeighbridgeSystem.ViewModels
                     else
                     {
                         // Trường hợp hy hữu: Đang sửa mà bản ghi bị ai đó xóa mất trong DB
-                        MessageBox.Show("Không tìm thấy sản phẩm để cập nhật!", "Lỗi");
+                        _notificationService.ShowError(UiText.Messages.ProductNotFoundToUpdate, UiText.Titles.Error);
                         return;
                     }
                 }
 
                 await db.SaveChangesAsync();
-                MessageBox.Show("Lưu dữ liệu thành công!", "Thành công");
+                _notificationService.ShowInfo(UiText.Messages.ProductSaveSuccess, UiText.Titles.Success);
 
                 await LoadDataAsync();
                 ClearForm();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi hệ thống: " + ex.Message);
+                _notificationService.ShowError(UiText.Messages.SystemErrorWithDetail(ex.Message));
             }
         }
 
@@ -145,10 +150,11 @@ namespace AutoWeighbridgeSystem.ViewModels
             // Đảm bảo mã xóa cũng được chuẩn hóa
             string cleanId = SelectedProduct.ProductId.Trim().ToUpper();
 
-            var result = MessageBox.Show($"Xác nhận xóa mã: {cleanId}?",
-                                        "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.Yes)
+            if (_notificationService.Confirm(
+                UiText.Messages.DeleteProductConfirm(cleanId),
+                "Xác nhận xóa",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning))
             {
                 try
                 {
@@ -161,10 +167,10 @@ namespace AutoWeighbridgeSystem.ViewModels
                         await db.SaveChangesAsync();
                         await LoadDataAsync();
                         ClearForm();
-                        MessageBox.Show("Đã xóa sản phẩm thành công!");
+                        _notificationService.ShowInfo(UiText.Messages.ProductDeleteSuccess);
                     }
                 }
-                catch (Exception ex) { MessageBox.Show("Lỗi khi xóa: " + ex.Message); }
+                catch (Exception ex) { _notificationService.ShowError(UiText.Messages.DeleteError(ex.Message)); }
             }
         }
 
@@ -191,10 +197,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                     ProductList = new ObservableCollection<Product>(list);
                 });
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Lỗi load dữ liệu: " + ex.Message);
-            }
+            catch (Exception ex) { _notificationService.LogError(ex, "Lỗi load dữ liệu sản phẩm"); }
         }
     }
 }

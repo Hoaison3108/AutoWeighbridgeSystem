@@ -1,5 +1,5 @@
 ﻿using AutoWeighbridgeSystem.Services;
-using AutoWeighbridgeSystem.ViewModels;
+using AutoWeighbridgeSystem.Common;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
@@ -22,6 +22,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly WeighingHistoryViewModel _historyVm; // Bổ sung module Lịch sử
         private readonly SettingsViewModel _settingsVm;
         private readonly AppSession _appSession;
+        private readonly IUserNotificationService _notificationService;
 
         // --- 3. CONSTRUCTOR (Đồng nhất qua Injection) ---
 
@@ -32,7 +33,8 @@ namespace AutoWeighbridgeSystem.ViewModels
             ProductViewModel productVm,
             WeighingHistoryViewModel historyVm, // Inject module Lịch sử
             SettingsViewModel settingsVm,
-            AppSession appSession)
+            AppSession appSession,
+            IUserNotificationService notificationService)
         {
             _dashboardVm = dashboardVm;
             _registrationVm = registrationVm;
@@ -41,6 +43,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _historyVm = historyVm;
             _settingsVm = settingsVm;
             _appSession = appSession;
+            _notificationService = notificationService;
 
             // Mặc định hiển thị Dashboard khi khởi động
             _currentView = _dashboardVm;
@@ -72,9 +75,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [RelayCommand]
         private void Logout()
         {
-            var result = MessageBox.Show("Bạn có chắc chắn muốn đăng xuất?", "Xác nhận",
-                                        MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result == MessageBoxResult.Yes)
+            if (_notificationService.Confirm(UiText.Messages.LogoutConfirm, UiText.Titles.Confirm))
             {
                 Application.Current.Shutdown();
             }

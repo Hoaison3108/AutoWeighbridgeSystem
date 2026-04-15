@@ -1,9 +1,11 @@
 ﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using AutoWeighbridgeSystem.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -19,6 +21,7 @@ namespace AutoWeighbridgeSystem.ViewModels
     {
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly IConfiguration _configuration;
+        private readonly IUserNotificationService _notificationService;
 
         // --- 1. QUẢN LÝ DANH SÁCH USER ---
         [ObservableProperty] private ObservableCollection<User> _userList = new();
@@ -80,10 +83,14 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _rfidDeskParity;
         [ObservableProperty] private string _rfidDeskStopBits;
 
-        public SettingsViewModel(IDbContextFactory<AppDbContext> dbContextFactory, IConfiguration configuration)
+        public SettingsViewModel(
+            IDbContextFactory<AppDbContext> dbContextFactory,
+            IConfiguration configuration,
+            IUserNotificationService notificationService)
         {
             _dbContextFactory = dbContextFactory;
             _configuration = configuration;
+            _notificationService = notificationService;
             LoadConfig();
             _ = LoadUsersAsync();
         }
@@ -147,7 +154,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Lỗi Load Config: " + ex.Message);
+                _notificationService.LogError(ex, "Lỗi Load Config");
             }
         }
 
@@ -243,11 +250,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 File.WriteAllText(jsonPath, root.ToJsonString(options));
 
-                MessageBox.Show("Lưu cấu hình thành công! Hãy khởi động lại ứng dụng.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                _notificationService.ShowInfo(UiText.Messages.SaveConfigSuccess, UiText.Titles.Info);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi lưu cấu hình: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                _notificationService.ShowError(UiText.Messages.SaveConfigError(ex.Message), UiText.Titles.Error);
             }
         }
 
