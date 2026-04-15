@@ -62,12 +62,10 @@ namespace AutoWeighbridgeSystem.Services
                     }
 
                     // Lấy thông tin xe để bốc khối lượng bì
-                    var vehicle = await db.Vehicles.FindAsync(vehicleId);
-                    // NẾU KHÔNG THẤY THEO ID, THỬ TÌM THEO BIỂN SỐ (Xử lý cho gõ tay)
-                    if (vehicle == null)
-                    {
-                        vehicle = await db.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate && !v.IsDeleted);
-                    }
+                    // TỐI ƯU: Gọi DB 1 lần duy nhất, tắt Tracking để chạy nhanh nhất có thể
+                    var vehicle = await db.Vehicles
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(v => (v.VehicleId == vehicleId || v.LicensePlate == licensePlate) && !v.IsDeleted);
 
                     if (vehicle == null)
                     {
@@ -181,17 +179,17 @@ namespace AutoWeighbridgeSystem.Services
         {
             string prefix = DateTime.Now.ToString("yyMMdd");
 
-            // Tìm phiếu cuối cùng trong ngày (Bỏ qua bộ lọc IsVoid để đếm số thứ tự chính xác)
-            var lastTicket = await db.WeighingTickets
+            // TỐI ƯU: Chỉ lấy đúng cột TicketID, lấy giá trị Max trực tiếp trên SQL Server
+            var maxTicketId = await db.WeighingTickets
                 .IgnoreQueryFilters()
                 .Where(t => t.TicketID.StartsWith(prefix))
-                .OrderByDescending(t => t.TicketID)
-                .FirstOrDefaultAsync();
+                .Select(t => t.TicketID) // Không kéo cả Entity về
+                .MaxAsync();             // SQL Server tính Max rất nhanh
 
             int nextNum = 1;
-            if (lastTicket != null && lastTicket.TicketID.Contains("-"))
+            if (!string.IsNullOrEmpty(maxTicketId) && maxTicketId.Contains("-"))
             {
-                if (int.TryParse(lastTicket.TicketID.Split('-').Last(), out int num))
+                if (int.TryParse(maxTicketId.Split('-').Last(), out int num))
                 {
                     nextNum = num + 1;
                 }

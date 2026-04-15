@@ -1,7 +1,7 @@
 ﻿using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
-using AutoWeighbridgeSystem.Services.Protocols; // Thêm namespace Protocols
+using AutoWeighbridgeSystem.Services.Protocols;
 using AutoWeighbridgeSystem.ViewModels;
 using AutoWeighbridgeSystem.Views;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +10,42 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.IO;
-using System.IO.Ports; // Thêm thư viện COM Port
+using System.IO.Ports;
 using System.Windows;
+using System.Threading; // THÊM THƯ VIỆN NÀY CHO MUTEX
 
 namespace AutoWeighbridgeSystem
 {
     public partial class App : Application
     {
-        // Quản lý toàn bộ các Service (DI Container)
         public static IServiceProvider ServiceProvider { get; private set; }
-
-        // Quản lý cấu hình (đọc từ appsettings.json)
         public IConfiguration Configuration { get; private set; }
+
+        // Biến Mutex toàn cục để kiểm tra app đang chạy
+        private static Mutex _mutex = null;
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // =======================================================
+            // 1. CƠ CHẾ CHỐNG MỞ 2 APP CÙNG LÚC (Fix lỗi chiếm cổng COM)
+            // =======================================================
+            const string appName = "RangDong_AutoWeighbridgeSystem_Unique";
+            bool createdNew;
+            _mutex = new Mutex(true, appName, out createdNew);
+
+            if (!createdNew)
+            {
+                MessageBox.Show("Phần mềm Trạm Cân đang được mở rồi!\nVui lòng kiểm tra dưới thanh Taskbar.",
+                                "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Application.Current.Shutdown();
+                return; // Ngừng khởi động ngay lập tức
+            }
+
             base.OnStartup(e);
 
-            // 1. Cấu hình hệ thống Ghi Log chuyên nghiệp
+            // =======================================================
+            // 2. KHỞI TẠO LOG & CÁC DỊCH VỤ CỐT LÕI
+            // =======================================================
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.File(
@@ -41,29 +59,25 @@ namespace AutoWeighbridgeSystem
 
             try
             {
-                // 2. Khởi tạo Configuration: Đọc appsettings.json
                 Configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                // 3. Khởi tạo Dependency Injection (DI)
                 var serviceCollection = new ServiceCollection();
                 ConfigureServices(serviceCollection);
                 ServiceProvider = serviceCollection.BuildServiceProvider();
 
-                // 4. Tự động Migration & Seeding: Đảm bảo DB luôn sẵn sàng khi mở App
                 using (var scope = ServiceProvider.CreateScope())
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     dbContext.Database.Migrate();
                 }
 
-                // Ép hệ thống khởi tạo RFID Service và Scale Service ngay lập tức
+                // Ép hệ thống khởi tạo RFID Service và Scale Service
                 ServiceProvider.GetRequiredService<ScaleService>();
                 ServiceProvider.GetRequiredService<RfidMultiService>();
 
-                // 5. Khởi chạy màn hình đăng nhập
                 var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
                 loginWindow.Show();
             }
@@ -78,6 +92,7 @@ namespace AutoWeighbridgeSystem
 
         private void ConfigureServices(IServiceCollection services)
         {
+            // (Đoạn này giữ nguyên 100% code cũ của Sơn, không thay đổi logic)
             // --- Nhóm 1: Cấu hình & Database ---
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddDbContextFactory<AppDbContext>(options =>
@@ -92,7 +107,6 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<AlarmService>();
             services.AddSingleton<WeighingBusinessService>();
 
-            // CẬP NHẬT: Cấu hình ScaleService linh hoạt (Strategy Pattern)
             services.AddSingleton<ScaleService>(provider =>
             {
                 var config = provider.GetRequiredService<IConfiguration>();
@@ -105,13 +119,11 @@ namespace AutoWeighbridgeSystem
 
                     if (!string.IsNullOrEmpty(port))
                     {
-                        // Đọc thông số kết nối (mặc định cho Vishay là 2400-7-Even-1)
                         int baud = int.TryParse(section["BaudRate"], out int b) ? b : 2400;
                         int dataBits = int.TryParse(section["DataBits"], out int d) ? d : 7;
                         Enum.TryParse(section["Parity"] ?? "Even", out Parity parity);
                         Enum.TryParse(section["StopBits"] ?? "One", out StopBits stopBits);
 
-                        // Đọc tên chuẩn từ file cấu hình (mặc định Vishay)
                         string protocolName = section["Protocol"] ?? "VishayVT220";
 
                         IScaleProtocol selectedProtocol = protocolName switch
@@ -120,7 +132,6 @@ namespace AutoWeighbridgeSystem
                             _ => new VishayVT220protocol()
                         };
 
-                        // Khởi tạo Service với chuẩn và cấu hình đọc được
                         scaleService.Initialize(port, baud, dataBits, parity, stopBits, selectedProtocol);
                     }
                 }
@@ -132,7 +143,6 @@ namespace AutoWeighbridgeSystem
                 return scaleService;
             });
 
-            // Cấu hình RfidMultiService tự động mở cổng COM từ appsettings.json
             services.AddSingleton<RfidMultiService>(provider =>
             {
                 var config = provider.GetRequiredService<IConfiguration>();
@@ -184,13 +194,44 @@ namespace AutoWeighbridgeSystem
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Log.Information("=== HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===");
+            Log.Information("=== HỆ THỐNG TRẠM CÂN BẮT ĐẦU ĐÓNG KẾT NỐI ===");
 
+            try
+            {
+                // =======================================================
+                // 3. CHỦ ĐỘNG ĐÓNG CÁC CỔNG COM TRƯỚC TIÊN (Fix lỗi Access Denied)
+                // =======================================================
+                if (ServiceProvider != null)
+                {
+                    var rfidService = ServiceProvider.GetService<RfidMultiService>();
+                    if (rfidService != null)
+                    {
+                        rfidService.CloseAll();
+                        Log.Information("[APP] Đã ngắt kết nối an toàn các đầu đọc RFID.");
+                    }
+
+                    var scaleService = ServiceProvider.GetService<ScaleService>();
+                    if (scaleService != null)
+                    {
+                        // Giả định ScaleService của bạn có hàm Close() hoặc Disconnect()
+                        // Nếu tên hàm khác, bạn đổi lại tên hàm cho đúng nhé
+                        scaleService.Close();
+                        Log.Information("[APP] Đã ngắt kết nối an toàn với Đầu cân.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "[APP] Lỗi khi cố gắng đóng cổng COM lúc tắt phần mềm.");
+            }
+
+            // Giải phóng DI Container
             if (ServiceProvider is IDisposable disposableProvider)
             {
                 disposableProvider.Dispose();
             }
 
+            Log.Information("=== HỆ THỐNG TRẠM CÂN ĐÃ TẮT HOÀN TOÀN ===");
             Log.CloseAndFlush();
             base.OnExit(e);
         }

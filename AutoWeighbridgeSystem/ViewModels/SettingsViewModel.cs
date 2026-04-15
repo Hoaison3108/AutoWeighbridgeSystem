@@ -160,15 +160,26 @@ namespace AutoWeighbridgeSystem.ViewModels
                 string jsonString = File.ReadAllText(jsonPath);
                 var root = JsonNode.Parse(jsonString);
 
-                // DB & Camera
+                // Đảm bảo Root không bị null (Phòng trường hợp file JSON trống trơn)
+                if (root == null) root = new JsonObject();
+
+                // ==========================================
+                // 1. DB & Camera
+                // ==========================================
+                if (root["ConnectionStrings"] == null) root["ConnectionStrings"] = new JsonObject();
                 root["ConnectionStrings"]["DefaultConnection"] = DbConnectionString;
+
+                if (root["CameraSettings"] == null) root["CameraSettings"] = new JsonObject();
                 root["CameraSettings"]["IpAddress"] = CamIpAddress;
                 root["CameraSettings"]["RtspPort"] = CamRtspPort;
                 root["CameraSettings"]["Username"] = CamUsername;
                 root["CameraSettings"]["Password"] = CamPassword;
                 root["CameraSettings"]["RtspUrl"] = CamRtspUrl;
 
-                // Scale
+                // ==========================================
+                // 2. Scale Settings
+                // ==========================================
+                if (root["ScaleSettings"] == null) root["ScaleSettings"] = new JsonObject();
                 var scale = root["ScaleSettings"];
                 scale["Protocol"] = ScaleProtocol;
                 scale["ComPort"] = ScaleComPort;
@@ -184,7 +195,10 @@ namespace AutoWeighbridgeSystem.ViewModels
                 scale["DefaultToAutoMode"] = DefaultToAutoMode;
                 scale["DefaultToOnePassMode"] = DefaultToOnePassMode;
 
-                // Relay
+                // ==========================================
+                // 3. Relay Settings
+                // ==========================================
+                if (root["RelaySettings"] == null) root["RelaySettings"] = new JsonObject();
                 var relay = root["RelaySettings"];
                 relay["ComPort"] = RelayComPort;
                 relay["BaudRate"] = RelayBaudRate;
@@ -193,27 +207,39 @@ namespace AutoWeighbridgeSystem.ViewModels
                 relay["StopBits"] = RelayStopBits;
                 relay["AlarmDurationMs"] = RelayAlarmDuration;
 
-                // RFID
+                // ==========================================
+                // 4. RFID Settings
+                // ==========================================
+                if (root["RfidSettings"] == null) root["RfidSettings"] = new JsonObject();
                 var rfid = root["RfidSettings"];
 
+                // Nhánh Scale In
+                if (rfid["ScaleIn"] == null) rfid["ScaleIn"] = new JsonObject();
                 rfid["ScaleIn"]["ComPort"] = RfidInPort;
                 rfid["ScaleIn"]["BaudRate"] = RfidInBaudRate;
                 rfid["ScaleIn"]["DataBits"] = RfidInDataBits;
                 rfid["ScaleIn"]["Parity"] = RfidInParity;
                 rfid["ScaleIn"]["StopBits"] = RfidInStopBits;
 
+                // Nhánh Scale Out
+                if (rfid["ScaleOut"] == null) rfid["ScaleOut"] = new JsonObject();
                 rfid["ScaleOut"]["ComPort"] = RfidOutPort;
                 rfid["ScaleOut"]["BaudRate"] = RfidOutBaudRate;
                 rfid["ScaleOut"]["DataBits"] = RfidOutDataBits;
                 rfid["ScaleOut"]["Parity"] = RfidOutParity;
                 rfid["ScaleOut"]["StopBits"] = RfidOutStopBits;
 
+                // Nhánh Desk (Bàn làm việc)
+                if (rfid["Desk"] == null) rfid["Desk"] = new JsonObject();
                 rfid["Desk"]["ComPort"] = RfidDeskPort;
                 rfid["Desk"]["BaudRate"] = RfidDeskBaudRate;
                 rfid["Desk"]["DataBits"] = RfidDeskDataBits;
                 rfid["Desk"]["Parity"] = RfidDeskParity;
                 rfid["Desk"]["StopBits"] = RfidDeskStopBits;
 
+                // ==========================================
+                // LƯU FILE
+                // ==========================================
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 File.WriteAllText(jsonPath, root.ToJsonString(options));
 

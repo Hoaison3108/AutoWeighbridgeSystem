@@ -284,32 +284,70 @@
                                     </WrapPanel>
                                 </Expander>
 
-                                <Expander Header="📷 CAMERA &amp; RELAY &amp; DATABASE" IsExpanded="False">
+                                <Expander Header="📷 CAMERA &amp; RELAY &amp; DATABASE" IsExpanded="True">
                                     <WrapPanel>
                                         <GroupBox Header="CAMERA RTSP" Width="385" Margin="0,0,10,10">
-                                            <StackPanel>
-                                                <TextBlock Text="RTSP URL:" Style="{StaticResource LabelStyle}"/>
-                                                <TextBox Text="{Binding CamRtspUrl}" FontSize="10"/>
+                                            <StackPanel Margin="5">
+                                                <UniformGrid Columns="2">
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="IP Address:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding CamIpAddress}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="RTSP Port:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding CamRtspPort}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Username:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding CamUsername}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Password:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding CamPassword}"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                                <StackPanel Margin="2,5,2,0">
+                                                    <TextBlock Text="RTSP URL (Tổng hợp):" Style="{StaticResource LabelStyle}"/>
+                                                    <TextBox Text="{Binding CamRtspUrl}" FontSize="10"/>
+                                                </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
+
                                         <GroupBox Header="ĐIỀU KHIỂN RELAY" Width="385" Margin="0,0,10,10">
-                                            <UniformGrid Columns="3">
-                                                <StackPanel Margin="2">
-                                                    <TextBlock Text="COM:" Style="{StaticResource LabelStyle}"/>
-                                                    <TextBox Text="{Binding RelayComPort}"/>
-                                                </StackPanel>
-                                                <StackPanel Margin="2">
-                                                    <TextBlock Text="Baud:" Style="{StaticResource LabelStyle}"/>
-                                                    <TextBox Text="{Binding RelayBaudRate}"/>
-                                                </StackPanel>
-                                                <StackPanel Margin="2">
-                                                    <TextBlock Text="Còi (ms):" Style="{StaticResource LabelStyle}"/>
-                                                    <TextBox Text="{Binding RelayAlarmDuration}"/>
-                                                </StackPanel>
-                                            </UniformGrid>
+                                            <StackPanel Margin="5">
+                                                <UniformGrid Columns="3">
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="COM:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding RelayComPort}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Baud:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding RelayBaudRate}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="DataBits:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding RelayDataBits}"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                                <UniformGrid Columns="3" Margin="0,5,0,0">
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Parity:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding RelayParity}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="StopBits:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding RelayStopBits}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Còi (ms):" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding RelayAlarmDuration}"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                            </StackPanel>
                                         </GroupBox>
-                                        <GroupBox Header="SQL SERVER" Width="385">
-                                            <StackPanel>
+
+                                        <GroupBox Header="SQL SERVER" Width="385" Margin="0,0,0,10">
+                                            <StackPanel Margin="5">
                                                 <TextBlock Text="Connection String:" Style="{StaticResource LabelStyle}"/>
                                                 <TextBox Text="{Binding DbConnectionString}" FontSize="10" Height="45" TextWrapping="Wrap"/>
                                             </StackPanel>

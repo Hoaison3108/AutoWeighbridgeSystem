@@ -174,9 +174,11 @@ D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.AssemblyInfoInputs.cache
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.AssemblyInfo.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.csproj.CoreCompileInputs.cache
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.sourcelink.json
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeig.9E02DC97.Up2Date
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.dll
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\refint\AutoWeighbridgeSystem.dll
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.pdb
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.genruntimeconfig.cache
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\ref\AutoWeighbridgeSystem.dll
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem_Content.g.cs

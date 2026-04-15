@@ -931,3 +931,26 @@ Error Number:547,State:0,Class:16
 2026-04-13 16:44:31.427 [INF] [ALARM] Đã kích hoạt còi báo thành công.
 2026-04-13 16:45:24.739 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===
 2026-04-13 16:45:24.850 [INF] [SCALE] Đã đóng cổng cân.
+2026-04-13 21:42:09.605 [INF] === HỆ THỐNG TRẠM CÂN BẮT ĐẦU KHỞI ĐỘNG ===
+2026-04-13 21:42:11.735 [ERR] [SCALE] Lỗi khởi tạo cổng COM7
+System.UnauthorizedAccessException: Access to the path 'COM7' is denied.
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.ScaleService.Initialize(String portName, Int32 baudRate, Int32 dataBits, Parity parity, StopBits stopBits, IScaleProtocol protocol) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\ScaleService.cs:line 52
+2026-04-13 21:42:11.768 [ERR] [RFID] THẤT BẠI khi mở cổng COM4 cho Desk
+System.UnauthorizedAccessException: Access to the path 'COM4' is denied.
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 67
+2026-04-13 21:42:11.780 [ERR] [RFID] THẤT BẠI khi mở cổng COM3 cho ScaleIn
+System.UnauthorizedAccessException: Access to the path 'COM3' is denied.
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 67
+2026-04-13 21:42:11.791 [ERR] [RFID] THẤT BẠI khi mở cổng COM2 cho ScaleOut
+System.UnauthorizedAccessException: Access to the path 'COM2' is denied.
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at AutoWeighbridgeSystem.Services.RfidMultiService.AddReader(String roleName, String comPort, Int32 baudRate) in D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\Services\RfidMultiService.cs:line 67
+2026-04-13 21:42:18.258 [INF] Người dùng admin đã đăng nhập thành công
+2026-04-13 21:42:27.257 [INF] === HỆ THỐNG TRẠM CÂN ĐÓNG KẾT NỐI ===

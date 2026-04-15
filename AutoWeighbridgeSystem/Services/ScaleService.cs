@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using AutoWeighbridgeSystem.Services.Protocols;
 using Serilog;
 
@@ -14,21 +14,21 @@ namespace AutoWeighbridgeSystem.Services
         private SerialPort _serialPort;
         private IScaleProtocol _protocol;
 
-        // Dùng Queue để tối ưu hiệu năng O(1) thay vì List.RemoveAt(0) là O(n)
         private readonly Queue<decimal> _weightBuffer = new Queue<decimal>();
-
-        // Buffer trung gian để ghép các mảnh chuỗi bị cắt đoạn từ cổng COM
         private readonly StringBuilder _incomingDataBuffer = new StringBuilder();
 
-        private const int BufferSize = 20; // Khoảng 2 giây nếu đầu cân gửi 10Hz
+        private const int BufferSize = 10;
+
+        // === CÁC BIẾN CHO THROTTLING THÔNG MINH ===
+        private readonly Stopwatch _uiThrottleStopwatch = Stopwatch.StartNew();
+        private const int MinUiUpdateIntervalMs = 40; // ~25 FPS cho UI siêu mượt
+        private bool _lastBroadcastedStableState = false; // Nhớ trạng thái để không bỏ lỡ nhịp chốt
+
         public decimal CurrentWeight { get; private set; }
         public bool IsScaleStable { get; private set; }
 
         public event Action<decimal, bool> WeightChanged;
 
-        /// <summary>
-        /// Khởi tạo kết nối cân với chuẩn Protocol linh hoạt
-        /// </summary>
         public void Initialize(string portName, int baudRate, int dataBits, Parity parity, StopBits stopBits, IScaleProtocol protocol)
         {
             try
@@ -45,7 +45,7 @@ namespace AutoWeighbridgeSystem.Services
                 {
                     Encoding = Encoding.ASCII,
                     ReadTimeout = 500,
-                    ReceivedBytesThreshold = 1 // Kích hoạt sự kiện ngay khi có 1 byte
+                    ReceivedBytesThreshold = 1
                 };
 
                 _serialPort.DataReceived += SerialPort_DataReceived;
@@ -65,44 +65,69 @@ namespace AutoWeighbridgeSystem.Services
 
             try
             {
-                // 1. Đọc tất cả dữ liệu đang có và cộng dồn vào StringBuilder
+                // Đọc TẤT CẢ những gì đang kẹt trong cổng COM
                 string rawData = _serialPort.ReadExisting();
                 _incomingDataBuffer.Append(rawData);
 
-                // 2. Chuyển cho Protocol mổ xẻ chuỗi
-                // Protocol sẽ tìm trong đống "xà bần" dữ liệu xem có con số nào hợp lệ không
-                decimal? parsedWeight = _protocol.ParseWeight(_incomingDataBuffer.ToString());
+                string currentBuffer = _incomingDataBuffer.ToString();
 
-                if (parsedWeight.HasValue)
+                // 1. Tìm vị trí của cờ P+ hoặc @+ TỪ CUỐI LÊN (Lấy tín hiệu mới nhất)
+                int pIndex = currentBuffer.LastIndexOf("P+");
+                int aIndex = currentBuffer.LastIndexOf("@+");
+                int targetIndex = Math.Max(pIndex, aIndex);
+
+                // 2. Nếu tìm thấy và đủ độ dài (VD: P+029780 cần 8 ký tự)
+                if (targetIndex != -1 && targetIndex + 8 <= currentBuffer.Length)
                 {
-                    ProcessWeightStability(parsedWeight.Value);
+                    string weightStr = currentBuffer.Substring(targetIndex + 2, 6);
 
-                    // Xóa buffer sau khi đã tìm thấy số cân hợp lệ để tránh tích tụ dữ liệu cũ
+                    if (decimal.TryParse(weightStr, out decimal weight))
+                    {
+                        bool isHardwareStable = (targetIndex == pIndex);
+
+                        // Đẩy số mới nhất đi xử lý
+                        ProcessWeightStability(weight, isHardwareStable);
+
+                        // QUAN TRỌNG NHẤT: Xóa sạch toàn bộ buffer để triệt tiêu độ trễ!
+                        _incomingDataBuffer.Clear();
+                    }
+                }
+                else if (_incomingDataBuffer.Length > 200)
+                {
+                    // Chống tràn bộ nhớ nếu nhiễu tín hiệu
                     _incomingDataBuffer.Clear();
                 }
-
-                // Chống tràn bộ nhớ nếu nhận rác liên tục mà không parse được số
-                if (_incomingDataBuffer.Length > 200) _incomingDataBuffer.Clear();
             }
             catch (Exception ex)
             {
-                Log.Debug("[SCALE] Nhiễu tín hiệu: {Msg}", ex.Message);
+                Log.Debug("[SCALE] Nhiễu tín hiệu DataReceived: {Msg}", ex.Message);
             }
         }
 
-        private void ProcessWeightStability(decimal weight)
+        private void ProcessWeightStability(decimal weight, bool isHardwareStable)
         {
             CurrentWeight = weight;
 
-            // Thuật toán Rolling Window bằng Queue
-            _weightBuffer.Enqueue(weight);
-            if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
-
-            // Logic xét ổn định: Dao động trong buffer không quá 5kg (có thể cấu hình lại)
+            // === 1. THUẬT TOÁN LAI (HYBRID STABILITY) ===
             if (weight > 50)
             {
-                decimal delta = _weightBuffer.Max() - _weightBuffer.Min();
-                IsScaleStable = (_weightBuffer.Count >= BufferSize) && (delta <= 5);
+                // Nếu phần cứng báo ổn định (có chữ P+) -> Chốt ngay lập tức, độ trễ 0s
+                if (isHardwareStable)
+                {
+                    IsScaleStable = true;
+                    // Reset lại buffer mềm để chuẩn bị cho lần cân tiếp theo
+                    if (_weightBuffer.Count > 0) _weightBuffer.Clear();
+                }
+                else
+                {
+                    // Nếu phần cứng báo dao động (@+), đẩy vào Buffer để phần mềm tự tính
+                    _weightBuffer.Enqueue(weight);
+                    if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
+
+                    // Tăng độ lệch lên 10kg theo yêu cầu chống rung
+                    decimal delta = _weightBuffer.Count > 0 ? _weightBuffer.Max() - _weightBuffer.Min() : 0;
+                    IsScaleStable = (_weightBuffer.Count >= BufferSize) && (delta <= 10);
+                }
             }
             else
             {
@@ -110,8 +135,18 @@ namespace AutoWeighbridgeSystem.Services
                 if (_weightBuffer.Count > 0) _weightBuffer.Clear();
             }
 
-            // Bắn sự kiện cập nhật UI
-            WeightChanged?.Invoke(CurrentWeight, IsScaleStable);
+            // === 2. THROTTLING THÔNG MINH (BẢO VỆ GIAO DIỆN) ===
+            bool stateChanged = (IsScaleStable != _lastBroadcastedStableState);
+
+            // Bắn Event NẾU: Trạng thái vừa thay đổi (Ưu tiên tuyệt đối) HOẶC đã đủ thời gian 40ms
+            if (stateChanged || _uiThrottleStopwatch.ElapsedMilliseconds >= MinUiUpdateIntervalMs)
+            {
+                WeightChanged?.Invoke(CurrentWeight, IsScaleStable);
+
+                // Cập nhật lại bộ nhớ đệm cho lần sau
+                _lastBroadcastedStableState = IsScaleStable;
+                _uiThrottleStopwatch.Restart();
+            }
         }
 
         public void Close()

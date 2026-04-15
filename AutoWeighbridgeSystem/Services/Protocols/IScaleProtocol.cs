@@ -11,7 +11,7 @@ namespace AutoWeighbridgeSystem.Services.Protocols
         // Tên định danh của chuẩn (vd: Yaohua, Kingbird, Cas)
         string ProtocolName { get; }
 
-        // Hàm bóc tách số từ chuỗi thô
-        decimal? ParseWeight(string rawData);
+        // Trả về số cân VÀ cờ ổn định của phần cứng
+        (decimal Weight, bool IsHardwareStable)? ParseWeight(string rawData);
     }
 }
