@@ -36,7 +36,7 @@ namespace AutoWeighbridgeSystem.Services
         // THROTTLING UI
         // =========================================================================
         private readonly Stopwatch _uiThrottleStopwatch = Stopwatch.StartNew();
-        private const int MinUiUpdateIntervalMs = 40;
+        private const int MinUiUpdateIntervalMs = 20; // 50 FPS (Siêu nhạy)
         private bool _lastBroadcastedStableState = false;
 
         // =========================================================================

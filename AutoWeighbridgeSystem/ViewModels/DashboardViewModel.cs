@@ -102,10 +102,8 @@ namespace AutoWeighbridgeSystem.ViewModels
         public bool IsManualMode => !IsAutoMode;
 
         // =========================================================================
-        // UI REFRESH TIMER — chỉ polling hiển thị số cân, không chứa logic
+        // UI REFRESH (Event-driven realtime)
         // =========================================================================
-        private DispatcherTimer _uiRefreshTimer;
-        private const int RefreshIntervalMs = 40;
 
         // =========================================================================
         // CONSTRUCTOR
@@ -135,7 +133,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             LoadUiConfiguration();
             InitializeCamera();
-            InitializeUiRefreshTimer();
+            SubscribeToScaleEvent();
             SubscribeToCoordinatorEvents();
 
             // Khởi động Coordinator — truyền Func<> để Coordinator đọc state VM khi cần
@@ -167,14 +165,20 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (!string.IsNullOrEmpty(url)) CameraUri = new Uri(url);
         }
 
-        private void InitializeUiRefreshTimer()
+        private void SubscribeToScaleEvent()
         {
-            _uiRefreshTimer = new DispatcherTimer
+            _scaleService.WeightChanged += OnScaleWeightChangedUiUpdate;
+        }
+
+        private void OnScaleWeightChangedUiUpdate(decimal weight, bool isStable)
+        {
+            if (IsWeightLocked) return;
+            // Ép luồng UI cập nhật ngay tức thì (Priority cao hơn Timer)
+            Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
             {
-                Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs),
-                IsEnabled = true
-            };
-            _uiRefreshTimer.Tick += UiRefreshTimer_Tick;
+                WeightDisplay = weight.ToString("N0");
+                IsScaleStable = isStable;
+            }), DispatcherPriority.DataBind);
         }
 
         /// <summary>Đăng ký lắng nghe tất cả events từ DashboardEventCoordinator.</summary>
@@ -187,15 +191,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _coordinator.PendingTimeoutStartRequested += OnPendingTimeoutStartRequested;
         }
 
-        // =========================================================================
-        // UI TIMER TICK — polling state từ ScaleService chỉ để hiển thị
-        // =========================================================================
-        private void UiRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            if (IsWeightLocked) return;
-            WeightDisplay = _scaleService.CurrentWeight.ToString("N0");
-            IsScaleStable = _scaleService.IsScaleStable;
-        }
+        // Được xử lý qua OnScaleWeightChangedUiUpdate
 
         // =========================================================================
         // COORDINATOR EVENT HANDLERS — phản ứng với quyết định từ Coordinator
@@ -536,7 +532,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         // =========================================================================
         public void Dispose()
         {
-            _uiRefreshTimer?.Stop();
+            _scaleService.WeightChanged -= OnScaleWeightChangedUiUpdate;
             _coordinator.AutoSaveRequested -= OnAutoSaveRequested;
             _coordinator.FormResetRequested -= OnFormResetRequested;
             _coordinator.CameraMessageRequested -= OnCameraMessageRequested;
