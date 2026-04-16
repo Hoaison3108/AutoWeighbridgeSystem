@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace AutoWeighbridgeSystem.Services
 {
+    /// <summary>
+    /// Dịch vụ nghiệp vụ cốt lõi của quy trình cân xe.
+    /// Xử lý toàn bộ logic cân: tạo phiếu mới (cân vào), cập nhật phiếu (cân ra),
+    /// cân 1 lần (One-Pass), tự hủy phiếu treo sau 24h, và hủy phiếu thủ công.
+    /// </summary>
     public class WeighingBusinessService
     {
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
@@ -17,6 +22,21 @@ namespace AutoWeighbridgeSystem.Services
             _dbContextFactory = dbContextFactory;
         }
 
+        /// <summary>
+        /// Xử lý một sự kiện cân: tạo phiếu mới hoặc hoàn tất phiếu đang treo.
+        /// <list type="bullet">
+        ///   <item><b>Cân 1 lần (One-Pass)</b>: dùng khối lượng bì đã đăng ký, hoàn tất ngay.</item>
+        ///   <item><b>Cân 2 lần — Lần 1</b>: tạo phiếu mới với GrossWeight, chờ lần cân thứ 2.</item>
+        ///   <item><b>Cân 2 lần — Lần 2</b>: tìm phiếu đang treo, tính Net = Gross - Tare, đóng phiếu.</item>
+        ///   <item><b>Auto-void</b>: nếu phiếu treo quá 24h, tự động hủy trước khi tạo phiếu mới.</item>
+        /// </list>
+        /// </summary>
+        /// <param name="licensePlate">Biển số xe.</param>
+        /// <param name="vehicleId">ID xe trong database (0 nếu chưa xác định).</param>
+        /// <param name="customerName">Tên khách hàng (snapshot lưu vào phiếu).</param>
+        /// <param name="productName">Tên hàng hóa (snapshot lưu vào phiếu).</param>
+        /// <param name="finalWeight">Trọng lượng đã chốt từ đầu cân (kg).</param>
+        /// <param name="isOnePassMode">Chế độ cân 1 lần hay 2 lần.</param>
         public async Task<WeighingProcessResult> ProcessWeighingAsync(
       string licensePlate, int vehicleId, string customerName, string productName, decimal finalWeight, bool isOnePassMode) // Thêm tham số isOnePassMode
         {
@@ -173,8 +193,53 @@ namespace AutoWeighbridgeSystem.Services
         }
 
         // =========================================================================
+        // HÀM HỦY PHIẾU CÂN
+        // =========================================================================
+
+        /// <summary>
+        /// Hủy một phiếu cân theo ID. Hàm được tách từ DashboardViewModel để đặt
+        /// đúng chỗ trong Business Layer.
+        /// </summary>
+        public async Task<(bool IsSuccess, string Message)> VoidTicketAsync(string ticketId, string reason = "Hủy thủ công")
+        {
+            if (string.IsNullOrWhiteSpace(ticketId))
+                return (false, "Mã phiếu không hợp lệ.");
+
+            try
+            {
+                using var db = _dbContextFactory.CreateDbContext();
+                var ticket = await db.WeighingTickets
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(t => t.TicketID == ticketId);
+
+                if (ticket == null)
+                    return (false, $"Không tìm thấy phiếu {ticketId}.");
+
+                if (ticket.IsVoid)
+                    return (false, $"Phiếu {ticketId} đã bị hủy trước đó.");
+
+                ticket.IsVoid = true;
+                ticket.VoidReason = reason;
+                db.WeighingTickets.Update(ticket);
+                await db.SaveChangesAsync();
+
+                Log.Information("[WEIGHING] Đã hủy phiếu {TicketId}, lý do: {Reason}", ticketId, reason);
+                return (true, ticketId);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "[WEIGHING] Lỗi khi hủy phiếu {TicketId}", ticketId);
+                return (false, "Lỗi hệ thống: " + ex.Message);
+            }
+        }
+
+        // =========================================================================
         // HÀM BỔ TRỢ (Sinh mã tự động)
         // =========================================================================
+        /// <summary>
+        /// Sinh mã phiếu cân theo định dạng <c>yyMMdd-xxx</c> (vd: 260416-001).
+        /// Tìm mã lớn nhất trong ngày hiện tại và tăng lên 1.
+        /// </summary>
         private async Task<string> GenerateTicketIdAsync(AppDbContext db)
         {
             string prefix = DateTime.Now.ToString("yyMMdd");

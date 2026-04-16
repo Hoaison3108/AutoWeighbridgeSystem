@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
 using AutoWeighbridgeSystem.Services.Protocols;
@@ -110,6 +110,7 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<DashboardSaveService>();
             services.AddSingleton<DashboardDataService>();
             services.AddSingleton<HardwareWatchdogService>();
+            services.AddSingleton<DashboardEventCoordinator>();
             services.AddSingleton<IUserNotificationService, UserNotificationService>();
 
             services.AddSingleton<ScaleService>(provider =>
@@ -178,6 +179,8 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<IExportService, ExcelExportService>();
             services.AddSingleton<DashboardViewModel>();
+            // Lưu ý: DashboardViewModel nhận DashboardEventCoordinator (Singleton) thay cho
+            // RfidMultiService, DashboardWorkflowService, HardwareWatchdogService, IDbContextFactory
             services.AddSingleton<VehicleRegistrationViewModel>();
             services.AddTransient<LoginViewModel>();
 

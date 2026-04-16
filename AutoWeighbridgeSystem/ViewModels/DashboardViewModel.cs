@@ -1,122 +1,192 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace AutoWeighbridgeSystem.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject, IDisposable
     {
-        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
+        // =========================================================================
+        // DEPENDENCIES
+        // =========================================================================
         private readonly IConfiguration _configuration;
         private readonly ScaleService _scaleService;
-        private readonly RfidMultiService _rfidService;
-        private readonly DashboardWorkflowService _dashboardWorkflow;
+        private readonly DashboardEventCoordinator _coordinator;
         private readonly DashboardSaveService _dashboardSaveService;
         private readonly DashboardDataService _dashboardDataService;
-        private readonly HardwareWatchdogService _hardwareWatchdogService;
+        private readonly WeighingBusinessService _weighingBusiness;
         private readonly IUserNotificationService _notificationService;
         private readonly AlarmService _alarmService;
         private readonly AppSession _appSession;
 
-        // --- CẤU HÌNH & TRẠNG THÁI ---
-        private int _queueTimeoutSeconds = 45;
-        private int _hardwareWatchdogSeconds = 15;
+        // =========================================================================
+        // TRẠNG THÁI NỘI BỘ
+        // =========================================================================
 
-        private bool _isProcessingSave = false;
+        /// <summary>
+        /// SemaphoreSlim thay cho bool thông thường — đảm bảo thread-safe khi
+        /// Scale event và RFID event có thể cùng kích hoạt ProcessAndSave.
+        /// </summary>
+        private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1, 1);
 
+        // === FFME VideoPlayer — set từ code-behind ===
         public Unosquare.FFME.MediaElement VideoPlayer { get; set; }
 
-        // --- PROPERTIES BINDING ---
+        // =========================================================================
+        // OBSERVABLE PROPERTIES (UI Binding)
+        // =========================================================================
+
+        // --- Hiển thị cân ---
         [ObservableProperty] private string _weightDisplay = "0";
         [ObservableProperty] private bool _isScaleStable = false;
+        [ObservableProperty] private decimal _lockedWeight = 0;
+        [ObservableProperty] private bool _isWeightLocked = false;
 
+        // --- Thông tin phiếu cân ---
         [ObservableProperty] private string _licensePlate = "";
         [ObservableProperty] private string _customerName = "";
         [ObservableProperty] private string _productName = "";
         [ObservableProperty] private string _rfidInput = "";
         [ObservableProperty] private string _rfidLocationLabel = "Mã thẻ RFID (Đang chờ...):";
 
-        [ObservableProperty] private bool _isAutoMode = true;
+        // --- Chế độ hoạt động ---
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsManualMode))]
+        private bool _isAutoMode = true;
         [ObservableProperty] private bool _isOnePassMode = false;
+
+        // --- Camera ---
         [ObservableProperty] private Uri _cameraUri;
         [ObservableProperty] private string _cameraStatus = "Camera Online";
 
+        // --- Danh sách lịch sử ---
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
         [ObservableProperty] private WeighingTicket _selectedRecentTicket;
 
-        [ObservableProperty] private ObservableCollection<Product> _productList = new();
-        [ObservableProperty] private Product _selectedProduct;
-        [ObservableProperty] private ObservableCollection<Vehicle> _vehicleList = new();
+        // --- Danh mục (nguồn gốc) ---
+        [ObservableProperty] private ObservableCollection<Product>  _productList  = new();
+        [ObservableProperty] private ObservableCollection<Vehicle>  _vehicleList  = new();
         [ObservableProperty] private ObservableCollection<Customer> _customerList = new();
-        [ObservableProperty] private Vehicle _selectedVehicle;
+        [ObservableProperty] private Product  _selectedProduct;
+        [ObservableProperty] private Vehicle  _selectedVehicle;
         [ObservableProperty] private Customer _selectedCustomer;
 
-        [ObservableProperty] private decimal _lockedWeight = 0;
-        [ObservableProperty] private bool _isWeightLocked = false;
+        // --- CollectionView cho Autocomplete (filter-as-you-type) ---
+        /// <summary>View đã lọc dùng cho ComboBox Biển số — binding thay thế VehicleList.</summary>
+        public ICollectionView VehicleView  { get; private set; }
+        /// <summary>View đã lọc dùng cho ComboBox Khách hàng — binding thay thế CustomerList.</summary>
+        public ICollectionView CustomerView { get; private set; }
+        /// <summary>View đã lọc dùng cho ComboBox Hàng hóa — binding thay thế ProductList.</summary>
+        public ICollectionView ProductView  { get; private set; }
 
-        // === TIMER CẬP NHẬT UI ===
+        // --- Text đang gõ trong từng ComboBox để thực hiện filter ---
+        [ObservableProperty] private string _vehicleFilterText  = "";
+        [ObservableProperty] private string _customerFilterText = "";
+        [ObservableProperty] private string _productFilterText  = "";
+
+        /// <summary>Ngược của IsAutoMode — dùng để bind IsEnabled cho ComboBox.</summary>
+        public bool IsManualMode => !IsAutoMode;
+
+        // =========================================================================
+        // UI REFRESH TIMER — chỉ polling hiển thị số cân, không chứa logic
+        // =========================================================================
         private DispatcherTimer _uiRefreshTimer;
         private const int RefreshIntervalMs = 40;
 
+        // =========================================================================
+        // CONSTRUCTOR
+        // =========================================================================
         public DashboardViewModel(
-            IDbContextFactory<AppDbContext> dbContextFactory,
             IConfiguration configuration,
             ScaleService scaleService,
-            RfidMultiService rfidService,
-            DashboardWorkflowService dashboardWorkflow,
+            DashboardEventCoordinator coordinator,
             DashboardSaveService dashboardSaveService,
             DashboardDataService dashboardDataService,
-            HardwareWatchdogService hardwareWatchdogService,
+            WeighingBusinessService weighingBusiness,
             IUserNotificationService notificationService,
             AlarmService alarmService,
             AppSession appSession)
         {
-            _dbContextFactory = dbContextFactory;
             _configuration = configuration;
             _scaleService = scaleService;
-            _rfidService = rfidService;
-            _dashboardWorkflow = dashboardWorkflow;
+            _coordinator = coordinator;
             _dashboardSaveService = dashboardSaveService;
             _dashboardDataService = dashboardDataService;
-            _hardwareWatchdogService = hardwareWatchdogService;
+            _weighingBusiness = weighingBusiness;
             _notificationService = notificationService;
             _alarmService = alarmService;
             _appSession = appSession;
 
-            LoadConfiguration();
-
-            _scaleService.WeightChanged += OnScaleWeightChanged;
-            _rfidService.CardRead += OnRfidCardRead;
-
+            LoadUiConfiguration();
             InitializeCamera();
             InitializeUiRefreshTimer();
+            SubscribeToCoordinatorEvents();
 
-            _ = LoadRecentTicketsAsync();
-            _ = LoadInitialDataAsync();
-            StartHardwareWatchdog();
+            // Khởi động Coordinator — truyền Func<> để Coordinator đọc state VM khi cần
+            _coordinator.Start(
+                getIsAutoMode:          () => IsAutoMode,
+                getIsWeightLocked:      () => IsWeightLocked,
+                getIsProcessingSave:    () => _saveLock.CurrentCount == 0,
+                getSelectedProductName: () => SelectedProduct?.ProductName ?? "Hàng hóa");
+
+            LoadInitialDataAsync().FireAndForgetSafe(ex =>
+                _notificationService.LogError(ex, "Lỗi tải danh mục lúc khởi động"));
+            LoadRecentTicketsAsync().FireAndForgetSafe(ex =>
+                _notificationService.LogError(ex, "Lỗi tải nhật ký phiếu cân lúc khởi động"));
+        }
+
+        // =========================================================================
+        // KHỞI TẠO
+        // =========================================================================
+
+        private void LoadUiConfiguration()
+        {
+            if (bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"],    out bool isAuto))    IsAutoMode    = isAuto;
+            if (bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool isOnePass)) IsOnePassMode = isOnePass;
+        }
+
+        private void InitializeCamera()
+        {
+            string url = _configuration["CameraSettings:RtspUrl"];
+            if (!string.IsNullOrEmpty(url)) CameraUri = new Uri(url);
         }
 
         private void InitializeUiRefreshTimer()
         {
             _uiRefreshTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs),
+                Interval  = TimeSpan.FromMilliseconds(RefreshIntervalMs),
                 IsEnabled = true
             };
             _uiRefreshTimer.Tick += UiRefreshTimer_Tick;
         }
 
+        /// <summary>Đăng ký lắng nghe tất cả events từ DashboardEventCoordinator.</summary>
+        private void SubscribeToCoordinatorEvents()
+        {
+            _coordinator.AutoSaveRequested         += OnAutoSaveRequested;
+            _coordinator.FormResetRequested        += OnFormResetRequested;
+            _coordinator.CameraMessageRequested    += OnCameraMessageRequested;
+            _coordinator.RfidCaptured              += OnRfidCaptured;
+            _coordinator.PendingTimeoutStartRequested += OnPendingTimeoutStartRequested;
+        }
+
+        // =========================================================================
+        // UI TIMER TICK — polling state từ ScaleService chỉ để hiển thị
+        // =========================================================================
         private void UiRefreshTimer_Tick(object sender, EventArgs e)
         {
             if (IsWeightLocked) return;
@@ -124,14 +194,43 @@ namespace AutoWeighbridgeSystem.ViewModels
             IsScaleStable = _scaleService.IsScaleStable;
         }
 
-        private void LoadConfiguration()
-        {
-            if (int.TryParse(_configuration["ScaleSettings:QueueTimeoutSeconds"], out int qt)) _queueTimeoutSeconds = qt;
-            if (int.TryParse(_configuration["ScaleSettings:HardwareWatchdogSeconds"], out int wd)) _hardwareWatchdogSeconds = wd;
+        // =========================================================================
+        // COORDINATOR EVENT HANDLERS — phản ứng với quyết định từ Coordinator
+        // =========================================================================
 
-            if (bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"], out bool isAuto)) IsAutoMode = isAuto;
-            if (bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool isOnePass)) IsOnePassMode = isOnePass;
+        private async Task OnAutoSaveRequested(decimal weight, PendingVehicleData vehicleData)
+        {
+            LicensePlate = vehicleData.LicensePlate;
+            CustomerName = vehicleData.CustomerName;
+            ProductName  = vehicleData.ProductName;
+            await ProcessAndSaveWeighingAsync(weight);
         }
+
+        private void OnFormResetRequested(string message)
+        {
+            ResetForm();
+            ShowCameraMessage(message);
+        }
+
+        private void OnCameraMessageRequested(string message, bool autoHide)
+        {
+            ShowCameraMessage(message, autoHide);
+        }
+
+        private void OnRfidCaptured(string cardId, string locationLabel)
+        {
+            RfidInput        = cardId;
+            RfidLocationLabel = locationLabel;
+        }
+
+        private void OnPendingTimeoutStartRequested()
+        {
+            _coordinator.RequestPendingTimeout();
+        }
+
+        // =========================================================================
+        // CẬP NHẬT FORM KHI CHỌN COMBO BOX
+        // =========================================================================
 
         partial void OnSelectedVehicleChanged(Vehicle value)
         {
@@ -140,7 +239,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (value.Customer != null)
             {
                 SelectedCustomer = CustomerList.FirstOrDefault(c => c.CustomerId == value.CustomerId);
-                CustomerName = value.Customer.CustomerName;
+                CustomerName     = value.Customer.CustomerName;
             }
         }
 
@@ -154,16 +253,56 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (value != null) ProductName = value.ProductName;
         }
 
+        // =========================================================================
+        // AUTOCOMPLETE FILTER HANDLERS
+        // =========================================================================
+
+        /// <summary>
+        /// Khi IsAutoMode thay đổi → xóa filter, thông báo IsManualMode thay đổi.
+        /// Việc đổi sang Auto xóa trắng filter để tránh nhầm lẫn.
+        /// </summary>
+        partial void OnIsAutoModeChanged(bool value)
+        {
+            if (value) // Chuyển sang Auto — xóa filter
+            {
+                VehicleFilterText  = "";
+                CustomerFilterText = "";
+                ProductFilterText  = "";
+            }
+        }
+
+        /// <summary>Lọc danh sách xe theo text đang gõ trong ComboBox Biển số.</summary>
+        partial void OnVehicleFilterTextChanged(string value)
+        {
+            VehicleView?.Refresh();
+        }
+
+        /// <summary>Lọc danh sách khách hàng theo text đang gõ trong ComboBox Khách hàng.</summary>
+        partial void OnCustomerFilterTextChanged(string value)
+        {
+            CustomerView?.Refresh();
+        }
+
+        /// <summary>Lọc danh sách hàng hóa theo text đang gõ trong ComboBox Hàng hóa.</summary>
+        partial void OnProductFilterTextChanged(string value)
+        {
+            ProductView?.Refresh();
+        }
+
+        // =========================================================================
+        // LOGIC LƯU PHIẾU — điều phối UI state xung quanh một lần gọi service
+        // =========================================================================
+
         private async Task ProcessAndSaveWeighingAsync(decimal finalWeight)
         {
-            if (_isProcessingSave) return;
-            _isProcessingSave = true;
+            // SemaphoreSlim(1,1): chỉ cho 1 luồng thực thi cùng lúc, không block — bỏ qua nếu đang bận
+            if (!await _saveLock.WaitAsync(0)) return;
 
             try
             {
-                LockedWeight = finalWeight;
+                LockedWeight  = finalWeight;
                 IsWeightLocked = true;
-                WeightDisplay = LockedWeight.ToString("N0");
+                WeightDisplay  = LockedWeight.ToString("N0");
 
                 var request = new DashboardSaveRequest(
                     LicensePlate,
@@ -173,13 +312,13 @@ namespace AutoWeighbridgeSystem.ViewModels
                     ProductName,
                     LockedWeight,
                     IsOnePassMode);
+
                 var result = await _dashboardSaveService.ExecuteSaveAsync(request);
 
                 if (result.IsSuccess)
                 {
                     ShowCameraMessage($"🔒 ĐÃ CHỐT: {result.FinalWeight:N0} KG\n{result.Message}", false);
                     await LoadRecentTicketsAsync();
-
                     await Task.Delay(2000);
                     ResetForm();
                 }
@@ -190,98 +329,54 @@ namespace AutoWeighbridgeSystem.ViewModels
                     IsWeightLocked = false;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 IsWeightLocked = false;
+                Log.Error(ex, "[DASHBOARD] Lỗi không xác định khi lưu phiếu cân, trọng lượng: {Weight}", finalWeight);
             }
             finally
             {
-                _isProcessingSave = false;
+                _saveLock.Release();
             }
         }
 
-        private void OnScaleWeightChanged(decimal weight, bool isStable)
-        {
-            _hardwareWatchdogService.NotifyScaleDataReceived();
-            var decision = _dashboardWorkflow.EvaluateScaleEvent(weight, isStable, IsAutoMode, _isProcessingSave, IsWeightLocked);
-            if (!decision.ShouldClearPendingAndReset && !decision.ShouldSave) return;
-
-            Application.Current?.Dispatcher.InvokeAsync(async () =>
-            {
-                if (decision.ShouldClearPendingAndReset)
-                {
-                    ResetForm();
-                    ShowCameraMessage(decision.CameraMessage);
-                    return;
-                }
-
-                if (_isProcessingSave || IsWeightLocked) return;
-
-                LicensePlate = decision.PendingVehicle.LicensePlate;
-                CustomerName = decision.PendingVehicle.CustomerName;
-                ProductName = decision.PendingVehicle.ProductName;
-                await ProcessAndSaveWeighingAsync(decision.WeightToSave);
-            });
-        }
-
-        private void OnRfidCardRead(string readerRole, string cardId)
-        {
-            Application.Current?.Dispatcher.InvokeAsync(async () =>
-            {
-                if (_dashboardWorkflow.ShouldIgnoreRfidRead(readerRole)) return;
-
-                if (readerRole == ReaderRoles.Desk) return;
-
-                RfidInput = cardId;
-                RfidLocationLabel = $"Mã thẻ RFID (Nhận từ {readerRole}):";
-
-                var selectedProductName = SelectedProduct?.ProductName ?? "Hàng hóa";
-                var decision = await _dashboardWorkflow.EvaluateRfidEventAsync(
-                    cardId,
-                    selectedProductName,
-                    IsAutoMode,
-                    IsScaleStable,
-                    _scaleService.CurrentWeight);
-
-                if (decision.ShouldShowMessage)
-                    ShowCameraMessage(decision.CameraMessage, decision.MessageAutoHide);
-
-                if (decision.ShouldStartPendingTimeout)
-                    StartPendingTimeout();
-
-                if (decision.ShouldSave)
-                {
-                    LicensePlate = decision.PendingVehicle.LicensePlate;
-                    CustomerName = decision.PendingVehicle.CustomerName;
-                    ProductName = decision.PendingVehicle.ProductName;
-                    await ProcessAndSaveWeighingAsync(decision.WeightToSave);
-                }
-            });
-        }
+        // =========================================================================
+        // COMMANDS — hành động người dùng thực hiện
+        // =========================================================================
 
         [RelayCommand]
         private void ToggleWeightLock()
         {
             if (!IsWeightLocked)
             {
-                if (!IsScaleStable) { _notificationService.ShowWarning(UiText.Messages.UnstableScaleWarning, UiText.Titles.Warning); return; }
-                if (_scaleService.CurrentWeight < _dashboardWorkflow.MinWeightThreshold) return;
+                if (!IsScaleStable)
+                {
+                    _notificationService.ShowWarning(UiText.Messages.UnstableScaleWarning, UiText.Titles.Warning);
+                    return;
+                }
+                if (_scaleService.CurrentWeight < _coordinator.MinWeightThreshold) return;
 
-                LockedWeight = _scaleService.CurrentWeight;
+                LockedWeight   = _scaleService.CurrentWeight;
                 IsWeightLocked = true;
                 ShowCameraMessage($"🔒 ĐÃ CHỐT: {LockedWeight:N0} KG", false);
             }
-            else { IsWeightLocked = false; LockedWeight = 0; }
+            else
+            {
+                IsWeightLocked = false;
+                LockedWeight   = 0;
+            }
         }
 
         [RelayCommand]
         private async Task ManualSaveAsync()
         {
-            if (IsAutoMode) { _notificationService.ShowWarning(UiText.Messages.ManualModeDisableAuto); return; }
-            if (string.IsNullOrWhiteSpace(LicensePlate)) { _notificationService.ShowWarning(UiText.Messages.EnterLicensePlate); return; }
-            if (!IsWeightLocked || LockedWeight <= 0) { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave); return; }
+            if (IsAutoMode)                               { _notificationService.ShowWarning(UiText.Messages.ManualModeDisableAuto);  return; }
+            if (string.IsNullOrWhiteSpace(LicensePlate)) { _notificationService.ShowWarning(UiText.Messages.EnterLicensePlate);       return; }
+            if (!IsWeightLocked || LockedWeight <= 0)    { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave);    return; }
 
-            if (!_notificationService.Confirm(UiText.Messages.SaveTicketConfirm(LicensePlate, LockedWeight), UiText.Titles.Confirm)) return;
+            if (!_notificationService.Confirm(UiText.Messages.SaveTicketConfirm(LicensePlate, LockedWeight), UiText.Titles.Confirm))
+                return;
+
             await ProcessAndSaveWeighingAsync(LockedWeight);
         }
 
@@ -291,21 +386,17 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (SelectedRecentTicket == null || SelectedRecentTicket.IsVoid) return;
             if (!_notificationService.Confirm(UiText.Messages.CancelTicketConfirm, UiText.Titles.Cancel)) return;
 
-            try
+            var (isSuccess, message) = await _weighingBusiness.VoidTicketAsync(SelectedRecentTicket.TicketID);
+
+            if (isSuccess)
             {
-                using var db = _dbContextFactory.CreateDbContext();
-                var ticket = await db.WeighingTickets.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.TicketID == SelectedRecentTicket.TicketID);
-                if (ticket != null)
-                {
-                    ticket.IsVoid = true;
-                    ticket.VoidReason = "Hủy thủ công";
-                    db.WeighingTickets.Update(ticket);
-                    await db.SaveChangesAsync();
-                    ShowCameraMessage($"ĐÃ HỦY: {ticket.TicketID}");
-                    await LoadRecentTicketsAsync();
-                }
+                ShowCameraMessage($"ĐÃ HỦY: {message}");
+                await LoadRecentTicketsAsync();
             }
-            catch (Exception ex) { _notificationService.LogError(ex, "Lỗi hủy phiếu"); }
+            else
+            {
+                _notificationService.ShowWarning(message);
+            }
         }
 
         [RelayCommand]
@@ -318,64 +409,80 @@ namespace AutoWeighbridgeSystem.ViewModels
             ShowCameraMessage("♻️ ĐÃ LÀM SẠCH BIỂU MẪU");
         }
 
+        // =========================================================================
+        // TẢI DỮ LIỆU
+        // =========================================================================
+
         private async Task LoadInitialDataAsync()
         {
-            try
+            var initialData = await _dashboardDataService.LoadInitialDataAsync();
+
+            Application.Current?.Dispatcher.Invoke(() =>
             {
-                var initialData = await _dashboardDataService.LoadInitialDataAsync();
+                VehicleList  = new ObservableCollection<Vehicle>(initialData.Vehicles);
+                CustomerList = new ObservableCollection<Customer>(initialData.Customers);
+                ProductList  = new ObservableCollection<Product>(initialData.Products);
 
-                Application.Current?.Dispatcher.Invoke(() =>
+                // Khởi tạo CollectionView với predicate filter — hỗ trợ autocomplete khi gõ
+                VehicleView  = CollectionViewSource.GetDefaultView(VehicleList);
+                CustomerView = CollectionViewSource.GetDefaultView(CustomerList);
+                ProductView  = CollectionViewSource.GetDefaultView(ProductList);
+
+                VehicleView.Filter = item =>
                 {
-                    VehicleList = new ObservableCollection<Vehicle>(initialData.Vehicles);
-                    CustomerList = new ObservableCollection<Customer>(initialData.Customers);
-                    ProductList = new ObservableCollection<Product>(initialData.Products);
+                    if (string.IsNullOrWhiteSpace(VehicleFilterText)) return true;
+                    return item is Vehicle v &&
+                           v.LicensePlate.Contains(VehicleFilterText, StringComparison.OrdinalIgnoreCase);
+                };
 
-                    string defProd = initialData.DefaultProductName;
-                    var prod = ProductList.FirstOrDefault(p => p.ProductName.Equals(defProd, StringComparison.OrdinalIgnoreCase));
-                    if (prod != null) { SelectedProduct = prod; ProductName = prod.ProductName; }
-                    else ProductName = defProd;
-                });
-            }
-            catch (Exception ex) { _notificationService.LogError(ex, "Lỗi tải danh mục"); }
+                CustomerView.Filter = item =>
+                {
+                    if (string.IsNullOrWhiteSpace(CustomerFilterText)) return true;
+                    return item is Customer c &&
+                           c.CustomerName.Contains(CustomerFilterText, StringComparison.OrdinalIgnoreCase);
+                };
+
+                ProductView.Filter = item =>
+                {
+                    if (string.IsNullOrWhiteSpace(ProductFilterText)) return true;
+                    return item is Product p &&
+                           p.ProductName.Contains(ProductFilterText, StringComparison.OrdinalIgnoreCase);
+                };
+
+                // Thông báo UI biết có View mới
+                OnPropertyChanged(nameof(VehicleView));
+                OnPropertyChanged(nameof(CustomerView));
+                OnPropertyChanged(nameof(ProductView));
+
+                string defProd = initialData.DefaultProductName;
+                var prod = ProductList.FirstOrDefault(p => p.ProductName.Equals(defProd, StringComparison.OrdinalIgnoreCase));
+                if (prod != null) { SelectedProduct = prod; ProductName = prod.ProductName; }
+                else ProductName = defProd;
+            });
         }
 
         public async Task LoadRecentTicketsAsync()
         {
-            try
-            {
-                var tickets = await _dashboardDataService.LoadRecentTicketsAsync();
-                Application.Current?.Dispatcher.Invoke(() => RecentTickets = new ObservableCollection<WeighingTicket>(tickets));
-            }
-            catch (Exception ex) { _notificationService.LogError(ex, "Lỗi tải nhật ký"); }
+            var tickets = await _dashboardDataService.LoadRecentTicketsAsync();
+            Application.Current?.Dispatcher.Invoke(() =>
+                RecentTickets = new ObservableCollection<WeighingTicket>(tickets));
         }
 
-        private void InitializeCamera()
-        {
-            string url = _configuration["CameraSettings:RtspUrl"];
-            if (!string.IsNullOrEmpty(url)) CameraUri = new Uri(url);
-        }
-
-        private void StartHardwareWatchdog()
-        {
-            _hardwareWatchdogService.StartHardwareWatchdog(
-                _hardwareWatchdogSeconds,
-                () => ShowCameraMessage("⚠️ MẤT TÍN HIỆU ĐẦU CÂN!", false));
-        }
+        // =========================================================================
+        // HELPERS
+        // =========================================================================
 
         private void ResetForm()
         {
-            LicensePlate = ""; CustomerName = ""; RfidInput = "";
-            SelectedVehicle = null; SelectedCustomer = null;
-            IsWeightLocked = false; LockedWeight = 0;
-            _dashboardWorkflow.ClearPendingData();
-            _hardwareWatchdogService.CancelPendingTimeout();
-        }
-
-        private void StartPendingTimeout()
-        {
-            _hardwareWatchdogService.StartPendingTimeout(
-                _queueTimeoutSeconds,
-                () => _dashboardWorkflow.ClearPendingData());
+            LicensePlate   = "";
+            CustomerName   = "";
+            RfidInput      = "";
+            SelectedVehicle  = null;
+            SelectedCustomer = null;
+            IsWeightLocked   = false;
+            LockedWeight     = 0;
+            _coordinator.ClearPendingData();
+            _coordinator.CancelPendingTimeout();
         }
 
         private void ShowCameraMessage(string msg, bool autoHide = true)
@@ -383,12 +490,19 @@ namespace AutoWeighbridgeSystem.ViewModels
             _notificationService.ShowCameraStatus(s => CameraStatus = s, msg, autoHide);
         }
 
+        // =========================================================================
+        // DISPOSE
+        // =========================================================================
         public void Dispose()
         {
-            _hardwareWatchdogService.StopAll();
             _uiRefreshTimer?.Stop();
-            _scaleService.WeightChanged -= OnScaleWeightChanged;
-            _rfidService.CardRead -= OnRfidCardRead;
+            _coordinator.AutoSaveRequested            -= OnAutoSaveRequested;
+            _coordinator.FormResetRequested           -= OnFormResetRequested;
+            _coordinator.CameraMessageRequested       -= OnCameraMessageRequested;
+            _coordinator.RfidCaptured                 -= OnRfidCaptured;
+            _coordinator.PendingTimeoutStartRequested -= OnPendingTimeoutStartRequested;
+            _coordinator.Dispose();
+            _saveLock.Dispose();
         }
     }
 }

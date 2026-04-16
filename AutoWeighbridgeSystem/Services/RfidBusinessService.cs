@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace AutoWeighbridgeSystem.Services
 {
+    /// <summary>
+    /// Dịch vụ nghiệp vụ RFID cấp cao: nhận mã thẻ thô từ đầu đọc,
+    /// làm sạch dữ liệu (lọc chữ số), rồi tra cứu database để xác định
+    /// xe nào đang gắn với thẻ đó.
+    /// Được dùng chung bởi <see cref="DashboardWorkflowService"/> và
+    /// <see cref="VehicleRegistrationViewModel"/>.
+    /// </summary>
     public class RfidBusinessService
     {
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
@@ -17,8 +24,14 @@ namespace AutoWeighbridgeSystem.Services
         }
 
         /// <summary>
-        /// Hàm dùng chung cho mọi ViewModel để xử lý mã thẻ thô
+        /// Xử lý mã thẻ RFID thô: làm sạch → tra cứu database → trả về kết quả.
+        /// <list type="bullet">
+        ///   <item>Nếu thẻ chưa đăng ký: <see cref="RfidProcessResult.IsNewCard"/> = <c>true</c>.</item>
+        ///   <item>Nếu thẻ đã gắn với xe: <see cref="RfidProcessResult.ExistingVehicle"/> chứa thông tin xe.</item>
+        /// </list>
         /// </summary>
+        /// <param name="rawCardId">Chuỗi thô nhận từ Serial Port (có thể chứa ký tự điều khiển).</param>
+        /// <returns><see cref="RfidProcessResult"/> chứa kết quả tra cứu.</returns>
         public async Task<RfidProcessResult> ProcessRawCardAsync(string rawCardId)
         {
             var result = new RfidProcessResult();
@@ -29,7 +42,7 @@ namespace AutoWeighbridgeSystem.Services
                 var match = Regex.Match(rawCardId, @"\d+");
                 if (!match.Success)
                 {
-                    result.IsSuccess = false;
+                    result.IsSuccess    = false;
                     result.ErrorMessage = $"Không tìm thấy số trong chuỗi thô: {rawCardId}";
                     return result;
                 }
@@ -46,7 +59,7 @@ namespace AutoWeighbridgeSystem.Services
             }
             catch (Exception ex)
             {
-                result.IsSuccess = false;
+                result.IsSuccess    = false;
                 result.ErrorMessage = "Lỗi Database khi tra cứu thẻ: " + ex.Message;
             }
 

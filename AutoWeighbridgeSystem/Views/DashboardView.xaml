@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AutoWeighbridgeSystem.Views.DashboardView"
+<UserControl x:Class="AutoWeighbridgeSystem.Views.DashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
@@ -42,6 +42,13 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#EEEEEE" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="Black" />
             </Style.Resources>
+            <!-- Khi ở Auto Mode (IsEnabled=False): làm mờ để người dùng biết không thể chỉnh -->
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.45"/>
+                    <Setter Property="Cursor" Value="No"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style TargetType="DataGrid">
@@ -194,7 +201,18 @@
                      IsReadOnly="{Binding IsAutoMode}" 
                      Height="38" Background="#2D2D2D" Foreground="#2196F3" 
                      VerticalContentAlignment="Center" Padding="10,0" FontWeight="Bold" Margin="0,0,5,0"/>
-                                <ComboBox Grid.Column="1" ItemsSource="{Binding VehicleList}" SelectedItem="{Binding SelectedVehicle}" DisplayMemberPath="LicensePlate" IsEditable="True" Height="38"/>
+                                <!-- IsEnabled=IsManualMode: chỉ cho phép dùng ComboBox khi ở chế độ Manual -->
+                                <!-- IsEditable=True + TextChanged: tạo hiệu ứng filter-as-you-type autocomplete -->
+                                <ComboBox x:Name="VehicleComboBox"
+                                          Grid.Column="1"
+                                          ItemsSource="{Binding VehicleView}"
+                                          SelectedItem="{Binding SelectedVehicle}"
+                                          DisplayMemberPath="LicensePlate"
+                                          IsEditable="True"
+                                          IsEnabled="{Binding IsManualMode}"
+                                          Height="38"
+                                          TextBoxBase.TextChanged="VehicleComboBox_TextChanged"
+                                          ToolTip="Gõ để lọc danh sách xe — chỉ khả dụng ở chế độ Manual"/>
                             </Grid>
 
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="KHÁCH HÀNG (GÕ TRỰC TIẾP KHI MANUAL)"/>
@@ -207,7 +225,16 @@
                      IsReadOnly="{Binding IsAutoMode}" 
                      Height="38" Background="#2D2D2D" Foreground="White" 
                      VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="12"/>
-                                <ComboBox Grid.Column="1" ItemsSource="{Binding CustomerList}" SelectedItem="{Binding SelectedCustomer}" DisplayMemberPath="CustomerName" IsEditable="True" Height="38"/>
+                                <ComboBox x:Name="CustomerComboBox"
+                                          Grid.Column="1"
+                                          ItemsSource="{Binding CustomerView}"
+                                          SelectedItem="{Binding SelectedCustomer}"
+                                          DisplayMemberPath="CustomerName"
+                                          IsEditable="True"
+                                          IsEnabled="{Binding IsManualMode}"
+                                          Height="38"
+                                          TextBoxBase.TextChanged="CustomerComboBox_TextChanged"
+                                          ToolTip="Gõ để lọc danh sách khách hàng — chỉ khả dụng ở chế độ Manual"/>
                             </Grid>
 
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="LOẠI HÀNG (GÕ TRỰC TIẾP KHI MANUAL)"/>
@@ -220,7 +247,16 @@
                      IsReadOnly="{Binding IsAutoMode}" 
                      Height="38" Background="#2D2D2D" Foreground="White" 
                      VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="12"/>
-                                <ComboBox Grid.Column="1" ItemsSource="{Binding ProductList}" SelectedItem="{Binding SelectedProduct}" DisplayMemberPath="ProductName" IsEditable="True" Height="38"/>
+                                <ComboBox x:Name="ProductComboBox"
+                                          Grid.Column="1"
+                                          ItemsSource="{Binding ProductView}"
+                                          SelectedItem="{Binding SelectedProduct}"
+                                          DisplayMemberPath="ProductName"
+                                          IsEditable="True"
+                                          IsEnabled="{Binding IsManualMode}"
+                                          Height="38"
+                                          TextBoxBase.TextChanged="ProductComboBox_TextChanged"
+                                          ToolTip="Gõ để lọc danh sách hàng hóa — chỉ khả dụng ở chế độ Manual"/>
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>

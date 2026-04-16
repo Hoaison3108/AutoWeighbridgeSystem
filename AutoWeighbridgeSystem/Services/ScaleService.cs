@@ -1,82 +1,177 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoWeighbridgeSystem.Services.Protocols;
 using Serilog;
 
 namespace AutoWeighbridgeSystem.Services
 {
+    /// <summary>
+    /// Dịch vụ giao tiếp với đầu cân điện tử qua cổng COM (Serial Port).
+    /// Chịu trách nhiệm: mở kết nối, nhận dữ liệu thô, phân tích giao thức,
+    /// tính toán trạng thái ổn định và phát sự kiện <see cref="WeightChanged"/>.
+    /// <para>
+    /// <b>Auto-Reconnect</b>: Khi mất kết nối (rút cáp, mất điện thiết bị...),
+    /// service tự động thử kết nối lại theo chu kỳ tăng dần:
+    /// 5s → 5s → 10s → 30s → 60s (lặp lại ở 60s cho đến khi thành công).
+    /// </para>
+    /// </summary>
     public class ScaleService : IDisposable
     {
+        // =========================================================================
+        // PHẦN CỨNG
+        // =========================================================================
         private SerialPort _serialPort;
         private IScaleProtocol _protocol;
 
-        private readonly Queue<decimal> _weightBuffer = new Queue<decimal>();
+        private readonly Queue<decimal> _weightBuffer     = new Queue<decimal>();
         private readonly StringBuilder _incomingDataBuffer = new StringBuilder();
-
         private const int BufferSize = 10;
 
-        // === CÁC BIẾN CHO THROTTLING THÔNG MINH ===
+        // =========================================================================
+        // THROTTLING UI
+        // =========================================================================
         private readonly Stopwatch _uiThrottleStopwatch = Stopwatch.StartNew();
-        private const int MinUiUpdateIntervalMs = 40; // ~25 FPS cho UI siêu mượt
-        private bool _lastBroadcastedStableState = false; // Nhớ trạng thái để không bỏ lỡ nhịp chốt
+        private const int MinUiUpdateIntervalMs = 40;
+        private bool _lastBroadcastedStableState = false;
 
+        // =========================================================================
+        // THÔNG SỐ KẾT NỐI (lưu lại để dùng khi reconnect)
+        // =========================================================================
+        private string _portName;
+        private int _baudRate;
+        private int _dataBits;
+        private Parity _parity;
+        private StopBits _stopBits;
+
+        // =========================================================================
+        // TRẠNG THÁI RECONNECT
+        // =========================================================================
+        private volatile bool _isConnected = false;
+        private volatile bool _isReconnecting = false;
+        private CancellationTokenSource _reconnectCts = new CancellationTokenSource();
+
+        /// <summary>Các mốc thời gian chờ (giây) giữa các lần thử kết nối lại.</summary>
+        private static readonly int[] ReconnectDelaysSeconds = { 5, 5, 10, 30, 60 };
+
+        // =========================================================================
+        // PUBLIC PROPERTIES
+        // =========================================================================
+
+        /// <summary>Trọng lượng hiện tại đọc được từ đầu cân (kg).</summary>
         public decimal CurrentWeight { get; private set; }
+
+        /// <summary>
+        /// <c>true</c> nếu đầu cân đang báo trạng thái ổn định (P+) hoặc
+        /// bộ đệm phần mềm xác nhận dao động trong ngưỡng cho phép (&lt;= 10kg).
+        /// </summary>
         public bool IsScaleStable { get; private set; }
 
-        public event Action<decimal, bool> WeightChanged;
+        /// <summary><c>true</c> khi đầu cân đang kết nối bình thường.</summary>
+        public bool IsConnected => _isConnected;
 
+        // =========================================================================
+        // EVENTS
+        // =========================================================================
+
+        /// <summary>
+        /// Sự kiện phát ra khi có dữ liệu cân mới hợp lệ.
+        /// Tham số: <c>(decimal weight, bool isStable)</c>. Tần suất tối đa ~25 lần/giây.
+        /// </summary>
+        public event Action<decimal, bool>? WeightChanged;
+
+        /// <summary>Phát ra ngay khi phát hiện mất kết nối với đầu cân.</summary>
+        public event Action? Disconnected;
+
+        /// <summary>Phát ra khi kết nối lại với đầu cân thành công.</summary>
+        public event Action? Reconnected;
+
+        /// <summary>
+        /// Phát ra trước mỗi lần thử kết nối lại.
+        /// Tham số: số lần thử (1-based).
+        /// </summary>
+        public event Action<int>? ReconnectAttempting;
+
+        // =========================================================================
+        // KHỞI TẠO
+        // =========================================================================
+
+        /// <summary>
+        /// Khởi tạo và mở kết nối với đầu cân qua cổng COM.
+        /// Lưu lại thông số kết nối để dùng khi auto-reconnect.
+        /// </summary>
         public void Initialize(string portName, int baudRate, int dataBits, Parity parity, StopBits stopBits, IScaleProtocol protocol)
+        {
+            // Lưu lại thông số để dùng khi reconnect
+            _portName  = portName;
+            _baudRate  = baudRate;
+            _dataBits  = dataBits;
+            _parity    = parity;
+            _stopBits  = stopBits;
+            _protocol  = protocol;
+
+            OpenPort();
+        }
+
+        /// <summary>
+        /// Mở cổng COM. Được gọi từ <see cref="Initialize"/> và từ vòng lặp reconnect.
+        /// </summary>
+        private void OpenPort()
         {
             try
             {
-                _protocol = protocol;
+                // Giải phóng port cũ nếu còn tồn tại
+                SafeClosePort();
 
-                if (_serialPort != null && _serialPort.IsOpen)
+                _serialPort = new SerialPort(_portName, _baudRate, _parity, _dataBits, _stopBits)
                 {
-                    _serialPort.Close();
-                    _serialPort.Dispose();
-                }
-
-                _serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits)
-                {
-                    Encoding = Encoding.ASCII,
-                    ReadTimeout = 500,
+                    Encoding              = Encoding.ASCII,
+                    ReadTimeout           = 500,
                     ReceivedBytesThreshold = 1
                 };
 
-                _serialPort.DataReceived += SerialPort_DataReceived;
+                _serialPort.DataReceived  += SerialPort_DataReceived;
+                _serialPort.ErrorReceived += SerialPort_ErrorReceived;
                 _serialPort.Open();
 
-                Log.Information("[SCALE] Đã kết nối đầu cân chuẩn {Protocol} tại {Port}", protocol.ProtocolName, portName);
+                _isConnected = true;
+                Log.Information("[SCALE] Đã kết nối đầu cân chuẩn {Protocol} tại {Port}", _protocol.ProtocolName, _portName);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "[SCALE] Lỗi khởi tạo cổng {Port}", portName);
+                _isConnected = false;
+                Log.Error(ex, "[SCALE] Lỗi khởi tạo cổng {Port}", _portName);
             }
         }
 
+        // =========================================================================
+        // XỬ LÝ DỮ LIỆU
+        // =========================================================================
+
+        /// <summary>
+        /// Xử lý dữ liệu thô nhận được từ Serial Port.
+        /// Nếu xảy ra lỗi đọc, kích hoạt quy trình <see cref="HandleDisconnect"/>.
+        /// </summary>
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (!_serialPort.IsOpen) return;
+            if (_serialPort == null || !_serialPort.IsOpen) return;
 
             try
             {
-                // Đọc TẤT CẢ những gì đang kẹt trong cổng COM
                 string rawData = _serialPort.ReadExisting();
                 _incomingDataBuffer.Append(rawData);
 
                 string currentBuffer = _incomingDataBuffer.ToString();
 
-                // 1. Tìm vị trí của cờ P+ hoặc @+ TỪ CUỐI LÊN (Lấy tín hiệu mới nhất)
-                int pIndex = currentBuffer.LastIndexOf("P+");
-                int aIndex = currentBuffer.LastIndexOf("@+");
+                // Tìm frame hợp lệ từ cuối lên (lấy tín hiệu mới nhất)
+                int pIndex      = currentBuffer.LastIndexOf("P+");
+                int aIndex      = currentBuffer.LastIndexOf("@+");
                 int targetIndex = Math.Max(pIndex, aIndex);
 
-                // 2. Nếu tìm thấy và đủ độ dài (VD: P+029780 cần 8 ký tự)
                 if (targetIndex != -1 && targetIndex + 8 <= currentBuffer.Length)
                 {
                     string weightStr = currentBuffer.Substring(targetIndex + 2, 6);
@@ -84,47 +179,58 @@ namespace AutoWeighbridgeSystem.Services
                     if (decimal.TryParse(weightStr, out decimal weight))
                     {
                         bool isHardwareStable = (targetIndex == pIndex);
-
-                        // Đẩy số mới nhất đi xử lý
                         ProcessWeightStability(weight, isHardwareStable);
-
-                        // QUAN TRỌNG NHẤT: Xóa sạch toàn bộ buffer để triệt tiêu độ trễ!
                         _incomingDataBuffer.Clear();
                     }
                 }
                 else if (_incomingDataBuffer.Length > 200)
                 {
-                    // Chống tràn bộ nhớ nếu nhiễu tín hiệu
-                    _incomingDataBuffer.Clear();
+                    _incomingDataBuffer.Clear(); // Chống tràn bộ nhớ khi nhiễu tín hiệu
                 }
             }
             catch (Exception ex)
             {
-                Log.Debug("[SCALE] Nhiễu tín hiệu DataReceived: {Msg}", ex.Message);
+                // IOException / InvalidOperationException thường xảy ra khi rút cáp
+                Log.Warning("[SCALE] Lỗi đọc dữ liệu — có thể mất kết nối: {Msg}", ex.Message);
+                HandleDisconnect();
             }
         }
 
+        /// <summary>
+        /// Xử lý lỗi phần cứng từ Serial Port (frame error, buffer overflow...).
+        /// Kích hoạt quy trình <see cref="HandleDisconnect"/>.
+        /// </summary>
+        private void SerialPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            Log.Warning("[SCALE] SerialPort ErrorReceived: {Error} — kích hoạt reconnect.", e.EventType);
+            HandleDisconnect();
+        }
+
+        // =========================================================================
+        // THUẬT TOÁN TÍNH ĐỘ ỔN ĐỊNH
+        // =========================================================================
+
+        /// <summary>
+        /// Thuật toán lai (Hybrid Stability): ưu tiên tín hiệu ổn định từ phần cứng (P+),
+        /// fallback sang bộ đệm phần mềm 10 mẫu khi cân báo dao động (@+).
+        /// Áp dụng throttling 40ms trước khi phát <see cref="WeightChanged"/>.
+        /// </summary>
         private void ProcessWeightStability(decimal weight, bool isHardwareStable)
         {
             CurrentWeight = weight;
 
-            // === 1. THUẬT TOÁN LAI (HYBRID STABILITY) ===
             if (weight > 50)
             {
-                // Nếu phần cứng báo ổn định (có chữ P+) -> Chốt ngay lập tức, độ trễ 0s
                 if (isHardwareStable)
                 {
                     IsScaleStable = true;
-                    // Reset lại buffer mềm để chuẩn bị cho lần cân tiếp theo
                     if (_weightBuffer.Count > 0) _weightBuffer.Clear();
                 }
                 else
                 {
-                    // Nếu phần cứng báo dao động (@+), đẩy vào Buffer để phần mềm tự tính
                     _weightBuffer.Enqueue(weight);
                     if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
 
-                    // Tăng độ lệch lên 10kg theo yêu cầu chống rung
                     decimal delta = _weightBuffer.Count > 0 ? _weightBuffer.Max() - _weightBuffer.Min() : 0;
                     IsScaleStable = (_weightBuffer.Count >= BufferSize) && (delta <= 10);
                 }
@@ -135,34 +241,143 @@ namespace AutoWeighbridgeSystem.Services
                 if (_weightBuffer.Count > 0) _weightBuffer.Clear();
             }
 
-            // === 2. THROTTLING THÔNG MINH (BẢO VỆ GIAO DIỆN) ===
             bool stateChanged = (IsScaleStable != _lastBroadcastedStableState);
-
-            // Bắn Event NẾU: Trạng thái vừa thay đổi (Ưu tiên tuyệt đối) HOẶC đã đủ thời gian 40ms
             if (stateChanged || _uiThrottleStopwatch.ElapsedMilliseconds >= MinUiUpdateIntervalMs)
             {
                 WeightChanged?.Invoke(CurrentWeight, IsScaleStable);
-
-                // Cập nhật lại bộ nhớ đệm cho lần sau
                 _lastBroadcastedStableState = IsScaleStable;
                 _uiThrottleStopwatch.Restart();
             }
         }
 
-        public void Close()
+        // =========================================================================
+        // AUTO-RECONNECT
+        // =========================================================================
+
+        /// <summary>
+        /// Xử lý sự kiện mất kết nối: đóng port an toàn, phát event <see cref="Disconnected"/>,
+        /// và bắt đầu vòng lặp thử kết nối lại.
+        /// </summary>
+        private void HandleDisconnect()
         {
-            if (_serialPort != null && _serialPort.IsOpen)
-            {
-                _serialPort.DataReceived -= SerialPort_DataReceived;
-                _serialPort.Close();
-                Log.Information("[SCALE] Đã đóng cổng cân.");
-            }
+            // Chỉ xử lý một lần nếu đang reconnect
+            if (_isReconnecting) return;
+
+            _isConnected   = false;
+            _isReconnecting = true;
+
+            Log.Warning("[SCALE] Phát hiện mất kết nối đầu cân tại {Port}. Bắt đầu thử kết nối lại...", _portName);
+
+            SafeClosePort();
+            Disconnected?.Invoke();
+            StartReconnectLoop();
         }
 
+        /// <summary>
+        /// Đóng port hiện tại một cách an toàn, unsubscribe events, bỏ qua mọi exception.
+        /// </summary>
+        private void SafeClosePort()
+        {
+            try
+            {
+                if (_serialPort != null)
+                {
+                    _serialPort.DataReceived  -= SerialPort_DataReceived;
+                    _serialPort.ErrorReceived -= SerialPort_ErrorReceived;
+                    if (_serialPort.IsOpen) _serialPort.Close();
+                    _serialPort.Dispose();
+                    _serialPort = null;
+                }
+            }
+            catch { /* Bỏ qua — port có thể đã ở trạng thái lỗi */ }
+        }
+
+        /// <summary>
+        /// Vòng lặp thử kết nối lại với backoff tăng dần:
+        /// 5s → 5s → 10s → 30s → 60s (lặp lại ở 60s).
+        /// Dừng lại khi kết nối thành công hoặc khi <see cref="Dispose"/> được gọi.
+        /// </summary>
+        private void StartReconnectLoop()
+        {
+            // Hủy vòng lặp cũ nếu có
+            _reconnectCts.Cancel();
+            _reconnectCts = new CancellationTokenSource();
+            var token = _reconnectCts.Token;
+
+            Task.Run(async () =>
+            {
+                int attempt = 0;
+
+                while (!token.IsCancellationRequested)
+                {
+                    int delaySec = ReconnectDelaysSeconds[Math.Min(attempt, ReconnectDelaysSeconds.Length - 1)];
+                    Log.Information("[SCALE] Thử kết nối lại lần {Attempt} sau {Delay}s...", attempt + 1, delaySec);
+                    ReconnectAttempting?.Invoke(attempt + 1);
+
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(delaySec), token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break; // Dispose() đã được gọi
+                    }
+
+                    if (token.IsCancellationRequested) break;
+
+                    try
+                    {
+                        // Thử mở lại cổng
+                        var testPort = new SerialPort(_portName, _baudRate, _parity, _dataBits, _stopBits)
+                        {
+                            Encoding              = Encoding.ASCII,
+                            ReadTimeout           = 500,
+                            ReceivedBytesThreshold = 1
+                        };
+                        testPort.DataReceived  += SerialPort_DataReceived;
+                        testPort.ErrorReceived += SerialPort_ErrorReceived;
+                        testPort.Open();
+
+                        // Thành công
+                        _serialPort     = testPort;
+                        _isConnected    = true;
+                        _isReconnecting = false;
+                        _weightBuffer.Clear();
+                        _incomingDataBuffer.Clear();
+
+                        Log.Information("[SCALE] ✅ KẾT NỐI LẠI THÀNH CÔNG tại {Port} (sau {Attempt} lần thử).", _portName, attempt + 1);
+                        Reconnected?.Invoke();
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug("[SCALE] Lần thử {Attempt} thất bại: {Msg}", attempt + 1, ex.Message);
+                    }
+
+                    attempt++;
+                }
+
+                _isReconnecting = false;
+            }, token);
+        }
+
+        // =========================================================================
+        // CLEANUP
+        // =========================================================================
+
+        /// <summary>Đóng kết nối Serial Port với đầu cân một cách an toàn.</summary>
+        public void Close()
+        {
+            _reconnectCts.Cancel();
+            SafeClosePort();
+            Log.Information("[SCALE] Đã đóng cổng cân.");
+        }
+
+        /// <inheritdoc/>
         public void Dispose()
         {
             Close();
-            _serialPort?.Dispose();
+            _reconnectCts.Dispose();
         }
     }
 }

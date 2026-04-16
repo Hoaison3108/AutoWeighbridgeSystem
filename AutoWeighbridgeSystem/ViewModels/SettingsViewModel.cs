@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,6 +22,11 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly IConfiguration _configuration;
         private readonly IUserNotificationService _notificationService;
+        private readonly AppSession _appSession;
+
+        // --- 0. PHÂN QUYỀN ---
+        /// <summary>Trả về true nếu người dùng hiện tại có quyền Admin.</summary>
+        public bool IsAdmin => string.Equals(_appSession.Role, "Admin", StringComparison.OrdinalIgnoreCase);
 
         // --- 1. QUẢN LÝ DANH SÁCH USER ---
         [ObservableProperty] private ObservableCollection<User> _userList = new();
@@ -86,11 +91,13 @@ namespace AutoWeighbridgeSystem.ViewModels
         public SettingsViewModel(
             IDbContextFactory<AppDbContext> dbContextFactory,
             IConfiguration configuration,
-            IUserNotificationService notificationService)
+            IUserNotificationService notificationService,
+            AppSession appSession)
         {
             _dbContextFactory = dbContextFactory;
             _configuration = configuration;
             _notificationService = notificationService;
+            _appSession = appSession;
             LoadConfig();
             _ = LoadUsersAsync();
         }
