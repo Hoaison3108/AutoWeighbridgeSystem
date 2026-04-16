@@ -7,11 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
-    <ApplicationIcon>autoweigh.ico</ApplicationIcon>
+    <ApplicationIcon>iconappw.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="autoweigh.ico" />
+    <Content Include="iconappw.ico" />
   </ItemGroup>
 
   <ItemGroup>

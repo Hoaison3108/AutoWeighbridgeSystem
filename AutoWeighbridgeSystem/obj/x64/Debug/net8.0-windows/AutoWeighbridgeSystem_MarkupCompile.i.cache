@@ -11,7 +11,7 @@ false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml
 9443391138
-1-431261312
+120336084
 68995268461
 256-820312560
 Views\CustomerView.xaml;Views\DashboardView.xaml;Views\LoginWindow.xaml;Views\MainWindow.xaml;Views\ProductView.xaml;Views\QuickVehicleRegisterWindow.xaml;Views\SettingsView.xaml;Views\VehicleRegistrationView.xaml;Views\WeighingHistoryView.xaml;
