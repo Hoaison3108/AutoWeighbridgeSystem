@@ -255,7 +255,27 @@ namespace AutoWeighbridgeSystem.ViewModels
                 // LƯU FILE
                 // ==========================================
                 var options = new JsonSerializerOptions { WriteIndented = true };
-                File.WriteAllText(jsonPath, root.ToJsonString(options));
+                string outputJson = root.ToJsonString(options);
+                File.WriteAllText(jsonPath, outputJson);
+
+                // Đồng bộ ngược lại file gốc appsettings.json của Project nếu đang chạy trong Debug
+                try
+                {
+                    string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                    if (baseDir.Contains("bin\\Debug") || baseDir.Contains("bin/Debug"))
+                    {
+                        var projectRoot = Directory.GetParent(baseDir)?.Parent?.Parent?.Parent?.FullName;
+                        if (projectRoot != null)
+                        {
+                            string sourceJsonPath = Path.Combine(projectRoot, "appsettings.json");
+                            if (File.Exists(sourceJsonPath))
+                            {
+                                File.WriteAllText(sourceJsonPath, outputJson);
+                            }
+                        }
+                    }
+                }
+                catch { /* Bỏ qua nếu lỗi phân quyền ghi file hệ thống */ }
 
                 _notificationService.ShowInfo(UiText.Messages.SaveConfigSuccess, UiText.Titles.Info);
             }

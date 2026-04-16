@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -19,8 +19,8 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             // Đánh Index để tra cứu nhanh biển số
             builder.HasIndex(v => v.LicensePlate);
 
-            // Chống trùng lặp RFID (Chỉ tính trên những xe chưa xóa)
-            builder.HasIndex(v => v.RfidCardId).IsUnique().HasFilter("[IsDeleted] = 0");
+            // Chống trùng lặp RFID (Chỉ tính trên những xe chưa xóa và có thẻ)
+            builder.HasIndex(v => v.RfidCardId).IsUnique().HasFilter("[IsDeleted] = 0 AND [RfidCardId] IS NOT NULL");
 
             builder.Property(v => v.TareWeight).HasColumnType("decimal(18, 2)");
 

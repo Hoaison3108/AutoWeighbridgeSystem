@@ -31,6 +31,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IUserNotificationService _notificationService;
         private readonly AlarmService _alarmService;
         private readonly AppSession _appSession;
+        private readonly Microsoft.EntityFrameworkCore.IDbContextFactory<AutoWeighbridgeSystem.Data.AppDbContext> _dbContextFactory;
 
         // =========================================================================
         // TRẠNG THÁI NỘI BỘ
@@ -77,25 +78,25 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private WeighingTicket _selectedRecentTicket;
 
         // --- Danh mục (nguồn gốc) ---
-        [ObservableProperty] private ObservableCollection<Product>  _productList  = new();
-        [ObservableProperty] private ObservableCollection<Vehicle>  _vehicleList  = new();
+        [ObservableProperty] private ObservableCollection<Product> _productList = new();
+        [ObservableProperty] private ObservableCollection<Vehicle> _vehicleList = new();
         [ObservableProperty] private ObservableCollection<Customer> _customerList = new();
-        [ObservableProperty] private Product  _selectedProduct;
-        [ObservableProperty] private Vehicle  _selectedVehicle;
+        [ObservableProperty] private Product _selectedProduct;
+        [ObservableProperty] private Vehicle _selectedVehicle;
         [ObservableProperty] private Customer _selectedCustomer;
 
         // --- CollectionView cho Autocomplete (filter-as-you-type) ---
         /// <summary>View đã lọc dùng cho ComboBox Biển số — binding thay thế VehicleList.</summary>
-        public ICollectionView VehicleView  { get; private set; }
+        public ICollectionView VehicleView { get; private set; }
         /// <summary>View đã lọc dùng cho ComboBox Khách hàng — binding thay thế CustomerList.</summary>
         public ICollectionView CustomerView { get; private set; }
         /// <summary>View đã lọc dùng cho ComboBox Hàng hóa — binding thay thế ProductList.</summary>
-        public ICollectionView ProductView  { get; private set; }
+        public ICollectionView ProductView { get; private set; }
 
         // --- Text đang gõ trong từng ComboBox để thực hiện filter ---
-        [ObservableProperty] private string _vehicleFilterText  = "";
+        [ObservableProperty] private string _vehicleFilterText = "";
         [ObservableProperty] private string _customerFilterText = "";
-        [ObservableProperty] private string _productFilterText  = "";
+        [ObservableProperty] private string _productFilterText = "";
 
         /// <summary>Ngược của IsAutoMode — dùng để bind IsEnabled cho ComboBox.</summary>
         public bool IsManualMode => !IsAutoMode;
@@ -118,7 +119,8 @@ namespace AutoWeighbridgeSystem.ViewModels
             WeighingBusinessService weighingBusiness,
             IUserNotificationService notificationService,
             AlarmService alarmService,
-            AppSession appSession)
+            AppSession appSession,
+            Microsoft.EntityFrameworkCore.IDbContextFactory<AutoWeighbridgeSystem.Data.AppDbContext> dbContextFactory)
         {
             _configuration = configuration;
             _scaleService = scaleService;
@@ -129,6 +131,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _notificationService = notificationService;
             _alarmService = alarmService;
             _appSession = appSession;
+            _dbContextFactory = dbContextFactory;
 
             LoadUiConfiguration();
             InitializeCamera();
@@ -137,9 +140,9 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             // Khởi động Coordinator — truyền Func<> để Coordinator đọc state VM khi cần
             _coordinator.Start(
-                getIsAutoMode:          () => IsAutoMode,
-                getIsWeightLocked:      () => IsWeightLocked,
-                getIsProcessingSave:    () => _saveLock.CurrentCount == 0,
+                getIsAutoMode: () => IsAutoMode,
+                getIsWeightLocked: () => IsWeightLocked,
+                getIsProcessingSave: () => _saveLock.CurrentCount == 0,
                 getSelectedProductName: () => SelectedProduct?.ProductName ?? "Hàng hóa");
 
             LoadInitialDataAsync().FireAndForgetSafe(ex =>
@@ -154,7 +157,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         private void LoadUiConfiguration()
         {
-            if (bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"],    out bool isAuto))    IsAutoMode    = isAuto;
+            if (bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"], out bool isAuto)) IsAutoMode = isAuto;
             if (bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool isOnePass)) IsOnePassMode = isOnePass;
         }
 
@@ -168,7 +171,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             _uiRefreshTimer = new DispatcherTimer
             {
-                Interval  = TimeSpan.FromMilliseconds(RefreshIntervalMs),
+                Interval = TimeSpan.FromMilliseconds(RefreshIntervalMs),
                 IsEnabled = true
             };
             _uiRefreshTimer.Tick += UiRefreshTimer_Tick;
@@ -177,10 +180,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         /// <summary>Đăng ký lắng nghe tất cả events từ DashboardEventCoordinator.</summary>
         private void SubscribeToCoordinatorEvents()
         {
-            _coordinator.AutoSaveRequested         += OnAutoSaveRequested;
-            _coordinator.FormResetRequested        += OnFormResetRequested;
-            _coordinator.CameraMessageRequested    += OnCameraMessageRequested;
-            _coordinator.RfidCaptured              += OnRfidCaptured;
+            _coordinator.AutoSaveRequested += OnAutoSaveRequested;
+            _coordinator.FormResetRequested += OnFormResetRequested;
+            _coordinator.CameraMessageRequested += OnCameraMessageRequested;
+            _coordinator.RfidCaptured += OnRfidCaptured;
             _coordinator.PendingTimeoutStartRequested += OnPendingTimeoutStartRequested;
         }
 
@@ -202,7 +205,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             LicensePlate = vehicleData.LicensePlate;
             CustomerName = vehicleData.CustomerName;
-            ProductName  = vehicleData.ProductName;
+            ProductName = vehicleData.ProductName;
             await ProcessAndSaveWeighingAsync(weight);
         }
 
@@ -219,7 +222,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         private void OnRfidCaptured(string cardId, string locationLabel)
         {
-            RfidInput        = cardId;
+            RfidInput = cardId;
             RfidLocationLabel = locationLabel;
         }
 
@@ -239,7 +242,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (value.Customer != null)
             {
                 SelectedCustomer = CustomerList.FirstOrDefault(c => c.CustomerId == value.CustomerId);
-                CustomerName     = value.Customer.CustomerName;
+                CustomerName = value.Customer.CustomerName;
             }
         }
 
@@ -265,9 +268,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             if (value) // Chuyển sang Auto — xóa filter
             {
-                VehicleFilterText  = "";
+                VehicleFilterText = "";
                 CustomerFilterText = "";
-                ProductFilterText  = "";
+                ProductFilterText = "";
             }
         }
 
@@ -300,9 +303,9 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             try
             {
-                LockedWeight  = finalWeight;
+                LockedWeight = finalWeight;
                 IsWeightLocked = true;
-                WeightDisplay  = LockedWeight.ToString("N0");
+                WeightDisplay = LockedWeight.ToString("N0");
 
                 var request = new DashboardSaveRequest(
                     LicensePlate,
@@ -356,23 +359,41 @@ namespace AutoWeighbridgeSystem.ViewModels
                 }
                 if (_scaleService.CurrentWeight < _coordinator.MinWeightThreshold) return;
 
-                LockedWeight   = _scaleService.CurrentWeight;
+                LockedWeight = _scaleService.CurrentWeight;
                 IsWeightLocked = true;
                 ShowCameraMessage($"🔒 ĐÃ CHỐT: {LockedWeight:N0} KG", false);
             }
             else
             {
                 IsWeightLocked = false;
-                LockedWeight   = 0;
+                LockedWeight = 0;
             }
         }
 
         [RelayCommand]
         private async Task ManualSaveAsync()
         {
-            if (IsAutoMode)                               { _notificationService.ShowWarning(UiText.Messages.ManualModeDisableAuto);  return; }
-            if (string.IsNullOrWhiteSpace(LicensePlate)) { _notificationService.ShowWarning(UiText.Messages.EnterLicensePlate);       return; }
-            if (!IsWeightLocked || LockedWeight <= 0)    { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave);    return; }
+            if (IsAutoMode) { _notificationService.ShowWarning(UiText.Messages.ManualModeDisableAuto); return; }
+            if (string.IsNullOrWhiteSpace(LicensePlate)) { _notificationService.ShowWarning(UiText.Messages.EnterLicensePlate); return; }
+            if (!IsWeightLocked || LockedWeight <= 0) { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave); return; }
+
+            // Bổ sung luồng chặn xử lý Đăng ký xe vãng lai
+            if (!VehicleList.Any(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
+            {
+                var vm = new QuickVehicleRegisterViewModel(LicensePlate, _dbContextFactory, _notificationService, _scaleService);
+                var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
+                window.ShowDialog();
+
+                if (!vm.IsRegisteredAndSaved)
+                {
+                    return; // Người dùng Hủy ngang cửa sổ thiết bị
+                }
+
+                // Nếu đăng ký thành công, load lại DB và chọn xe mới
+                await LoadInitialDataAsync();
+                var newVehicle = VehicleList.FirstOrDefault(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase));
+                if (newVehicle != null) SelectedVehicle = newVehicle;
+            }
 
             if (!_notificationService.Confirm(UiText.Messages.SaveTicketConfirm(LicensePlate, LockedWeight), UiText.Titles.Confirm))
                 return;
@@ -409,6 +430,26 @@ namespace AutoWeighbridgeSystem.ViewModels
             ShowCameraMessage("♻️ ĐÃ LÀM SẠCH BIỂU MẪU");
         }
 
+        [RelayCommand]
+        private void CopyDataFromTicket()
+        {
+            if (IsAutoMode) return; // Chỉ có tác dụng trong chế độ Manual
+            if (SelectedRecentTicket == null) return;
+
+            // Đẩy dữ liệu Text ngược lên form (Hỗ trợ nhập tay tự do)
+            LicensePlate = SelectedRecentTicket.LicensePlate;
+            var matchedVehicle = VehicleList.FirstOrDefault(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase));
+            if (matchedVehicle != null) SelectedVehicle = matchedVehicle;
+
+            CustomerName = SelectedRecentTicket.CustomerName;
+            var matchedCustomer = CustomerList.FirstOrDefault(c => c.CustomerName.Equals(CustomerName, StringComparison.OrdinalIgnoreCase));
+            if (matchedCustomer != null) SelectedCustomer = matchedCustomer;
+
+            ProductName = SelectedRecentTicket.ProductName;
+            var matchedProduct = ProductList.FirstOrDefault(p => p.ProductName.Equals(ProductName, StringComparison.OrdinalIgnoreCase));
+            if (matchedProduct != null) SelectedProduct = matchedProduct;
+        }
+
         // =========================================================================
         // TẢI DỮ LIỆU
         // =========================================================================
@@ -419,14 +460,14 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             Application.Current?.Dispatcher.Invoke(() =>
             {
-                VehicleList  = new ObservableCollection<Vehicle>(initialData.Vehicles);
+                VehicleList = new ObservableCollection<Vehicle>(initialData.Vehicles);
                 CustomerList = new ObservableCollection<Customer>(initialData.Customers);
-                ProductList  = new ObservableCollection<Product>(initialData.Products);
+                ProductList = new ObservableCollection<Product>(initialData.Products);
 
                 // Khởi tạo CollectionView với predicate filter — hỗ trợ autocomplete khi gõ
-                VehicleView  = CollectionViewSource.GetDefaultView(VehicleList);
+                VehicleView = CollectionViewSource.GetDefaultView(VehicleList);
                 CustomerView = CollectionViewSource.GetDefaultView(CustomerList);
-                ProductView  = CollectionViewSource.GetDefaultView(ProductList);
+                ProductView = CollectionViewSource.GetDefaultView(ProductList);
 
                 VehicleView.Filter = item =>
                 {
@@ -474,13 +515,13 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         private void ResetForm()
         {
-            LicensePlate   = "";
-            CustomerName   = "";
-            RfidInput      = "";
-            SelectedVehicle  = null;
+            LicensePlate = "";
+            CustomerName = "";
+            RfidInput = "";
+            SelectedVehicle = null;
             SelectedCustomer = null;
-            IsWeightLocked   = false;
-            LockedWeight     = 0;
+            IsWeightLocked = false;
+            LockedWeight = 0;
             _coordinator.ClearPendingData();
             _coordinator.CancelPendingTimeout();
         }
@@ -496,10 +537,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         public void Dispose()
         {
             _uiRefreshTimer?.Stop();
-            _coordinator.AutoSaveRequested            -= OnAutoSaveRequested;
-            _coordinator.FormResetRequested           -= OnFormResetRequested;
-            _coordinator.CameraMessageRequested       -= OnCameraMessageRequested;
-            _coordinator.RfidCaptured                 -= OnRfidCaptured;
+            _coordinator.AutoSaveRequested -= OnAutoSaveRequested;
+            _coordinator.FormResetRequested -= OnFormResetRequested;
+            _coordinator.CameraMessageRequested -= OnCameraMessageRequested;
+            _coordinator.RfidCaptured -= OnRfidCaptured;
             _coordinator.PendingTimeoutStartRequested -= OnPendingTimeoutStartRequested;
             _coordinator.Dispose();
             _saveLock.Dispose();

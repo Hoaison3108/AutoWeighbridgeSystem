@@ -185,7 +185,7 @@
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,0,10,0">
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="{Binding RfidLocationLabel}" Foreground="#00E676"/>
-                            <TextBox Text="{Binding RfidInput, UpdateSourceTrigger=PropertyChanged}" Height="35" Background="#111" Foreground="#00E676" BorderBrush="#00E676" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Padding="10,0" Margin="0,0,0,15">
+                            <TextBox Text="{Binding RfidInput, UpdateSourceTrigger=PropertyChanged}" Height="45" FontSize="18" Background="#111" Foreground="#00E676" BorderBrush="#00E676" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Padding="10,0" Margin="0,0,0,15">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding ProcessRfidCommand}"/>
                                 </TextBox.InputBindings>
@@ -194,12 +194,12 @@
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="BIỂN SỐ XE (GÕ TRỰC TIẾP KHI MANUAL)"/>
                             <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}" 
                      IsReadOnly="{Binding IsAutoMode}" 
-                     Height="38" Background="#2D2D2D" Foreground="#2196F3" 
+                     Height="45" FontSize="18" Background="#2D2D2D" Foreground="#2196F3" 
                      VerticalContentAlignment="Center" Padding="10,0" FontWeight="Bold" Margin="0,0,5,0"/>
                                 <!-- IsEnabled=IsManualMode: chỉ cho phép dùng ComboBox khi ở chế độ Manual -->
                                 <!-- IsEditable=True + TextChanged: tạo hiệu ứng filter-as-you-type autocomplete -->
@@ -210,7 +210,7 @@
                                           DisplayMemberPath="LicensePlate"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
-                                          Height="38"
+                                          Height="45" FontSize="18"
                                           TextBoxBase.TextChanged="VehicleComboBox_TextChanged"
                                           ToolTip="Gõ để lọc danh sách xe — chỉ khả dụng ở chế độ Manual"/>
                             </Grid>
@@ -218,13 +218,13 @@
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="KHÁCH HÀNG (GÕ TRỰC TIẾP KHI MANUAL)"/>
                             <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}" 
                      IsReadOnly="{Binding IsAutoMode}" 
-                     Height="38" Background="#2D2D2D" Foreground="White" 
-                     VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="12"/>
+                     Height="45" Background="#2D2D2D" Foreground="White" 
+                     VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="16"/>
                                 <ComboBox x:Name="CustomerComboBox"
                                           Grid.Column="1"
                                           ItemsSource="{Binding CustomerView}"
@@ -232,7 +232,7 @@
                                           DisplayMemberPath="CustomerName"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
-                                          Height="38"
+                                          Height="45" FontSize="16"
                                           TextBoxBase.TextChanged="CustomerComboBox_TextChanged"
                                           ToolTip="Gõ để lọc danh sách khách hàng — chỉ khả dụng ở chế độ Manual"/>
                             </Grid>
@@ -240,13 +240,13 @@
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="LOẠI HÀNG (GÕ TRỰC TIẾP KHI MANUAL)"/>
                             <Grid Margin="0,0,0,15">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" 
                      IsReadOnly="{Binding IsAutoMode}" 
-                     Height="38" Background="#2D2D2D" Foreground="White" 
-                     VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="12"/>
+                     Height="45" Background="#2D2D2D" Foreground="White" 
+                     VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="16"/>
                                 <ComboBox x:Name="ProductComboBox"
                                           Grid.Column="1"
                                           ItemsSource="{Binding ProductView}"
@@ -254,7 +254,7 @@
                                           DisplayMemberPath="ProductName"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
-                                          Height="38"
+                                          Height="45" FontSize="16"
                                           TextBoxBase.TextChanged="ProductComboBox_TextChanged"
                                           ToolTip="Gõ để lọc danh sách hàng hóa — chỉ khả dụng ở chế độ Manual"/>
                             </Grid>
@@ -322,7 +322,11 @@
                 </Grid.RowDefinitions>
                 <TextBlock Text="NHẬT KÝ VẬN HÀNH (GẦN NHẤT)" FontSize="14" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,10"/>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding RecentTickets}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding RecentTickets}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
+                          SelectedItem="{Binding SelectedRecentTicket}">
+                    <DataGrid.InputBindings>
+                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding CopyDataFromTicketCommand}" />
+                    </DataGrid.InputBindings>
                     <DataGrid.Columns>
 
                         <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding TicketID}" Width="100">

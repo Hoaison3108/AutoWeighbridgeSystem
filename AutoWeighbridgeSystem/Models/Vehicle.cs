@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +22,7 @@ namespace AutoWeighbridgeSystem.Models
 
         // 3. MÃ THẺ RFID
         [StringLength(50)]
-        public string RfidCardId { get; set; }
+        public string? RfidCardId { get; set; }
 
         // 4. TRỌNG LƯỢNG BÌ
         [Column(TypeName = "decimal(18,2)")] // Định dạng chuẩn cho cân điện tử (2 số thập phân)

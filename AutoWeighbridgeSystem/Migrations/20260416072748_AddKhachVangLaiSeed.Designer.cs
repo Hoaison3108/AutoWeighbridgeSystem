@@ -4,6 +4,7 @@ using AutoWeighbridgeSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoWeighbridgeSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260416072748_AddKhachVangLaiSeed")]
+    partial class AddKhachVangLaiSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,6 +187,7 @@ namespace AutoWeighbridgeSystem.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("RfidCardId")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -198,7 +202,7 @@ namespace AutoWeighbridgeSystem.Migrations
 
                     b.HasIndex("RfidCardId")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0 AND [RfidCardId] IS NOT NULL");
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Vehicles");
 
@@ -287,8 +291,8 @@ namespace AutoWeighbridgeSystem.Migrations
                             NetWeight = 22900m,
                             ProductName = "Đá xô bồ",
                             TareWeight = 12500m,
-                            TimeIn = new DateTime(2026, 4, 15, 14, 38, 32, 196, DateTimeKind.Local).AddTicks(8425),
-                            TimeOut = new DateTime(2026, 4, 15, 14, 53, 32, 196, DateTimeKind.Local).AddTicks(8437),
+                            TimeIn = new DateTime(2026, 4, 15, 14, 27, 47, 936, DateTimeKind.Local).AddTicks(5107),
+                            TimeOut = new DateTime(2026, 4, 15, 14, 42, 47, 936, DateTimeKind.Local).AddTicks(5124),
                             VehicleId = 1
                         });
                 });

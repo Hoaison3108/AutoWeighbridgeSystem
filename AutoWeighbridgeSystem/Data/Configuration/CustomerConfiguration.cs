@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -22,6 +22,7 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             builder.HasQueryFilter(c => !c.IsDeleted);
 
             builder.HasData(
+                new Customer { CustomerId = "KVL", CustomerName = "Khách vãng lai" },
                 new Customer { CustomerId = "MX1", CustomerName = "Máy xay 1" },
                 new Customer { CustomerId = "MX2", CustomerName = "Máy xay 2" },
                 new Customer { CustomerId = "MX3", CustomerName = "Máy xay 3" }

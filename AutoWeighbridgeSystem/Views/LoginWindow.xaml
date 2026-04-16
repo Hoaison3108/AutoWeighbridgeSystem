@@ -1,6 +1,7 @@
-﻿<Window x:Class="AutoWeighbridgeSystem.Views.LoginWindow"
+<Window x:Class="AutoWeighbridgeSystem.Views.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="clr-namespace:AutoWeighbridgeSystem.Common"
         Title="Đăng Nhập Hệ Thống" Height="450" Width="400"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -25,10 +26,12 @@
 
                 <TextBlock Text="Mật khẩu:" Foreground="LightGray" FontSize="13" Margin="0,0,0,5"/>
                 <PasswordBox x:Name="txtPassword" 
+                             common:PasswordBoxHelper.BindPassword="True"
+                             common:PasswordBoxHelper.BoundPassword="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              FontSize="16" Background="#2D2D2D" Foreground="White" 
                              Padding="10,0" BorderThickness="0" Margin="0,0,0,10" Height="38" VerticalContentAlignment="Center">
                     <PasswordBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=txtPassword}"/>
+                        <KeyBinding Key="Enter" Command="{Binding LoginCommand}"/>
                     </PasswordBox.InputBindings>
                 </PasswordBox>
 
@@ -36,7 +39,7 @@
                            HorizontalAlignment="Center" Margin="0,0,0,10" 
                            TextWrapping="Wrap" TextAlignment="Center" Height="35" FontSize="12"/>
 
-                <Button Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=txtPassword}" 
+                <Button Command="{Binding LoginCommand}" 
                         Content="ĐĂNG NHẬP" Height="42" FontSize="15" FontWeight="Bold" Foreground="White" Cursor="Hand">
                     <Button.Style>
                         <Style TargetType="Button">

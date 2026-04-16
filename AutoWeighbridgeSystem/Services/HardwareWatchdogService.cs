@@ -49,11 +49,18 @@ namespace AutoWeighbridgeSystem.Services
 
             Task.Run(async () =>
             {
-                while (!_watchdogCts.Token.IsCancellationRequested)
+                try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(hardwareWatchdogSeconds), _watchdogCts.Token);
-                    if ((DateTime.Now - _lastScaleDataReceivedTime).TotalSeconds > hardwareWatchdogSeconds)
-                        onSignalLost?.Invoke();
+                    while (!_watchdogCts.Token.IsCancellationRequested)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(hardwareWatchdogSeconds), _watchdogCts.Token);
+                        if ((DateTime.Now - _lastScaleDataReceivedTime).TotalSeconds > hardwareWatchdogSeconds)
+                            onSignalLost?.Invoke();
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ngoại lệ hủy Task được bắt tiêu chuẩn, chặn sập (crash ngầm) hệ thống
                 }
             }, _watchdogCts.Token);
         }

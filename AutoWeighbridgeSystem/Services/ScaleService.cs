@@ -62,8 +62,20 @@ namespace AutoWeighbridgeSystem.Services
         // PUBLIC PROPERTIES
         // =========================================================================
 
+        private readonly object _weightLock = new object();
+        private decimal _currentWeight;
+
         /// <summary>Trọng lượng hiện tại đọc được từ đầu cân (kg).</summary>
-        public decimal CurrentWeight { get; private set; }
+        public decimal CurrentWeight 
+        { 
+            get 
+            {
+                lock (_weightLock)
+                {
+                    return _currentWeight;
+                }
+            }
+        }
 
         /// <summary>
         /// <c>true</c> nếu đầu cân đang báo trạng thái ổn định (P+) hoặc
@@ -180,7 +192,14 @@ namespace AutoWeighbridgeSystem.Services
                     {
                         bool isHardwareStable = (targetIndex == pIndex);
                         ProcessWeightStability(weight, isHardwareStable);
-                        _incomingDataBuffer.Clear();
+                    }
+
+                    // Khắc phục Buffer Dataloss: Cắt bỏ phần đã xử lý, giữ lại các ký tự phía sau
+                    string remainder = currentBuffer.Substring(targetIndex + 8);
+                    _incomingDataBuffer.Clear();
+                    if (remainder.Length > 0)
+                    {
+                        _incomingDataBuffer.Append(remainder);
                     }
                 }
                 else if (_incomingDataBuffer.Length > 200)
@@ -217,7 +236,10 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         private void ProcessWeightStability(decimal weight, bool isHardwareStable)
         {
-            CurrentWeight = weight;
+            lock (_weightLock)
+            {
+                _currentWeight = weight;
+            }
 
             if (weight > 50)
             {

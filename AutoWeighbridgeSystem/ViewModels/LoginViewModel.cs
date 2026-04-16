@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Services;
 using AutoWeighbridgeSystem.Views;
@@ -24,6 +24,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         private string _username = "";
 
         [ObservableProperty]
+        private string _password = "";
+
+        [ObservableProperty]
         private string _errorMessage = "";
 
         [ObservableProperty]
@@ -44,15 +47,11 @@ namespace AutoWeighbridgeSystem.ViewModels
         }
 
         [RelayCommand]
-        private async Task LoginAsync(object parameter)
+        private async Task LoginAsync()
         {
             if (IsLoading) return;
 
-            // Lấy mật khẩu từ PasswordBox truyền vào (để bảo mật, không binding trực tiếp Password)
-            var passwordBox = parameter as PasswordBox;
-            string password = passwordBox?.Password ?? "";
-
-            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
                 ErrorMessage = "Vui lòng nhập đầy đủ Tài khoản và Mật khẩu.";
                 return;
@@ -71,7 +70,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                     var user = await db.Users.FirstOrDefaultAsync(u => u.Username == Username && u.IsActive);
 
                     // Đối chiếu mật khẩu (Lưu ý: Tương lai nên dùng hàm Hash để so sánh)
-                    if (user == null || user.Password != password)
+                    if (user == null || user.Password != Password)
                     {
                         ErrorMessage = "Tài khoản không tồn tại, bị khóa hoặc sai mật khẩu!";
                         return;
