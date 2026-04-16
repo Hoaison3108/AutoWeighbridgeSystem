@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj": {}
+    "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj": {}
   },
   "projects": {
-    "d:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj": {
+    "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
+        "projectUniqueName": "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
         "projectName": "AutoWeighbridgeSystem",
-        "projectPath": "d:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
+        "projectPath": "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
         "packagesPath": "C:\\Users\\SONPH\\.nuget\\packages\\",
-        "outputPath": "d:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\obj\\",
+        "outputPath": "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

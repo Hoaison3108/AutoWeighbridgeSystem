@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
@@ -120,25 +120,48 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 if (result.ExistingVehicle != null)
                 {
-                    // Nếu xe ĐÃ ĐĂNG KÝ: Chuyển sang chế độ xem/sửa, load thông tin lên Grid
-                    SelectedRecord = RegisteredVehicles.FirstOrDefault(v => v.VehicleId == result.ExistingVehicle.VehicleId);
+                    if (IsEditMode)
+                    {
+                        if (result.ExistingVehicle.VehicleId == NewVehicle.VehicleId)
+                        {
+                            _notificationService.ShowInfo("Thẻ này đã và đang được gắn cho chính xe này.");
+                        }
+                        else
+                        {
+                            _notificationService.ShowWarning($"Thẻ rác: Thẻ này đang bị gán cho xe {result.ExistingVehicle.LicensePlate}. Vui lòng sử dụng thẻ trắng mới!");
+                        }
+                    }
+                    else
+                    {
+                        // Nếu đang ở chế độ xem tự do: Tự động trỏ tới xe tìm được
+                        SelectedRecord = RegisteredVehicles.FirstOrDefault(v => v.VehicleId == result.ExistingVehicle.VehicleId);
+                    }
                 }
                 else
                 {
-                    // Nếu là THẺ HOÀN TOÀN MỚI
-                    ClearForm();
-
-                    // Ép UI cập nhật bằng cách gán nguyên Object mới
-                    NewVehicle = new Vehicle
+                    // THẺ RỖNG (CHƯA ĐĂNG KÝ CHO AI)
+                    if (IsEditMode)
                     {
-                        RfidCardId = result.CleanCardId,
-                        LicensePlate = "",
-                        TareWeight = 0
-                    };
+                        // Lẳng lặng điền thẻ từ vào giao diện mà không xóa Form
+                        NewVehicle.RfidCardId = result.CleanCardId;
+                        OnPropertyChanged(nameof(NewVehicle));
+                        OnPropertyChanged("NewVehicle.RfidCardId");
+                        _notificationService.ShowInfo("Đã nạp mã thẻ mới. Vui lòng bấm LƯU để chốt gán thẻ cho xe này.");
+                    }
+                    else
+                    {
+                        // Khởi tạo phôi xe mới tinh
+                        ClearForm();
+                        NewVehicle = new Vehicle
+                        {
+                            RfidCardId = result.CleanCardId,
+                            LicensePlate = "",
+                            TareWeight = 0
+                        };
 
-                    // Bắt buộc WPF Binding phải đọc lại giá trị
-                    OnPropertyChanged(nameof(NewVehicle));
-                    OnPropertyChanged("NewVehicle.RfidCardId");
+                        OnPropertyChanged(nameof(NewVehicle));
+                        OnPropertyChanged("NewVehicle.RfidCardId");
+                    }
                 }
             }
             catch (Exception ex)
@@ -151,7 +174,8 @@ namespace AutoWeighbridgeSystem.ViewModels
         private async Task SaveAsync()
         {
             NewVehicle.LicensePlate = FormatLicensePlate(NewVehicle.LicensePlate);
-            NewVehicle.RfidCardId = NewVehicle.RfidCardId?.Trim().ToUpper();
+            // Ép xóa trắng về giá trị null chuẩn hóa chống Lỗi Cơ Sở Dữ Liệu
+            NewVehicle.RfidCardId = string.IsNullOrWhiteSpace(NewVehicle.RfidCardId) ? null : NewVehicle.RfidCardId.Trim().ToUpper();
 
             if (string.IsNullOrWhiteSpace(NewVehicle.LicensePlate))
             {
