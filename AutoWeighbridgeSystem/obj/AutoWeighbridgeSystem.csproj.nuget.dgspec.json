@@ -58,9 +58,9 @@
               "target": "Package",
               "version": "[8.4.2, )"
             },
-            "FFME.Windows": {
+            "LibVLCSharp.WPF": {
               "target": "Package",
-              "version": "[4.4.350, )"
+              "version": "[3.9.7, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
@@ -87,6 +87,10 @@
             "System.IO.Ports": {
               "target": "Package",
               "version": "[10.0.5, )"
+            },
+            "VideoLAN.LibVLC.Windows": {
+              "target": "Package",
+              "version": "[3.0.23.1, )"
             }
           },
           "imports": [

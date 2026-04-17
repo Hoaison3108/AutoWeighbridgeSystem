@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Common;
 using Serilog;
 
 namespace AutoWeighbridgeSystem.Services
@@ -36,17 +37,19 @@ namespace AutoWeighbridgeSystem.Services
         {
             try
             {
-                // Resolve VehicleId: ưu tiên từ SelectedVehicle, fallback khớp biển số
+                // Resolve VehicleId: ưu tiên từ SelectedVehicle, fallback khớp biển số đã chuẩn hóa
                 int vehicleId = request.SelectedVehicleId ?? 0;
-                if (vehicleId == 0 && !string.IsNullOrEmpty(request.LicensePlate))
+                string formattedPlate = request.LicensePlate.FormatLicensePlate();
+
+                if (vehicleId == 0 && !string.IsNullOrEmpty(formattedPlate))
                 {
                     var matched = request.VehicleList.FirstOrDefault(v =>
-                        v.LicensePlate.Equals(request.LicensePlate, StringComparison.OrdinalIgnoreCase));
+                        v.LicensePlate.Equals(formattedPlate, StringComparison.OrdinalIgnoreCase));
                     if (matched != null) vehicleId = matched.VehicleId;
                 }
 
                 var result = await _weighingBusiness.ProcessWeighingAsync(
-                    request.LicensePlate,
+                    formattedPlate,
                     vehicleId,
                     request.CustomerName,
                     request.ProductName,

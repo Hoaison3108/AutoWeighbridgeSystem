@@ -10,7 +10,7 @@
         "dependencies": {
           "ClosedXML": "0.105.0",
           "CommunityToolkit.Mvvm": "8.4.2",
-          "FFME.Windows": "4.4.350",
+          "LibVLCSharp.WPF": "3.9.7",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.25",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.25",
           "Microsoft.Extensions.Configuration.Json": "10.0.5",
@@ -112,30 +112,30 @@
           }
         }
       },
-      "FFME.Windows/4.4.350": {
-        "dependencies": {
-          "FFmpeg.AutoGen": "4.4.0"
-        },
-        "runtime": {
-          "lib/net5.0-windows7.0/ffme.win.dll": {
-            "assemblyVersion": "4.4.350.0",
-            "fileVersion": "4.4.350.0"
-          }
-        }
-      },
-      "FFmpeg.AutoGen/4.4.0": {
-        "runtime": {
-          "lib/netstandard2.1/FFmpeg.AutoGen.dll": {
-            "assemblyVersion": "4.4.0.0",
-            "fileVersion": "4.4.0.0"
-          }
-        }
-      },
       "Humanizer.Core/2.14.1": {
         "runtime": {
           "lib/net6.0/Humanizer.dll": {
             "assemblyVersion": "2.14.0.0",
             "fileVersion": "2.14.1.48190"
+          }
+        }
+      },
+      "LibVLCSharp/3.9.7": {
+        "runtime": {
+          "lib/net8.0/LibVLCSharp.dll": {
+            "assemblyVersion": "3.9.7.0",
+            "fileVersion": "3.9.7.0"
+          }
+        }
+      },
+      "LibVLCSharp.WPF/3.9.7": {
+        "dependencies": {
+          "LibVLCSharp": "3.9.7"
+        },
+        "runtime": {
+          "lib/net6.0-windows7.0/LibVLCSharp.WPF.dll": {
+            "assemblyVersion": "3.9.7.0",
+            "fileVersion": "3.9.7.0"
           }
         }
       },
@@ -1211,26 +1211,26 @@
       "path": "excelnumberformat/1.1.0",
       "hashPath": "excelnumberformat.1.1.0.nupkg.sha512"
     },
-    "FFME.Windows/4.4.350": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-I5cuudTPFrk10H4J89R124HGjEw2Dbivsmt1mrfDPSdXL5t4MbYeCAt1aa2tC5cU22VvqwRpv4vWHVPU4y8GIg==",
-      "path": "ffme.windows/4.4.350",
-      "hashPath": "ffme.windows.4.4.350.nupkg.sha512"
-    },
-    "FFmpeg.AutoGen/4.4.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-MvlFWhwQMLCKzs4cHTzhIPdlP151+jBB4xx06sVXvGTpV66Isvjj5GvYLkEfUX1etEBNxUw8gCIE8CG/nQqtSw==",
-      "path": "ffmpeg.autogen/4.4.0",
-      "hashPath": "ffmpeg.autogen.4.4.0.nupkg.sha512"
-    },
     "Humanizer.Core/2.14.1": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
+    },
+    "LibVLCSharp/3.9.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Gz+KmhtBrXAI2PwHD3J1InQk9Cxp0/sUF9+ejOT6HPYCeET/gD6sLZ0v2PqUlBq6fZQKR1RO8W+6j7ZzJTMFBg==",
+      "path": "libvlcsharp/3.9.7",
+      "hashPath": "libvlcsharp.3.9.7.nupkg.sha512"
+    },
+    "LibVLCSharp.WPF/3.9.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bvVZUjzSeYt2QhNXEkrzeOqBtbJ0ep1XtCXNHOSdy3AFGrPZsnalikZfpOzGH0d0a3MVvz8rW4wJNd9Iq9ONSw==",
+      "path": "libvlcsharp.wpf/3.9.7",
+      "hashPath": "libvlcsharp.wpf.3.9.7.nupkg.sha512"
     },
     "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
       "type": "package",

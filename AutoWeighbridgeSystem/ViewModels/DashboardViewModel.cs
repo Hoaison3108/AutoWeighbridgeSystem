@@ -49,8 +49,8 @@ namespace AutoWeighbridgeSystem.ViewModels
         /// </summary>
         private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1, 1);
 
-        // === FFME VideoPlayer — set từ code-behind ===
-        public Unosquare.FFME.MediaElement VideoPlayer { get; set; }
+        // VideoPlayer control được quản lý hoàn toàn ở code-behind của DashboardView.xaml.cs
+
 
         // =========================================================================
         // OBSERVABLE PROPERTIES (UI Binding)

@@ -1,7 +1,7 @@
 <UserControl x:Class="AutoWeighbridgeSystem.Views.DashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
+             xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:AutoWeighbridgeSystem.Converters"
@@ -369,8 +369,7 @@
 
             <Border Grid.Column="1" Background="Black" CornerRadius="12" BorderBrush="#333" BorderThickness="2" ClipToBounds="True">
                 <Grid>
-                    <ffme:MediaElement x:Name="CameraPlayer" LoadedBehavior="Play" UnloadedBehavior="Stop" Background="Black" Stretch="UniformToFill"
-                                       MediaOpened="CameraPlayer_MediaOpened" MediaOpening="CameraPlayer_MediaOpening" MediaFailed="CameraPlayer_MediaFailed" />
+                    <vlc:VideoView x:Name="CameraPlayer" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                     <Border Background="#AA000000" VerticalAlignment="Top" Padding="12" Visibility="{Binding CameraStatus, Converter={StaticResource StringToVisibilityConverter}}">
                         <TextBlock Text="{Binding CameraStatus}" Foreground="Yellow" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
                     </Border>

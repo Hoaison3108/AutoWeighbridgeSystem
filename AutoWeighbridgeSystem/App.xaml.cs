@@ -13,6 +13,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Windows;
 using System.Threading; // THÊM THƯ VIỆN NÀY CHO MUTEX
+using LibVLCSharp.Shared;
 
 namespace AutoWeighbridgeSystem
 {
@@ -42,6 +43,9 @@ namespace AutoWeighbridgeSystem
             }
 
             base.OnStartup(e);
+
+            // Khởi tạo LibVLC
+            Core.Initialize();
 
             // =======================================================
             // 2. KHỞI TẠO LOG & CÁC DỊCH VỤ CỐT LÕI

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using AutoWeighbridgeSystem.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +13,6 @@ namespace AutoWeighbridgeSystem.Views
         public MainWindow(MainViewModel viewModel)
         {
             InitializeComponent();
-
-            // 1. Khởi tạo FFmpeg tại đây là đúng (vì nó nạp thư viện cho toàn bộ App)
-            Unosquare.FFME.Library.FFmpegDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg");
-            Unosquare.FFME.Library.LoadFFmpeg();
 
             // 2. Gán ViewModel điều phối
             _viewModel = viewModel;

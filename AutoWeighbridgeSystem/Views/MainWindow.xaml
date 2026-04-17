@@ -32,29 +32,6 @@
             </Setter>
         </Style>
 
-        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
-            <views:DashboardView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:VehicleRegistrationViewModel}">
-            <views:VehicleRegistrationView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:CustomerViewModel}">
-            <views:CustomerView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:ProductViewModel}">
-            <views:ProductView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:WeighingHistoryViewModel}">
-            <views:WeighingHistoryView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-            <views:SettingsView />
-        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -205,13 +182,32 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                    <TextBlock Text="DESIGN BY SONK (v1.7.2)" FontSize="16" FontWeight="Bold" 
+                    <TextBlock Text="DESIGN BY SONK (v1.7.5)" FontSize="16" FontWeight="Bold" 
                                Foreground="#2196F3" HorizontalAlignment="Center"
                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" Margin="15"/>
+        <Grid Grid.Column="1" Margin="15">
+            <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}">
+                <views:DashboardView DataContext="{Binding DashboardVM}" />
+            </Grid>
+            <Grid Visibility="{Binding IsRegistrationVisible, Converter={StaticResource BoolToVis}}">
+                <views:VehicleRegistrationView DataContext="{Binding RegistrationVM}" />
+            </Grid>
+            <Grid Visibility="{Binding IsCustomerVisible, Converter={StaticResource BoolToVis}}">
+                <views:CustomerView DataContext="{Binding CustomerVM}" />
+            </Grid>
+            <Grid Visibility="{Binding IsProductVisible, Converter={StaticResource BoolToVis}}">
+                <views:ProductView DataContext="{Binding ProductVM}" />
+            </Grid>
+            <Grid Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}">
+                <views:WeighingHistoryView DataContext="{Binding HistoryVM}" />
+            </Grid>
+            <Grid Visibility="{Binding IsSettingsVisible, Converter={StaticResource BoolToVis}}">
+                <views:SettingsView DataContext="{Binding SettingsVM}" />
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

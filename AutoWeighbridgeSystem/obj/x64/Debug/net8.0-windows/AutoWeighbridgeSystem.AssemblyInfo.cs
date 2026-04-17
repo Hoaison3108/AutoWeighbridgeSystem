@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AutoWeighbridgeSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d4123e51142db01908c491b3ee8dc8846ba0c79")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c286375c44fc214dc4ab2ab8029155b49949280")]
 [assembly: System.Reflection.AssemblyProductAttribute("AutoWeighbridgeSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AutoWeighbridgeSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

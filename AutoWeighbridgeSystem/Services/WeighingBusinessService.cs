@@ -5,6 +5,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoWeighbridgeSystem.Common;
 
 namespace AutoWeighbridgeSystem.Services
 {
@@ -47,6 +48,7 @@ namespace AutoWeighbridgeSystem.Services
       string licensePlate, int vehicleId, string customerName, string productName, decimal finalWeight, bool isOnePassMode) // Thêm tham số isOnePassMode
         {
             var result = new WeighingProcessResult();
+            licensePlate = licensePlate.FormatLicensePlate();
 
             if (string.IsNullOrWhiteSpace(licensePlate))
             {

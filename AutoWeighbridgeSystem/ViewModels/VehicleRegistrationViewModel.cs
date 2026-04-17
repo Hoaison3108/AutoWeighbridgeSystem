@@ -195,7 +195,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [RelayCommand]
         private async Task SaveAsync()
         {
-            NewVehicle.LicensePlate = FormatLicensePlate(NewVehicle.LicensePlate);
+            NewVehicle.LicensePlate = NewVehicle.LicensePlate.FormatLicensePlate();
             // Ép xóa trắng về giá trị null chuẩn hóa chống Lỗi Cơ Sở Dữ Liệu
             NewVehicle.RfidCardId = string.IsNullOrWhiteSpace(NewVehicle.RfidCardId) ? null : NewVehicle.RfidCardId.Trim().ToUpper();
 
@@ -329,12 +329,5 @@ namespace AutoWeighbridgeSystem.ViewModels
             _rfidService.CardRead -= OnCardReadAtDesk;
         }
 
-        private string FormatLicensePlate(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return "";
-            string raw = input.ToUpper().Replace(" ", "").Replace(".", "").Replace("-", "");
-            var match = Regex.Match(raw, @"^([0-9]{2}[A-Z]{1,2})([0-9]{4,5})$");
-            return match.Success ? $"{match.Groups[1].Value}-{match.Groups[2].Value}" : input.Trim().ToUpper();
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Services;
+using AutoWeighbridgeSystem.Services;
 using AutoWeighbridgeSystem.Common;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,7 +10,15 @@ namespace AutoWeighbridgeSystem.ViewModels
     {
         // --- 1. QUẢN LÝ TRẠNG THÁI GIAO DIỆN ---
 
-        [ObservableProperty] private object _currentView;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsDashboardVisible))]
+        [NotifyPropertyChangedFor(nameof(IsRegistrationVisible))]
+        [NotifyPropertyChangedFor(nameof(IsCustomerVisible))]
+        [NotifyPropertyChangedFor(nameof(IsProductVisible))]
+        [NotifyPropertyChangedFor(nameof(IsHistoryVisible))]
+        [NotifyPropertyChangedFor(nameof(IsSettingsVisible))]
+        private object _currentView;
+
         [ObservableProperty] private bool _isSidebarExpanded = true;
 
         // --- 2. CÁC INSTANCE VIEWMODEL CON (Quản lý bởi DI Container) ---
@@ -23,6 +31,22 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly SettingsViewModel _settingsVm;
         private readonly AppSession _appSession;
         private readonly IUserNotificationService _notificationService;
+
+        // Bộc lộ cho View (UI Caching)
+        public DashboardViewModel DashboardVM => _dashboardVm;
+        public VehicleRegistrationViewModel RegistrationVM => _registrationVm;
+        public CustomerViewModel CustomerVM => _customerVm;
+        public ProductViewModel ProductVM => _productVm;
+        public WeighingHistoryViewModel HistoryVM => _historyVm;
+        public SettingsViewModel SettingsVM => _settingsVm;
+
+        // Các biến quyết định cờ hiển thị
+        public bool IsDashboardVisible => CurrentView == _dashboardVm;
+        public bool IsRegistrationVisible => CurrentView == _registrationVm;
+        public bool IsCustomerVisible => CurrentView == _customerVm;
+        public bool IsProductVisible => CurrentView == _productVm;
+        public bool IsHistoryVisible => CurrentView == _historyVm;
+        public bool IsSettingsVisible => CurrentView == _settingsVm;
 
         // --- 3. CONSTRUCTOR (Đồng nhất qua Injection) ---
 

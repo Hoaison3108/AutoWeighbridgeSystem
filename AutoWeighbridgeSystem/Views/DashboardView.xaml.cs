@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using Unosquare.FFME;
-using Unosquare.FFME.Common;
+using LibVLCSharp.Shared;
+using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
 
 namespace AutoWeighbridgeSystem.Views
 {
@@ -30,6 +30,10 @@ namespace AutoWeighbridgeSystem.Views
             SetupCameraBinding();
         }
 
+        private LibVLC _libVLC;
+        private MediaPlayer _mediaPlayer;
+        private bool _isReconnecting = false;
+
         /// <summary>
         /// Gắn kết Camera giữa View và ViewModel và ra lệnh mở luồng.
         /// </summary>
@@ -37,16 +41,31 @@ namespace AutoWeighbridgeSystem.Views
         {
             if (this.DataContext is DashboardViewModel vm)
             {
-                // 1. Gán control thực tế vào ViewModel để Watchdog hoạt động
-                vm.VideoPlayer = this.CameraPlayer;
-
-                // 2. Ép mở camera ngay nếu chưa mở
-                if (vm.CameraUri != null && !this.CameraPlayer.IsOpen && !this.CameraPlayer.IsOpening)
+                if (vm.CameraUri != null)
                 {
-                    // Chạy Open trong task để không block UI
-                    _ = this.CameraPlayer.Open(vm.CameraUri);
+                    InitializeVLCAndPlay(vm.CameraUri);
                 }
             }
+        }
+
+        private void InitializeVLCAndPlay(Uri cameraUri)
+        {
+            if (_libVLC == null)
+            {
+                // Cấu hình VLC: Bộ đệm 200ms để duy trì Low Latency, ép RTSP xài TCP (chống rác hình/giật lag do mất gói), tắt âm thanh
+                _libVLC = new LibVLC("--network-caching=200", "--rtsp-tcp", "--no-audio", "--drop-late-frames");
+                _mediaPlayer = new MediaPlayer(_libVLC);
+                
+                this.CameraPlayer.MediaPlayer = _mediaPlayer;
+
+                // Bind events
+                _mediaPlayer.Playing += MediaPlayer_Playing;
+                _mediaPlayer.EncounteredError += MediaPlayer_EncounteredError;
+            }
+
+            // Mỗi lần reconnect hoặc bắt đầu đều tạo Media mới để giải phóng buffer lỗi cũ
+            var media = new Media(_libVLC, cameraUri.AbsoluteUri, FromType.FromLocation);
+            _mediaPlayer.Play(media);
         }
 
         // =========================================================================
@@ -94,92 +113,49 @@ namespace AutoWeighbridgeSystem.Views
             }
         }
 
-        /// <summary>KHI CAMERA ĐÃ LÊN HÌNH (Fix lỗi kẹt chữ "Đang khởi tạo FFME")</summary>
-        private void CameraPlayer_MediaOpened(object sender, EventArgs e)
+        /// <summary>KHI CAMERA ĐÃ LÊN HÌNH</summary>
+        private void MediaPlayer_Playing(object sender, EventArgs e)
         {
-            if (this.DataContext is DashboardViewModel vm)
+            _isReconnecting = false;
+            // LibVLC chạy callback ở background thread. Invoke sang UI thread để báo trạng thái an toàn:
+            Dispatcher.InvokeAsync(() =>
             {
-                vm.CameraStatus = "Camera Online (FFME 4.4.350)";
-                vm.NotifyCameraStatus(HardwareConnectionStatus.Online);
-            }
-        }
-
-        /// <summary>
-        /// Cấu hình FFME truớc khi mở luồng camera:
-        /// - Buộc dùng Software Decoding (không dùng GPU) bằng cách set VideoHardwareDevice = null.
-        /// - Tắt âm thanh: camera trạm cân không cần audio.
-        /// - Tối ưu buffer và transport cho RTSP UDP (giảm độ trễ khung hình).
-        /// </summary>
-        private void CameraPlayer_MediaOpening(object sender, MediaOpeningEventArgs e)
-        {
-            // =============================================================
-            // 1. FORCE SOFTWARE DECODING — không dùng GPU
-            // =============================================================
-            // API 4.4.350: set null = dùng software decoder (libavcodec thuần tuý)
-            // set thành một HardwareDeviceInfo cụ thể = bật hardware acceleration.
-            // Lý do chọn null:
-            //   - Máy công nghiệp thường dùng GPU tích hợp (Intel/AMD) với driver cũ.
-            //   - D3D11VA/DXVA2 không ổn định với RTSP dài hạn chạy 24/7.
-            //   - Software decoding tốn thêm 5-10% CPU nhưng không bao giờ crash.
-            e.Options.VideoHardwareDevice = null;
-
-            // =============================================================
-            // 2. TắT ÂM THANH — camera cân không cần audio
-            // =============================================================
-            e.Options.IsAudioDisabled = true;
-
-            // =============================================================
-            // 3. TỐI Ư U BUFFER — giảm độ trễ hiển thị khung hình
-            // =============================================================
-            // MinimumPlaybackBufferPercent = 0: không chờ pre-buffer, phát ngay khi có frame.
-            e.Options.MinimumPlaybackBufferPercent = 0;
-
-            // =============================================================
-            // 4. TỐI Ư U RTSP TRANSPORT — dùng DecoderParams (API 4.4.350)
-            // =============================================================
-            // Ép dùng UDP để giảm overhead trên mạng LAN.
-            // Nếu camera ở mạng không ổn định hoặc qua NAT, đổi thành "tcp".
-            e.Options.DecoderParams["rtsp_transport"] = "udp";
-
-            // Timeout kết nối RTSP: 5 giây (tránh đờ vô hạn khi camera off)
-            e.Options.DecoderParams["stimeout"] = "5000000"; // đơn vị: micro-giây
-
-            // =============================================================
-            // 5. TắT TIME SYNC — phù hợp stream trực tiếp (live stream)
-            // =============================================================
-            // IsTimeSyncDisabled = true: không đồng bộ timestamp với đồng hồ hệ thống,
-            // tránh hiện tượng giật khung hình khi camera có drift clock nhỏ.
-            e.Options.IsTimeSyncDisabled = true;
-        }
-
-        private void CameraPlayer_MediaFailed(object sender, MediaFailedEventArgs e)
-        {
-            if (this.DataContext is not DashboardViewModel vm) return;
-
-            vm.CameraStatus = "⚠️ LỖI KẾT NỐI CAMERA";
-            vm.NotifyCameraStatus(HardwareConnectionStatus.Offline);
-
-            // Auto-retry: đợi 5 giây rồi thử mở lại như RTSP stream
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(5000);
-                await Dispatcher.InvokeAsync(async () =>
+                if (this.DataContext is DashboardViewModel vm)
                 {
-                    try
+                    vm.CameraStatus = "Camera Online (LibVLCSharp)";
+                    vm.NotifyCameraStatus(HardwareConnectionStatus.Online);
+                }
+            });
+        }
+
+        /// <summary>KHI CAMERA GẶP SỰ CỐ, MẤT KẾT NỐI / DỮ LIỆU CHẬM</summary>
+        private void MediaPlayer_EncounteredError(object sender, EventArgs e)
+        {
+            if (_isReconnecting) return;
+            _isReconnecting = true;
+            
+            Dispatcher.InvokeAsync(() =>
+            {
+                if (this.DataContext is DashboardViewModel vm)
+                {
+                    vm.CameraStatus = "⚠️ LỖI KẾT NỐI CAMERA";
+                    vm.NotifyCameraStatus(HardwareConnectionStatus.Offline);
+
+                    // Auto-retry: đợi 5 giây rồi thử mở lại như RTSP stream
+                    _ = Task.Run(async () =>
                     {
-                        if (vm.CameraUri != null)
+                        await Task.Delay(5000);
+                        await Dispatcher.InvokeAsync(() =>
                         {
-                            vm.CameraStatus = "🔄 Đang kết nối lại camera...";
-                            vm.NotifyCameraStatus(HardwareConnectionStatus.Reconnecting);
-                            await this.CameraPlayer.Open(vm.CameraUri);
-                        }
-                    }
-                    catch
-                    {
-                        vm.CameraStatus = "❌ Camera không khả dụng";
-                        vm.NotifyCameraStatus(HardwareConnectionStatus.Offline);
-                    }
-                });
+                            if (vm.CameraUri != null)
+                            {
+                                vm.CameraStatus = "🔄 Đang kết nối lại camera...";
+                                vm.NotifyCameraStatus(HardwareConnectionStatus.Reconnecting);
+                                InitializeVLCAndPlay(vm.CameraUri);
+                            }
+                        });
+                    });
+                }
             });
         }
     }
