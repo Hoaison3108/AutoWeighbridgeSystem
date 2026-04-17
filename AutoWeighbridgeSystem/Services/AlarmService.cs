@@ -14,7 +14,7 @@ namespace AutoWeighbridgeSystem.Services
     {
         private readonly RelayService _relayService;
         private readonly IConfiguration _configuration;
-        private bool _isRinging = false; // Chống spam click hú còi liên tục
+        private volatile bool _isRinging = false; // Chống spam — volatile đảm bảo thread-safe khi nhiều luồng kiểm tra cùng lúc
 
         public AlarmService(RelayService relayService, IConfiguration configuration)
         {

@@ -85,9 +85,9 @@ namespace AutoWeighbridgeSystem.Services
                     await Task.Delay(TimeSpan.FromSeconds(queueTimeoutSeconds), _pendingTimeoutCts.Token);
                     onPendingTimeout?.Invoke();
                 }
-                catch
+                catch (OperationCanceledException)
                 {
-                    // TaskCanceledException được bắt thầm lặng — timeout bị hủy bởi CancelPendingTimeout()
+                    // CancelPendingTimeout() đã được gọi — timeout bị hủy chủ động, không phải lỗi
                 }
             }, _pendingTimeoutCts.Token);
         }

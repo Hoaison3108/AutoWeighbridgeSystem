@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "u2xKT1jDHKE=",
+  "dgSpecHash": "2w5ystJ4+T0=",
   "success": true,
-  "projectFilePath": "d:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
+  "projectFilePath": "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\SONPH\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

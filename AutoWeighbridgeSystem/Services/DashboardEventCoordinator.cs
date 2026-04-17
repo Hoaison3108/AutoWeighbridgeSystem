@@ -93,9 +93,9 @@ namespace AutoWeighbridgeSystem.Services
         /// Coordinator có thể đọc trạng thái hiện tại của ViewModel khi cần.
         /// </summary>
         public void Start(
-            Func<bool>   getIsAutoMode,
-            Func<bool>   getIsWeightLocked,
-            Func<bool>   getIsProcessingSave,
+            Func<bool> getIsAutoMode,
+            Func<bool> getIsWeightLocked,
+            Func<bool> getIsProcessingSave,
             Func<string> getSelectedProductName)
         {
             _getIsAutoMode = getIsAutoMode;
@@ -107,11 +107,11 @@ namespace AutoWeighbridgeSystem.Services
             _rfidService.CardRead += OnRfidCardRead;
 
             // Subscribe trạng thái kết nối phần cứng — chuyển tiếp thông báo lên UI
-            _scaleService.Disconnected        += OnScaleDisconnected;
-            _scaleService.Reconnected         += OnScaleReconnected;
+            _scaleService.Disconnected += OnScaleDisconnected;
+            _scaleService.Reconnected += OnScaleReconnected;
             _scaleService.ReconnectAttempting += OnScaleReconnectAttempting;
-            _rfidService.ReaderDisconnected   += OnRfidReaderDisconnected;
-            _rfidService.ReaderReconnected    += OnRfidReaderReconnected;
+            _rfidService.ReaderDisconnected += OnRfidReaderDisconnected;
+            _rfidService.ReaderReconnected += OnRfidReaderReconnected;
 
             StartHardwareWatchdog();
 
@@ -239,7 +239,7 @@ namespace AutoWeighbridgeSystem.Services
             _dashboardWorkflow.ClearPendingData();
             Application.Current?.Dispatcher.InvokeAsync(() =>
             {
-                FormResetRequested?.Invoke("⚠️ ĐẦU CÂN MẤT KẼT NỐI! Đang thử kết nối lại...");
+                FormResetRequested?.Invoke("⚠️ ĐẦU CÂN MẤT KẾT NỐI! Đang thử kết nối lại...");
             });
         }
 
@@ -247,7 +247,7 @@ namespace AutoWeighbridgeSystem.Services
         private void OnScaleReconnected()
         {
             Application.Current?.Dispatcher.InvokeAsync(() =>
-                CameraMessageRequested?.Invoke("✅ ĐẦU CÂN ĐÃ KẼT NỐI LạI!", true));
+                CameraMessageRequested?.Invoke("✅ ĐẦU CÂN ĐÃ KẾT NỐI LẠI!", true));
         }
 
         /// <summary>Hiển thị thông tin lần thử kết nối lại đang diễn ra.</summary>
@@ -268,7 +268,7 @@ namespace AutoWeighbridgeSystem.Services
         private void OnRfidReaderReconnected(string roleName)
         {
             Application.Current?.Dispatcher.InvokeAsync(() =>
-                CameraMessageRequested?.Invoke($"✅ RFID {roleName} ĐÃ KẼT NỐI LạI!", true));
+                CameraMessageRequested?.Invoke($"✅ RFID {roleName} ĐÃ KẾT NỐI LẠI!", true));
         }
 
         // =========================================================================
@@ -276,13 +276,13 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
         public void Dispose()
         {
-            _scaleService.WeightChanged        -= OnScaleWeightChanged;
-            _scaleService.Disconnected         -= OnScaleDisconnected;
-            _scaleService.Reconnected          -= OnScaleReconnected;
-            _scaleService.ReconnectAttempting  -= OnScaleReconnectAttempting;
-            _rfidService.CardRead              -= OnRfidCardRead;
-            _rfidService.ReaderDisconnected    -= OnRfidReaderDisconnected;
-            _rfidService.ReaderReconnected     -= OnRfidReaderReconnected;
+            _scaleService.WeightChanged -= OnScaleWeightChanged;
+            _scaleService.Disconnected -= OnScaleDisconnected;
+            _scaleService.Reconnected -= OnScaleReconnected;
+            _scaleService.ReconnectAttempting -= OnScaleReconnectAttempting;
+            _rfidService.CardRead -= OnRfidCardRead;
+            _rfidService.ReaderDisconnected -= OnRfidReaderDisconnected;
+            _rfidService.ReaderReconnected -= OnRfidReaderReconnected;
             _hardwareWatchdog.StopAll();
             Log.Information("[COORDINATOR] Coordinator đã dừng và giải phóng resources.");
         }

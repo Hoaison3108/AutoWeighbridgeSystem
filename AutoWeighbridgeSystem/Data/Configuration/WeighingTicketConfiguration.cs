@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -23,10 +23,11 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             builder.HasIndex(t => t.IsVoid);
 
             // 4. CẤU HÌNH QUAN HỆ (Foreign Keys)
-            // Lược bỏ UserID theo yêu cầu tối giản của bạn
+            // VehicleId là int? (nullable) — xe vãng lai chưa đăng ký không có VehicleId
             builder.HasOne(t => t.Vehicle)
                    .WithMany()
                    .HasForeignKey(t => t.VehicleId)
+                   .IsRequired(false)          // FK là optional
                    .OnDelete(DeleteBehavior.Restrict);
 
             // 5. ĐỊNH DẠNG DỮ LIỆU SỐ (Precision)

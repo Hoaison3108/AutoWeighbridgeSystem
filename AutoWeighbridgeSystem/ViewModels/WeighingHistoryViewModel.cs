@@ -19,15 +19,18 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IDbContextFactory<AppDbContext> _contextFactory;
         private readonly IExportService _exportService;
         private readonly IUserNotificationService _notificationService;
+        private readonly WeighingBusinessService _weighingBusiness;
 
         public WeighingHistoryViewModel(
             IDbContextFactory<AppDbContext> contextFactory,
             IExportService exportService,
-            IUserNotificationService notificationService)
+            IUserNotificationService notificationService,
+            WeighingBusinessService weighingBusiness)
         {
-            _contextFactory = contextFactory;
-            _exportService  = exportService;
+            _contextFactory      = contextFactory;
+            _exportService       = exportService;
             _notificationService = notificationService;
+            _weighingBusiness    = weighingBusiness;
 
             _fromDate = DateTime.Today;
             _toDate   = DateTime.Today.AddDays(1).AddSeconds(-1);
@@ -247,25 +250,22 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             if (ticket == null || ticket.IsVoid) return;
 
-            if (_notificationService.Confirm(
+            if (!_notificationService.Confirm(
                 UiText.Messages.VoidTicketConfirm(ticket.TicketID),
                 UiText.Titles.Warning,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning))
-            {
-                using var context = _contextFactory.CreateDbContext();
-                var ticketInDb = await context.WeighingTickets.IgnoreQueryFilters()
-                                              .FirstOrDefaultAsync(t => t.TicketID == ticket.TicketID);
+                return;
 
-                if (ticketInDb != null)
-                {
-                    ticketInDb.IsVoid     = true;
-                    ticketInDb.VoidReason = "Nhân viên yêu cầu hủy";
-                    ticketInDb.Note       = $"Hủy lúc: {DateTime.Now:HH:mm dd/MM/yyyy}";
-                    await context.SaveChangesAsync();
-                    await LoadHistoryAsync();
-                }
-            }
+            // Gọi Business Service thay vì viết lại logic trực tiếp trong ViewModel
+            var (isSuccess, message) = await _weighingBusiness.VoidTicketAsync(
+                ticket.TicketID,
+                reason: "Nhân viên yêu cầu hủy");
+
+            if (isSuccess)
+                await LoadHistoryAsync();
+            else
+                _notificationService.ShowWarning(message, UiText.Titles.Warning);
         }
 
         [RelayCommand]

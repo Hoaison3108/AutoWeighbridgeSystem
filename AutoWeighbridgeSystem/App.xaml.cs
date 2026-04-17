@@ -132,11 +132,8 @@ namespace AutoWeighbridgeSystem
 
                         string protocolName = section["Protocol"] ?? "VishayVT220";
 
-                        IScaleProtocol selectedProtocol = protocolName switch
-                        {
-                            "VishayVT220" => new VishayVT220protocol(),
-                            _ => new VishayVT220protocol()
-                        };
+                        var protocolFactory = provider.GetRequiredService<IScaleProtocolFactory>();
+                        IScaleProtocol selectedProtocol = protocolFactory.Create(protocolName);
 
                         scaleService.Initialize(port, baud, dataBits, parity, stopBits, selectedProtocol);
                     }
@@ -154,33 +151,39 @@ namespace AutoWeighbridgeSystem
                 var config = provider.GetRequiredService<IConfiguration>();
                 var rfidService = new RfidMultiService();
 
-                string inPort = config["RfidSettings:ScaleIn:ComPort"];
-                string outPort = config["RfidSettings:ScaleOut:ComPort"];
+                string inPort   = config["RfidSettings:ScaleIn:ComPort"];
+                string outPort  = config["RfidSettings:ScaleOut:ComPort"];
                 string deskPort = config["RfidSettings:Desk:ComPort"];
 
-                if (!int.TryParse(config["RfidSettings:Desk:BaudRate"], out int baudRate))
-                {
-                    baudRate = 9600;
-                }
+                // Mỗi đầu đọc sử dụng BaudRate riêng của mình (không dùng chung)
+                int inBaud   = int.TryParse(config["RfidSettings:ScaleIn:BaudRate"],  out int ib) ? ib  : 9600;
+                int outBaud  = int.TryParse(config["RfidSettings:ScaleOut:BaudRate"], out int ob) ? ob  : 9600;
+                int deskBaud = int.TryParse(config["RfidSettings:Desk:BaudRate"],     out int db) ? db  : 9600;
 
                 if (!string.IsNullOrEmpty(deskPort))
-                    rfidService.AddReader(ReaderRoles.Desk, deskPort, baudRate);
-
+                    rfidService.AddReader(ReaderRoles.Desk,     deskPort, deskBaud);
                 if (!string.IsNullOrEmpty(inPort))
-                    rfidService.AddReader(ReaderRoles.ScaleIn, inPort, baudRate);
-
+                    rfidService.AddReader(ReaderRoles.ScaleIn,  inPort,   inBaud);
                 if (!string.IsNullOrEmpty(outPort))
-                    rfidService.AddReader(ReaderRoles.ScaleOut, outPort, baudRate);
+                    rfidService.AddReader(ReaderRoles.ScaleOut, outPort,  outBaud);
 
                 return rfidService;
             });
 
             // --- Nhóm 3: ViewModels (Logic nghiệp vụ) ---
+            services.AddSingleton<IScaleProtocolFactory, ScaleProtocolFactory>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<IExportService, ExcelExportService>();
             services.AddSingleton<DashboardViewModel>();
-            // Lưu ý: DashboardViewModel nhận DashboardEventCoordinator (Singleton) thay cho
-            // RfidMultiService, DashboardWorkflowService, HardwareWatchdogService, IDbContextFactory
+            // DashboardViewModel nhận factory delegate thay vì IDbContextFactory trực tiếp.
+            // Delegate này được DI resolve và truyền các dependency cần thiết vào QuickVehicleRegisterViewModel.
+            services.AddSingleton<Func<string, QuickVehicleRegisterViewModel>>(sp => licensePlate =>
+                new QuickVehicleRegisterViewModel(
+                    licensePlate,
+                    sp.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<Data.AppDbContext>>(),
+                    sp.GetRequiredService<IUserNotificationService>(),
+                    sp.GetRequiredService<ScaleService>()));
+
             services.AddSingleton<VehicleRegistrationViewModel>();
             services.AddTransient<LoginViewModel>();
 

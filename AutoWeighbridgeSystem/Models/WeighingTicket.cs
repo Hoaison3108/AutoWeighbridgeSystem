@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,7 +12,7 @@ namespace AutoWeighbridgeSystem.Models
         [StringLength(20)]
         public string TicketID { get; set; } // Định dạng: yyMMdd-xxx
 
-        public int VehicleId { get; set; }
+        public int? VehicleId { get; set; }
         [ForeignKey("VehicleId")]
         public virtual Vehicle Vehicle { get; set; }
 

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoWeighbridgeSystem.Models;
 using Serilog;
 
 namespace AutoWeighbridgeSystem.Services
@@ -27,16 +29,32 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary>Lưu trạng thái và thông số kết nối của một đầu đọc RFID.</summary>
         private sealed class RfidReaderEntry
         {
-            public string   RoleName      { get; }
-            public string   ComPort       { get; }
-            public int      BaudRate      { get; }
-            public SerialPort?             Port           { get; set; }
-            public volatile bool           IsReconnecting;
-            public CancellationTokenSource ReconnectCts   = new CancellationTokenSource();
+            public string    RoleName  { get; }
+            public string    ComPort   { get; }
+            public int       BaudRate  { get; }
+            public SerialPort? Port    { get; set; }
+            public volatile bool IsReconnecting;
+            public CancellationTokenSource ReconnectCts = new CancellationTokenSource();
 
             /// <summary>Lưu tham chiếu handler để unsubscribe đúng cách khi cần.</summary>
             public SerialDataReceivedEventHandler?  DataHandler;
             public SerialErrorReceivedEventHandler? ErrorHandler;
+
+            // =========================================================================
+            // BUFFER + DEBOUNCE TIMER (thay thế Thread.Sleep)
+            // =========================================================================
+
+            /// <summary>
+            /// Buffer tích lũy dữ liệu thô giữa các lần DataReceived.
+            /// Truy cập phải lock trên chính object DataBuffer.
+            /// </summary>
+            public readonly StringBuilder DataBuffer = new StringBuilder();
+
+            /// <summary>
+            /// Timer debounce 80ms: reset sau mỗi lần nhận dữ liệu, kích hoạt
+            /// ProcessBufferedData() khi không có byte mới trong 80ms.
+            /// </summary>
+            public Timer? FlushTimer;
 
             public RfidReaderEntry(string roleName, string comPort, int baudRate)
             {
@@ -50,6 +68,9 @@ namespace AutoWeighbridgeSystem.Services
         // STATE
         // =========================================================================
         private readonly List<RfidReaderEntry> _readers = new List<RfidReaderEntry>();
+
+        /// <summary>Số đầu đọc RFID hiện đang được quản lý (bao gồm cả đang reconnect).</summary>
+        public int ActiveReaderCount => _readers.Count;
 
         /// <summary>Các mốc thời gian chờ (giây) giữa các lần thử kết nối lại.</summary>
         private static readonly int[] ReconnectDelaysSeconds = { 5, 5, 10, 30, 60 };
@@ -115,12 +136,42 @@ namespace AutoWeighbridgeSystem.Services
             _readers.Clear();
         }
 
+        /// <summary>
+        /// Khởi động lại tất cả đầu đọc RFID với thông số mới.
+        /// <para>
+        /// Vì <see cref="RfidMultiService"/> là Singleton, toàn bộ subscriber hiện có
+        /// của <see cref="CardRead"/> vẫn còn nguyên sau khi reinit.
+        /// Không cần thay đổi gì ở Coordinator hay ViewModel.
+        /// </para>
+        /// </summary>
+        /// <param name="inPort">COM port đầu đọc ScaleIn. Bỏ qua nếu rỗng.</param>
+        /// <param name="inBaud">BaudRate của ScaleIn.</param>
+        /// <param name="outPort">COM port đầu đọc ScaleOut. Bỏ qua nếu rỗng.</param>
+        /// <param name="outBaud">BaudRate của ScaleOut.</param>
+        /// <param name="deskPort">COM port đầu đọc Desk. Bỏ qua nếu rỗng.</param>
+        /// <param name="deskBaud">BaudRate của Desk.</param>
+        public void ReinitializeReaders(
+            string inPort,   int inBaud,
+            string outPort,  int outBaud,
+            string deskPort, int deskBaud)
+        {
+            Log.Information("[RFID] Đang khởi động lại tất cả đầu đọc RFID...");
+            CloseAll();
+
+            if (!string.IsNullOrEmpty(deskPort))  AddReader(ReaderRoles.Desk,     deskPort, deskBaud);
+            if (!string.IsNullOrEmpty(inPort))    AddReader(ReaderRoles.ScaleIn,  inPort,  inBaud);
+            if (!string.IsNullOrEmpty(outPort))   AddReader(ReaderRoles.ScaleOut, outPort, outBaud);
+
+            Log.Information("[RFID] Khởi động lại hoàn tất — {Count} đầu đọc đang hoạt động.", _readers.Count);
+        }
+
         // =========================================================================
         // KHỞI TẠO PORT CHO TỪNG ĐẦU ĐỌC
         // =========================================================================
 
         /// <summary>
-        /// Mở cổng COM cho một đầu đọc cụ thể, đăng ký các event handler.
+        /// Mở cổng COM cho một đầu đọc cụ thể, đăng ký các event handler,
+        /// và khởi tạo debounce timer để xử lý buffer.
         /// Được gọi từ <see cref="AddReader"/> và từ vòng lặp reconnect.
         /// </summary>
         private void OpenReaderPort(RfidReaderEntry entry)
@@ -147,6 +198,15 @@ namespace AutoWeighbridgeSystem.Services
                 port.Open();
 
                 entry.Port = port;
+
+                // Khởi tạo debounce timer (bắt đầu ở trạng thái tắt — Timeout.Infinite)
+                // Timer sẽ được kích hoạt trong HandleDataReceived sau mỗi lần nhận dữ liệu
+                entry.FlushTimer = new Timer(
+                    _ => ProcessBufferedData(entry),
+                    null,
+                    Timeout.Infinite,
+                    Timeout.Infinite);
+
                 Log.Information("[RFID] ĐÃ MỞ CỔNG {Port} cho đầu đọc {Role}", entry.ComPort, entry.RoleName);
             }
             catch (Exception ex)
@@ -156,35 +216,65 @@ namespace AutoWeighbridgeSystem.Services
         }
 
         // =========================================================================
-        // XỬ LÝ DỮ LIỆU
+        // XỬ LÝ DỮ LIỆU (Buffer + Debounce thay thế Thread.Sleep)
         // =========================================================================
 
+        /// <summary>
+        /// Xử lý DataReceived event: đọc dữ liệu thô vào buffer của entry,
+        /// sau đó reset debounce timer. Timer sẽ kích hoạt
+        /// <see cref="ProcessBufferedData"/> sau 80ms không có dữ liệu mới.
+        /// <para>
+        /// Không dùng Thread.Sleep — không block thread pool thread.
+        /// </para>
+        /// </summary>
         private void HandleDataReceived(RfidReaderEntry entry, SerialPort sp)
         {
             try
             {
-                Thread.Sleep(100); // Chờ nhận đủ gói tin
-
                 string rawData = sp.ReadExisting();
                 if (string.IsNullOrEmpty(rawData)) return;
 
                 Log.Information("[RFID] {Role} nhận dữ liệu thô: {Raw}", entry.RoleName, rawData);
 
-                // Lọc lấy chỉ các chữ số 0-9
-                string cleanId = "";
-                foreach (char c in rawData)
-                    if (char.IsDigit(c)) cleanId += c;
-
-                if (!string.IsNullOrEmpty(cleanId))
+                // Ghi vào buffer — thread-safe qua lock
+                lock (entry.DataBuffer)
                 {
-                    Log.Debug("[RFID] {Role} trích xuất mã số: {Data}", entry.RoleName, cleanId);
-                    CardRead?.Invoke(entry.RoleName, cleanId);
+                    entry.DataBuffer.Append(rawData);
                 }
+
+                // Reset debounce timer: 80ms sau lần nhận cuối cùng mới xử lý
+                // Tránh kích hoạt event nếu gói tin RFID đến phân mảnh nhiều DataReceived
+                entry.FlushTimer?.Change(dueTime: 80, period: Timeout.Infinite);
             }
             catch (Exception ex)
             {
                 Log.Warning("[RFID] Lỗi đọc dữ liệu từ {Role} — có thể mất kết nối: {Msg}", entry.RoleName, ex.Message);
                 HandleReaderDisconnect(entry);
+            }
+        }
+
+        /// <summary>
+        /// Được gọi bởi FlushTimer sau 80ms yên tĩnh.
+        /// Lấy toàn bộ buffer, lọc chữ số và emit <see cref="CardRead"/>.
+        /// </summary>
+        private void ProcessBufferedData(RfidReaderEntry entry)
+        {
+            string buffered;
+            lock (entry.DataBuffer)
+            {
+                buffered = entry.DataBuffer.ToString();
+                entry.DataBuffer.Clear();
+            }
+
+            if (string.IsNullOrEmpty(buffered)) return;
+
+            // Lọc lấy chỉ các chữ số 0-9 (mã thẻ RFID luôn là chuỗi số)
+            string cleanId = new string(buffered.Where(char.IsDigit).ToArray());
+
+            if (!string.IsNullOrEmpty(cleanId))
+            {
+                Log.Debug("[RFID] {Role} trích xuất mã số: {Data}", entry.RoleName, cleanId);
+                CardRead?.Invoke(entry.RoleName, cleanId);
             }
         }
 
@@ -209,12 +299,16 @@ namespace AutoWeighbridgeSystem.Services
         }
 
         /// <summary>
-        /// Đóng port của một đầu đọc một cách an toàn, unsubscribe events.
+        /// Đóng port, timer, và unsubscribe events của một đầu đọc một cách an toàn.
         /// </summary>
         private void SafeCloseReaderPort(RfidReaderEntry entry)
         {
             try
             {
+                // Dừng và giải phóng debounce timer trước tiên
+                entry.FlushTimer?.Dispose();
+                entry.FlushTimer = null;
+
                 if (entry.Port != null)
                 {
                     if (entry.DataHandler  != null) entry.Port.DataReceived  -= entry.DataHandler;
@@ -264,7 +358,6 @@ namespace AutoWeighbridgeSystem.Services
 
                     try
                     {
-                        // Thử mở lại port
                         var testPort = new SerialPort(entry.ComPort, entry.BaudRate, Parity.None, 8, StopBits.One)
                         {
                             Encoding = Encoding.GetEncoding("ISO-8859-1")
@@ -281,8 +374,14 @@ namespace AutoWeighbridgeSystem.Services
                         testPort.ErrorReceived += entry.ErrorHandler;
                         testPort.Open();
 
-                        // Thành công
-                        entry.Port          = testPort;
+                        // Thành công — khôi phục timer
+                        entry.Port = testPort;
+                        entry.FlushTimer = new Timer(
+                            _ => ProcessBufferedData(entry),
+                            null,
+                            Timeout.Infinite,
+                            Timeout.Infinite);
+
                         entry.IsReconnecting = false;
 
                         Log.Information("[RFID] ✅ [{Role}] KẾT NỐI LẠI THÀNH CÔNG tại {Port} (sau {Attempt} lần thử).",

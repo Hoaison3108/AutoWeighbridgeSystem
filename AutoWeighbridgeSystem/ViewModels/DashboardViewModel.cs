@@ -31,7 +31,13 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IUserNotificationService _notificationService;
         private readonly AlarmService _alarmService;
         private readonly AppSession _appSession;
-        private readonly Microsoft.EntityFrameworkCore.IDbContextFactory<AutoWeighbridgeSystem.Data.AppDbContext> _dbContextFactory;
+
+        /// <summary>
+        /// Factory delegate được inject từ DI — tạo <see cref="QuickVehicleRegisterViewModel"/>
+        /// với biển số xe được truyền vào, mà không cần DashboardViewModel
+        /// phải biết cách tạo VM con hoặc cần <c>IDbContextFactory</c>.
+        /// </summary>
+        private readonly Func<string, QuickVehicleRegisterViewModel> _quickRegisterVmFactory;
 
         // =========================================================================
         // TRẠNG THÁI NỘI BỘ
@@ -118,18 +124,18 @@ namespace AutoWeighbridgeSystem.ViewModels
             IUserNotificationService notificationService,
             AlarmService alarmService,
             AppSession appSession,
-            Microsoft.EntityFrameworkCore.IDbContextFactory<AutoWeighbridgeSystem.Data.AppDbContext> dbContextFactory)
+            Func<string, QuickVehicleRegisterViewModel> quickRegisterVmFactory)
         {
-            _configuration = configuration;
-            _scaleService = scaleService;
-            _coordinator = coordinator;
-            _dashboardSaveService = dashboardSaveService;
-            _dashboardDataService = dashboardDataService;
-            _weighingBusiness = weighingBusiness;
-            _notificationService = notificationService;
-            _alarmService = alarmService;
-            _appSession = appSession;
-            _dbContextFactory = dbContextFactory;
+            _configuration          = configuration;
+            _scaleService           = scaleService;
+            _coordinator            = coordinator;
+            _dashboardSaveService   = dashboardSaveService;
+            _dashboardDataService   = dashboardDataService;
+            _weighingBusiness       = weighingBusiness;
+            _notificationService    = notificationService;
+            _alarmService           = alarmService;
+            _appSession             = appSession;
+            _quickRegisterVmFactory = quickRegisterVmFactory;
 
             LoadUiConfiguration();
             InitializeCamera();
@@ -376,16 +382,17 @@ namespace AutoWeighbridgeSystem.ViewModels
             // Bổ sung luồng chặn xử lý Đăng ký xe vãng lai
             if (!VehicleList.Any(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
             {
-                var vm = new QuickVehicleRegisterViewModel(LicensePlate, _dbContextFactory, _notificationService, _scaleService);
+                // Sử dụng factory delegate — DashboardViewModel không cần biết
+                // cách tạo QuickVehicleRegisterViewModel hay cần IDbContextFactory
+                var vm     = _quickRegisterVmFactory(LicensePlate);
                 var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
                 window.ShowDialog();
 
                 if (!vm.IsRegisteredAndSaved)
                 {
-                    return; // Người dùng Hủy ngang cửa sổ thiết bị
+                    return;
                 }
 
-                // Nếu đăng ký thành công, load lại DB và chọn xe mới
                 await LoadInitialDataAsync();
                 var newVehicle = VehicleList.FirstOrDefault(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase));
                 if (newVehicle != null) SelectedVehicle = newVehicle;

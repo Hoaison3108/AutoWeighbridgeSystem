@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoWeighbridgeSystem.Models;
@@ -18,7 +19,7 @@ namespace AutoWeighbridgeSystem.Services
     public sealed class DashboardWorkflowService
     {
         private readonly RfidBusinessService _rfidBusiness;
-        private readonly Dictionary<string, DateTime> _rfidCooldowns = new();
+        private readonly ConcurrentDictionary<string, DateTime> _rfidCooldowns = new();
 
         private int _rfidCooldownSeconds = 3;
 

@@ -17,6 +17,12 @@ namespace AutoWeighbridgeSystem.Services
     {
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
+        /// <summary>
+        /// Lock tĩnh bảo vệ việc sinh TicketID — đảm bảo chỉ 1 luồng
+        /// thực hiện đọc Max + tăng số tại một thời điểm, tránh trùng mã.
+        /// </summary>
+        private static readonly SemaphoreSlim _ticketIdLock = new SemaphoreSlim(1, 1);
+
         public WeighingBusinessService(IDbContextFactory<AppDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
@@ -106,7 +112,7 @@ namespace AutoWeighbridgeSystem.Services
                     var onePassTicket = new WeighingTicket
                     {
                         TicketID = await GenerateTicketIdAsync(db),
-                        VehicleId = vehicleId,
+                        VehicleId = vehicleId == 0 ? null : vehicleId, // null = xe chưa đăng ký
                         LicensePlate = licensePlate,
                         CustomerName = customerName,
                         ProductName = productName,
@@ -140,7 +146,7 @@ namespace AutoWeighbridgeSystem.Services
                     var newTicket = new WeighingTicket
                     {
                         TicketID = await GenerateTicketIdAsync(db),
-                        VehicleId = vehicleId,
+                        VehicleId = vehicleId == 0 ? null : vehicleId, // null = xe chưa đăng ký
                         LicensePlate = licensePlate,
                         CustomerName = customerName,
                         ProductName = productName,
@@ -242,24 +248,31 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         private async Task<string> GenerateTicketIdAsync(AppDbContext db)
         {
-            string prefix = DateTime.Now.ToString("yyMMdd");
-
-            // TỐI ƯU: Chỉ lấy đúng cột TicketID, lấy giá trị Max trực tiếp trên SQL Server
-            var maxTicketId = await db.WeighingTickets
-                .IgnoreQueryFilters()
-                .Where(t => t.TicketID.StartsWith(prefix))
-                .Select(t => t.TicketID) // Không kéo cả Entity về
-                .MaxAsync();             // SQL Server tính Max rất nhanh
-
-            int nextNum = 1;
-            if (!string.IsNullOrEmpty(maxTicketId) && maxTicketId.Contains("-"))
+            // SemaphoreSlim(1,1): chỉ 1 luồng thực hiện đoạn đọc-tăng-trả về tại một thời điểm.
+            // Ngăn trường hợp 2 xe cân cùng lúc đọc được cùng MaxTicketId → sinh mã trùng.
+            await _ticketIdLock.WaitAsync();
+            try
             {
-                if (int.TryParse(maxTicketId.Split('-').Last(), out int num))
+                string prefix = DateTime.Now.ToString("yyMMdd");
+
+                var maxTicketId = await db.WeighingTickets
+                    .IgnoreQueryFilters()
+                    .Where(t => t.TicketID.StartsWith(prefix))
+                    .Select(t => t.TicketID)
+                    .MaxAsync();
+
+                int nextNum = 1;
+                if (!string.IsNullOrEmpty(maxTicketId) && maxTicketId.Contains("-"))
                 {
-                    nextNum = num + 1;
+                    if (int.TryParse(maxTicketId.Split('-').Last(), out int num))
+                        nextNum = num + 1;
                 }
+                return $"{prefix}-{nextNum:D3}";
             }
-            return $"{prefix}-{nextNum:D3}";
+            finally
+            {
+                _ticketIdLock.Release();
+            }
         }
     }
 }

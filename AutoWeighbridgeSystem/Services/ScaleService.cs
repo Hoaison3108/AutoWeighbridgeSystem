@@ -166,6 +166,9 @@ namespace AutoWeighbridgeSystem.Services
 
         /// <summary>
         /// Xử lý dữ liệu thô nhận được từ Serial Port.
+        /// Tích lũy vào buffer, sau đó ủy quyền toàn bộ việc parse frame cho
+        /// <see cref="IScaleProtocol.TryExtractFrame"/> — ScaleService không biết gì
+        /// về format giao thức cụ thể (P+, @+, Modbus, hay bất kỳ chuẩn nào).
         /// Nếu xảy ra lỗi đọc, kích hoạt quy trình <see cref="HandleDisconnect"/>.
         /// </summary>
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -179,32 +182,22 @@ namespace AutoWeighbridgeSystem.Services
 
                 string currentBuffer = _incomingDataBuffer.ToString();
 
-                // Tìm frame hợp lệ từ cuối lên (lấy tín hiệu mới nhất)
-                int pIndex      = currentBuffer.LastIndexOf("P+");
-                int aIndex      = currentBuffer.LastIndexOf("@+");
-                int targetIndex = Math.Max(pIndex, aIndex);
+                // Ủy quyền hoàn toàn cho protocol: tìm frame, parse giá trị, tính remainder
+                var frameResult = _protocol.TryExtractFrame(currentBuffer);
 
-                if (targetIndex != -1 && targetIndex + 8 <= currentBuffer.Length)
+                if (frameResult.HasValue)
                 {
-                    string weightStr = currentBuffer.Substring(targetIndex + 2, 6);
+                    ProcessWeightStability(frameResult.Value.Weight, frameResult.Value.IsHardwareStable);
 
-                    if (decimal.TryParse(weightStr, out decimal weight))
-                    {
-                        bool isHardwareStable = (targetIndex == pIndex);
-                        ProcessWeightStability(weight, isHardwareStable);
-                    }
-
-                    // Khắc phục Buffer Dataloss: Cắt bỏ phần đã xử lý, giữ lại các ký tự phía sau
-                    string remainder = currentBuffer.Substring(targetIndex + 8);
+                    // Cập nhật buffer: giữ lại phần dư chưa xử lý
                     _incomingDataBuffer.Clear();
-                    if (remainder.Length > 0)
-                    {
-                        _incomingDataBuffer.Append(remainder);
-                    }
+                    if (frameResult.Value.Remainder.Length > 0)
+                        _incomingDataBuffer.Append(frameResult.Value.Remainder);
                 }
                 else if (_incomingDataBuffer.Length > 200)
                 {
-                    _incomingDataBuffer.Clear(); // Chống tràn bộ nhớ khi nhiễu tín hiệu
+                    // Chống tràn bộ nhớ khi nhiễu tín hiệu kéo dài
+                    _incomingDataBuffer.Clear();
                 }
             }
             catch (Exception ex)
@@ -214,6 +207,7 @@ namespace AutoWeighbridgeSystem.Services
                 HandleDisconnect();
             }
         }
+
 
         /// <summary>
         /// Xử lý lỗi phần cứng từ Serial Port (frame error, buffer overflow...).
@@ -393,6 +387,23 @@ namespace AutoWeighbridgeSystem.Services
             _reconnectCts.Cancel();
             SafeClosePort();
             Log.Information("[SCALE] Đã đóng cổng cân.");
+        }
+
+        /// <summary>
+        /// Khởi động lại kết nối với đầu cân bằng thông số mới.
+        /// <para>
+        /// Vì <see cref="ScaleService"/> là Singleton, toàn bộ subscriber hiện có
+        /// (<c>WeightChanged</c>, <c>Disconnected</c>...) vẫn còn nguyên sau khi reinit.
+        /// Không cần thay đổi gì ở ViewModel hay Coordinator.
+        /// </para>
+        /// </summary>
+        public void Reinitialize(string portName, int baudRate, int dataBits,
+                                 Parity parity, StopBits stopBits, IScaleProtocol protocol)
+        {
+            Log.Information("[SCALE] Đang khởi động lại với cổng {Port} ({Baud} bps)...", portName, baudRate);
+            Close();   // Hủy reconnect loop cũ + đóng port hiện tại
+            Initialize(portName, baudRate, dataBits, parity, stopBits, protocol);
+            Log.Information("[SCALE] Khởi động lại hoàn tất.");
         }
 
         /// <inheritdoc/>
