@@ -16,5 +16,5 @@ D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml
 256-820312560
 Views\CustomerView.xaml;Views\DashboardView.xaml;Views\LoginWindow.xaml;Views\MainWindow.xaml;Views\ProductView.xaml;Views\QuickVehicleRegisterWindow.xaml;Views\SettingsView.xaml;Views\VehicleRegistrationView.xaml;Views\WeighingHistoryView.xaml;
 
-False
+True
 
