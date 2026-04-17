@@ -72,6 +72,23 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary>Số đầu đọc RFID hiện đang được quản lý (bao gồm cả đang reconnect).</summary>
         public int ActiveReaderCount => _readers.Count;
 
+        /// <summary>
+        /// Danh sách vai trò của các đầu đọc đang kết nối thành công (port đang mở và không đang reconnect).
+        /// </summary>
+        public IReadOnlyList<string> ConnectedReaderRoles
+        {
+            get
+            {
+                lock (_readers)
+                {
+                    return _readers
+                        .Where(r => r.Port?.IsOpen == true && !r.IsReconnecting)
+                        .Select(r => r.RoleName)
+                        .ToList();
+                }
+            }
+        }
+
         /// <summary>Các mốc thời gian chờ (giây) giữa các lần thử kết nối lại.</summary>
         private static readonly int[] ReconnectDelaysSeconds = { 5, 5, 10, 30, 60 };
 
@@ -100,6 +117,24 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
         // PUBLIC API
         // =========================================================================
+
+        /// <summary>
+        /// Gọi ngay sau khi Coordinator đã subscribe events — replay trạng thái hiện tại
+        /// cho mỗi đầu đọc đang online để không bị miss nếu port đã mở trước khi
+        /// subscriber kịp attach (race condition khởi động).
+        /// </summary>
+        public void NotifyInitialStatus()
+        {
+            lock (_readers)
+            {
+                foreach (var entry in _readers)
+                {
+                    if (entry.Port?.IsOpen == true && !entry.IsReconnecting)
+                        ReaderReconnected?.Invoke(entry.RoleName);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Thêm và khởi động một đầu đọc RFID mới vào hệ thống.
@@ -208,6 +243,7 @@ namespace AutoWeighbridgeSystem.Services
                     Timeout.Infinite);
 
                 Log.Information("[RFID] ĐÃ MỞ CỔNG {Port} cho đầu đọc {Role}", entry.ComPort, entry.RoleName);
+                // Status event KHÔNG fire ở đây — phát từ NotifyInitialStatus() hoặc reconnect loop
             }
             catch (Exception ex)
             {

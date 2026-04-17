@@ -36,7 +36,7 @@ namespace AutoWeighbridgeSystem.Services
                 string port = _configuration["RelaySettings:ComPort"];
                 if (string.IsNullOrEmpty(port)) return;
 
-                int duration = int.Parse(_configuration["RelaySettings:AlarmDurationMs"] ?? "1500");
+                int duration = int.TryParse(_configuration["RelaySettings:AlarmDurationMs"], out int d) ? d : 1500;
 
                 // Gọi xuống RelayService của phần cứng
                 await Task.Run(() => _relayService.TriggerAlarmAsync(port, duration));

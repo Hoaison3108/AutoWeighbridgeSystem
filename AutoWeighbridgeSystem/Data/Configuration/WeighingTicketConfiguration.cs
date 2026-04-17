@@ -18,9 +18,18 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             builder.HasQueryFilter(t => !t.IsVoid);
 
             // 3. TỐI ƯU HÓA TRA CỨU (Indexing)
-            builder.HasIndex(t => t.LicensePlate);
-            builder.HasIndex(t => t.TimeIn);
-            builder.HasIndex(t => t.IsVoid);
+            // -----------------------------------------------------------------------
+            // Index 1 — COMPOSITE: phục vụ query "tìm phiếu đang mở" (dùng trong mọi lần cân)
+            //   WHERE LicensePlate = ? AND IsVoid = 0 AND TimeOut IS NULL
+            //   → SQL Server seek trực tiếp vào (LicensePlate, IsVoid), lọc TimeOut — O(log n)
+            builder.HasIndex(t => new { t.LicensePlate, t.IsVoid, t.TimeOut })
+                   .HasDatabaseName("IX_WeighingTickets_OpenTicketLookup");
+
+            // Index 2 — TimeIn: phục vụ ORDER BY TimeIn DESC trong LoadRecentTickets
+            builder.HasIndex(t => t.TimeIn)
+                   .HasDatabaseName("IX_WeighingTickets_TimeIn");
+            // Lưu ý: TicketID là PRIMARY KEY (clustered index) — không cần index riêng.
+            // Query WHERE TicketID LIKE '260417%' sử dụng clustered index range scan — O(log n).
 
             // 4. CẤU HÌNH QUAN HỆ (Foreign Keys)
             // VehicleId là int? (nullable) — xe vãng lai chưa đăng ký không có VehicleId

@@ -262,11 +262,14 @@ namespace AutoWeighbridgeSystem.ViewModels
                 rfid["Desk"]["StopBits"] = RfidDeskStopBits;
 
                 // ==========================================
-                // LƯU FILE
+                // LƯU FILE (Atomic write: temp → rename)
                 // ==========================================
+                // Ghi ra .tmp trước, sau đó rename — nếu crash giữa chừng file gốc còn nguyên
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string outputJson = root.ToJsonString(options);
-                File.WriteAllText(jsonPath, outputJson);
+                string tempPath = jsonPath + ".tmp";
+                File.WriteAllText(tempPath, outputJson, System.Text.Encoding.UTF8);
+                File.Move(tempPath, jsonPath, overwrite: true); // atomic rename trên NTFS
 
                 // Đồng bộ ngược lại file gốc nếu đang chạy trong Debug
                 try
@@ -279,7 +282,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                         {
                             string sourceJsonPath = Path.Combine(projectRoot, "appsettings.json");
                             if (File.Exists(sourceJsonPath))
-                                File.WriteAllText(sourceJsonPath, outputJson);
+                            {
+                                string srcTmp = sourceJsonPath + ".tmp";
+                                File.WriteAllText(srcTmp, outputJson, System.Text.Encoding.UTF8);
+                                File.Move(srcTmp, sourceJsonPath, overwrite: true);
+                            }
                         }
                     }
                 }

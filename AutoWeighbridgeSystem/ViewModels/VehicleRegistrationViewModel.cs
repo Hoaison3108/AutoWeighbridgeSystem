@@ -72,6 +72,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 SelectedCustomer = AllCustomers.FirstOrDefault(c => c.CustomerId == value.CustomerId);
                 IsEditMode = true;
+                _isRfidAssignIntent = false; // xem thông tin xe, chưa có ý định gán thẻ
             }
         }
 
@@ -92,6 +93,17 @@ namespace AutoWeighbridgeSystem.ViewModels
             OnPropertyChanged(nameof(NewVehicle));
         }
 
+        // =========================================================================
+        // RFID ASSIGN INTENT — khác IsEditMode (chỉ là trạng thái UI form)
+        // IsRfidAssignIntent = true chỉ khi người dùng đang chủ động muốn gán/đổi thẻ
+        // =========================================================================
+
+        /// <summary>
+        /// True khi người dùng đang trong luồng gán thẻ (form mở + xe chưa có thẻ,
+        /// hoặc vừa nhận thẻ trắng để gán). Chỉ khi true mới cảnh báo "thẻ rác/xung đột".
+        /// </summary>
+        private bool _isRfidAssignIntent = false;
+
         private void OnCardReadAtDesk(string readerRole, string cardId)
         {
             if (readerRole.Equals(ReaderRoles.Desk, StringComparison.OrdinalIgnoreCase))
@@ -103,15 +115,15 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
         }
 
-        // CẬP NHẬT 2: Gọi Module nghiệp vụ thay vì tự xử lý
+        // =========================================================================
+        // XỬ LÝ QUẸT THẺ RFID TẠI BÀN
+        // =========================================================================
         private async Task ProcessScannedCardAsync(string cardId)
         {
             try
             {
-                // Gọi sang Tầng Business Logic để lấy mã sạch và kiểm tra DB
                 var result = await _rfidBusiness.ProcessRawCardAsync(cardId);
 
-                // Nếu có lỗi (VD: không tìm thấy số trong chuỗi)
                 if (!result.IsSuccess)
                 {
                     System.Diagnostics.Debug.WriteLine($"[RFID Lỗi]: {result.ErrorMessage}");
@@ -120,37 +132,46 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 if (result.ExistingVehicle != null)
                 {
-                    if (IsEditMode)
+                    // ── THẺ ĐÃ ĐƯỢC GÁN CHO MỘT XE ──────────────────────────────────
+                    if (IsEditMode && _isRfidAssignIntent)
                     {
+                        // Người dùng đang chủ động muốn gán thẻ này vào form
                         if (result.ExistingVehicle.VehicleId == NewVehicle.VehicleId)
                         {
-                            _notificationService.ShowInfo("Thẻ này đã và đang được gắn cho chính xe này.");
+                            // Thẻ chính là thẻ hiện tại của xe này — không cần đổi
+                            _notificationService.ShowInfo("Thẻ này đã được gắn cho chính xe này.");
+                            _isRfidAssignIntent = false;
                         }
                         else
                         {
-                            _notificationService.ShowWarning($"Thẻ rác: Thẻ này đang bị gán cho xe {result.ExistingVehicle.LicensePlate}. Vui lòng sử dụng thẻ trắng mới!");
+                            // Thẻ thuộc xe khác — cảnh báo thật sự
+                            _notificationService.ShowWarning(
+                                $"Thẻ xung đột: Thẻ này đang được gán cho xe {result.ExistingVehicle.LicensePlate}. " +
+                                $"Vui lòng dùng thẻ chưa được đăng ký!");
                         }
                     }
                     else
                     {
-                        // Nếu đang ở chế độ xem tự do: Tự động trỏ tới xe tìm được
-                        SelectedRecord = RegisteredVehicles.FirstOrDefault(v => v.VehicleId == result.ExistingVehicle.VehicleId);
+                        // Không có intent gán — quẹt để tra cứu: tự động trỏ đến xe chủ thẻ
+                        SelectedRecord = RegisteredVehicles.FirstOrDefault(
+                            v => v.VehicleId == result.ExistingVehicle.VehicleId);
                     }
                 }
                 else
                 {
-                    // THẺ RỖNG (CHƯA ĐĂNG KÝ CHO AI)
+                    // ── THẺ TRẮNG (CHƯA ĐĂNG KÝ CHO AI) ─────────────────────────────
                     if (IsEditMode)
                     {
-                        // Lẳng lặng điền thẻ từ vào giao diện mà không xóa Form
+                        // Điền thẻ vào form hiện tại — bật intent vì vừa nhận thẻ mới
                         NewVehicle.RfidCardId = result.CleanCardId;
                         OnPropertyChanged(nameof(NewVehicle));
                         OnPropertyChanged("NewVehicle.RfidCardId");
-                        _notificationService.ShowInfo("Đã nạp mã thẻ mới. Vui lòng bấm LƯU để chốt gán thẻ cho xe này.");
+                        _isRfidAssignIntent = true;  // từ giờ nếu quẹt thẻ khác thì cảnh báo
+                        _notificationService.ShowInfo("Đã nạp mã thẻ mới. Vui lòng bấm LƯU để chốt gán thẻ.");
                     }
                     else
                     {
-                        // Khởi tạo phôi xe mới tinh
+                        // Free-view: khởi tạo form thêm mới với thẻ này
                         ClearForm();
                         NewVehicle = new Vehicle
                         {
@@ -158,9 +179,9 @@ namespace AutoWeighbridgeSystem.ViewModels
                             LicensePlate = "",
                             TareWeight = 0
                         };
-
                         OnPropertyChanged(nameof(NewVehicle));
                         OnPropertyChanged("NewVehicle.RfidCardId");
+                        _isRfidAssignIntent = true;  // form đang chờ gán thẻ này
                     }
                 }
             }
@@ -169,6 +190,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 System.Diagnostics.Debug.WriteLine("Lỗi ngoại lệ RFID ViewModel: " + ex.Message);
             }
         }
+
 
         [RelayCommand]
         private async Task SaveAsync()
@@ -287,6 +309,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             SelectedCustomer = null;
             SelectedRecord = null;
             IsEditMode = false;
+            _isRfidAssignIntent = false; // reset intent khi xóa form
         }
 
         private async Task LoadDataAsync()

@@ -1,3 +1,4 @@
+using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.ViewModels;
 using System;
 using System.Threading.Tasks;
@@ -93,15 +94,13 @@ namespace AutoWeighbridgeSystem.Views
             }
         }
 
-        /// <summary>
-        /// KHI CAMERA ĐÃ LÊN HÌNH (Fix lỗi kẹt chữ "Đang khởi tạo FFME")
-        /// </summary>
+        /// <summary>KHI CAMERA ĐÃ LÊN HÌNH (Fix lỗi kẹt chữ "Đang khởi tạo FFME")</summary>
         private void CameraPlayer_MediaOpened(object sender, EventArgs e)
         {
             if (this.DataContext is DashboardViewModel vm)
             {
-                // Cập nhật đúng chuỗi để StringToVisibilityConverter ẩn lớp Overlay
                 vm.CameraStatus = "Camera Online (FFME 4.4.350)";
+                vm.NotifyCameraStatus(HardwareConnectionStatus.Online);
             }
         }
 
@@ -158,6 +157,7 @@ namespace AutoWeighbridgeSystem.Views
             if (this.DataContext is not DashboardViewModel vm) return;
 
             vm.CameraStatus = "⚠️ LỖI KẾT NỐI CAMERA";
+            vm.NotifyCameraStatus(HardwareConnectionStatus.Offline);
 
             // Auto-retry: đợi 5 giây rồi thử mở lại như RTSP stream
             _ = Task.Run(async () =>
@@ -170,12 +170,14 @@ namespace AutoWeighbridgeSystem.Views
                         if (vm.CameraUri != null)
                         {
                             vm.CameraStatus = "🔄 Đang kết nối lại camera...";
+                            vm.NotifyCameraStatus(HardwareConnectionStatus.Reconnecting);
                             await this.CameraPlayer.Open(vm.CameraUri);
                         }
                     }
                     catch
                     {
                         vm.CameraStatus = "❌ Camera không khả dụng";
+                        vm.NotifyCameraStatus(HardwareConnectionStatus.Offline);
                     }
                 });
             });

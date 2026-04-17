@@ -36,7 +36,7 @@ namespace AutoWeighbridgeSystem.Services
         // THROTTLING UI
         // =========================================================================
         private readonly Stopwatch _uiThrottleStopwatch = Stopwatch.StartNew();
-        private const int MinUiUpdateIntervalMs = 20; // 50 FPS (Siêu nhạy)
+        private const int MinUiUpdateIntervalMs = 33; // ~30 FPS — đủ mượt, giảm 40% so với 50 FPS
         private bool _lastBroadcastedStableState = false;
 
         // =========================================================================
@@ -96,6 +96,9 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         public event Action<decimal, bool>? WeightChanged;
 
+        /// <summary>Phát ra khi kết nối lần đầu với đầu cân thành công (sau Initialize hoặc Reinitialize).</summary>
+        public event Action? Connected;
+
         /// <summary>Phát ra ngay khi phát hiện mất kết nối với đầu cân.</summary>
         public event Action? Disconnected;
 
@@ -111,6 +114,16 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
         // KHỞI TẠO
         // =========================================================================
+
+        /// <summary>
+        /// Gọi ngay sau khi Coordinator đã subscribe events — replay trạng thái hiện tại
+        /// để không bị miss nếu port đã mở trước khi subscriber kịp attach.
+        /// </summary>
+        public void NotifyInitialStatus()
+        {
+            if (_isConnected) Connected?.Invoke();
+        }
+
 
         /// <summary>
         /// Khởi tạo và mở kết nối với đầu cân qua cổng COM.
@@ -152,6 +165,7 @@ namespace AutoWeighbridgeSystem.Services
 
                 _isConnected = true;
                 Log.Information("[SCALE] Đã kết nối đầu cân chuẩn {Protocol} tại {Port}", _protocol.ProtocolName, _portName);
+                // Status event KHÔNG fire ở đây — phát từ NotifyInitialStatus() hoặc Reconnected event
             }
             catch (Exception ex)
             {

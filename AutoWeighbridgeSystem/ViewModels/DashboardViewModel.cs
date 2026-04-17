@@ -60,7 +60,27 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _weightDisplay = "0";
         [ObservableProperty] private bool _isScaleStable = false;
         [ObservableProperty] private decimal _lockedWeight = 0;
-        [ObservableProperty] private bool _isWeightLocked = false;
+
+        /// <summary>
+        /// <c>true</c> khi trọng lượng đã được chốt thủ công.
+        /// <para>
+        /// Dùng <c>volatile</c> backing field để SerialPort thread có thể đọc
+        /// an toàn không cần lock trong <see cref="OnScaleWeightChangedUiUpdate"/>.
+        /// </para>
+        /// </summary>
+        private volatile bool _isWeightLockedVolatile = false;
+        public bool IsWeightLocked
+        {
+            get => _isWeightLockedVolatile;
+            set
+            {
+                if (_isWeightLockedVolatile != value)
+                {
+                    _isWeightLockedVolatile = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         // --- Thông tin phiếu cân ---
         [ObservableProperty] private string _licensePlate = "";
@@ -78,6 +98,13 @@ namespace AutoWeighbridgeSystem.ViewModels
         // --- Camera ---
         [ObservableProperty] private Uri _cameraUri;
         [ObservableProperty] private string _cameraStatus = "Camera Online";
+
+        // --- Trạng thái kết nối phần cứng (Offline mặc định → Online khi port mở thành công) ---
+        [ObservableProperty] private HardwareConnectionStatus _scaleConnectionStatus   = HardwareConnectionStatus.Offline;
+        [ObservableProperty] private HardwareConnectionStatus _rfidInStatus            = HardwareConnectionStatus.Offline;
+        [ObservableProperty] private HardwareConnectionStatus _rfidOutStatus           = HardwareConnectionStatus.Offline;
+        [ObservableProperty] private HardwareConnectionStatus _rfidDeskStatus          = HardwareConnectionStatus.Offline;
+        [ObservableProperty] private HardwareConnectionStatus _cameraConnectionStatus  = HardwareConnectionStatus.Offline;
 
         // --- Danh sách lịch sử ---
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
@@ -108,8 +135,15 @@ namespace AutoWeighbridgeSystem.ViewModels
         public bool IsManualMode => !IsAutoMode;
 
         // =========================================================================
-        // UI REFRESH (Event-driven realtime)
+        // UI REFRESH — Cache delegate và pending fields để tránh tạo object mới mỗi frame
         // =========================================================================
+
+        /// <summary>Trọng lượng đang chờ hiển thị lên UI — viết bởi Serial thread, đọc bởi UI thread.</summary>
+        private decimal _pendingDisplayWeight;
+        /// <summary>Ấn nập trạng thái ổn định — viết bởi Serial thread, đọc bới UI thread.</summary>
+        private volatile bool _pendingDisplayStable;
+        /// <summary>Cached Action delegate — khởi tạo một lần trong constructor, tái sử dụng mỗi frame.</summary>
+        private readonly Action _updateWeightDisplayAction;
 
         // =========================================================================
         // CONSTRUCTOR
@@ -136,6 +170,13 @@ namespace AutoWeighbridgeSystem.ViewModels
             _alarmService           = alarmService;
             _appSession             = appSession;
             _quickRegisterVmFactory = quickRegisterVmFactory;
+
+            // Khởi tạo cached action một lần duy nhất — tái sử dụng mỗi frame (không tạo object mới 30 lần/giây)
+            _updateWeightDisplayAction = () =>
+            {
+                WeightDisplay = _pendingDisplayWeight.ToString("N0");
+                IsScaleStable = _pendingDisplayStable;
+            };
 
             LoadUiConfiguration();
             InitializeCamera();
@@ -178,23 +219,28 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         private void OnScaleWeightChangedUiUpdate(decimal weight, bool isStable)
         {
+            // Nhận: Serial thread — giá trị so sánh IsWeightLocked là volatile read (an toàn)
             if (IsWeightLocked) return;
-            // Ép luồng UI cập nhật ngay tức thì (Priority cao hơn Timer)
-            Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                WeightDisplay = weight.ToString("N0");
-                IsScaleStable = isStable;
-            }), DispatcherPriority.DataBind);
+
+            // Ghi giá trị cần hiển thị trước khi có hàng rào bộ nhớ (BeginInvoke tạo happens-before)
+            _pendingDisplayWeight  = weight;
+            _pendingDisplayStable  = isStable;
+
+            // Dùng cached delegate thay vì new Action mỗi lần → không tạo GC pressure
+            Application.Current?.Dispatcher.BeginInvoke(
+                _updateWeightDisplayAction,
+                DispatcherPriority.DataBind);
         }
 
         /// <summary>Đăng ký lắng nghe tất cả events từ DashboardEventCoordinator.</summary>
         private void SubscribeToCoordinatorEvents()
         {
-            _coordinator.AutoSaveRequested += OnAutoSaveRequested;
-            _coordinator.FormResetRequested += OnFormResetRequested;
-            _coordinator.CameraMessageRequested += OnCameraMessageRequested;
-            _coordinator.RfidCaptured += OnRfidCaptured;
-            _coordinator.PendingTimeoutStartRequested += OnPendingTimeoutStartRequested;
+            _coordinator.AutoSaveRequested             += OnAutoSaveRequested;
+            _coordinator.FormResetRequested             += OnFormResetRequested;
+            _coordinator.CameraMessageRequested         += OnCameraMessageRequested;
+            _coordinator.RfidCaptured                   += OnRfidCaptured;
+            _coordinator.PendingTimeoutStartRequested   += OnPendingTimeoutStartRequested;
+            _coordinator.HardwareStatusChanged          += OnHardwareStatusChanged;
         }
 
         // Được xử lý qua OnScaleWeightChangedUiUpdate
@@ -232,6 +278,27 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             _coordinator.RequestPendingTimeout();
         }
+
+        /// <summary>
+        /// Cập nhật property tương ứng khi Coordinator báo trạng thái phần cứng thay đổi.
+        /// Chạy trên UI thread (Coordinator đã BeginInvoke trước khi raise event này).
+        /// </summary>
+        private void OnHardwareStatusChanged(string device, HardwareConnectionStatus status)
+        {
+            switch (device)
+            {
+                case "Scale":   ScaleConnectionStatus = status; break;
+                case ReaderRoles.ScaleIn:   RfidInStatus  = status; break;
+                case ReaderRoles.ScaleOut:  RfidOutStatus = status; break;
+                case ReaderRoles.Desk:      RfidDeskStatus = status; break;
+            }
+        }
+
+        /// <summary>
+        /// Gọi từ code-behind khi camera mở thành công hoặc thất bại.
+        /// </summary>
+        public void NotifyCameraStatus(HardwareConnectionStatus status)
+            => CameraConnectionStatus = status;
 
         // =========================================================================
         // CẬP NHẬT FORM KHI CHỌN COMBO BOX
@@ -540,11 +607,12 @@ namespace AutoWeighbridgeSystem.ViewModels
         public void Dispose()
         {
             _scaleService.WeightChanged -= OnScaleWeightChangedUiUpdate;
-            _coordinator.AutoSaveRequested -= OnAutoSaveRequested;
-            _coordinator.FormResetRequested -= OnFormResetRequested;
-            _coordinator.CameraMessageRequested -= OnCameraMessageRequested;
-            _coordinator.RfidCaptured -= OnRfidCaptured;
-            _coordinator.PendingTimeoutStartRequested -= OnPendingTimeoutStartRequested;
+            _coordinator.AutoSaveRequested             -= OnAutoSaveRequested;
+            _coordinator.FormResetRequested             -= OnFormResetRequested;
+            _coordinator.CameraMessageRequested         -= OnCameraMessageRequested;
+            _coordinator.RfidCaptured                   -= OnRfidCaptured;
+            _coordinator.PendingTimeoutStartRequested   -= OnPendingTimeoutStartRequested;
+            _coordinator.HardwareStatusChanged          -= OnHardwareStatusChanged;
             _coordinator.Dispose();
             _saveLock.Dispose();
         }

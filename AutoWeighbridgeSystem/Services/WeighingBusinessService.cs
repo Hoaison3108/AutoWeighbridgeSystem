@@ -258,7 +258,7 @@ namespace AutoWeighbridgeSystem.Services
                 var maxTicketId = await db.WeighingTickets
                     .IgnoreQueryFilters()
                     .Where(t => t.TicketID.StartsWith(prefix))
-                    .Select(t => t.TicketID)
+                    .Select(t => (string?)t.TicketID)
                     .MaxAsync();
 
                 int nextNum = 1;

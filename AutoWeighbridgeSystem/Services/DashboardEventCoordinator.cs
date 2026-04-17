@@ -38,6 +38,9 @@ namespace AutoWeighbridgeSystem.Services
         private Func<bool> _getIsProcessingSave = () => false;
         private Func<string> _getSelectedProductName = () => "Hàng hóa";
 
+        /// <summary>Cờ: đã nhận được dữ liệu từ đầu cân lần đầu (port open ≠ thiết bị kết nối thật).</summary>
+        private volatile bool _scaleDataReceived = false;
+
         // =========================================================================
         // EVENTS — ViewModel lắng nghe và phản ứng
         // =========================================================================
@@ -56,6 +59,13 @@ namespace AutoWeighbridgeSystem.Services
 
         /// <summary>Kích hoạt khi cần bắt đầu đếm ngược timeout cho xe đang chờ.</summary>
         public event Action? PendingTimeoutStartRequested;
+
+        /// <summary>
+        /// Kích hoạt khi trạng thái kết nối của một thiết bị phần cứng thay đổi.
+        /// Tham số: <c>(string device, HardwareConnectionStatus status)</c>.<br/>
+        /// Device names: <c>"Scale"</c> | <c>"ScaleIn"</c> | <c>"ScaleOut"</c> | <c>"Desk"</c> | <c>"Camera"</c>.
+        /// </summary>
+        public event Action<string, HardwareConnectionStatus>? HardwareStatusChanged;
 
         // =========================================================================
         // CONSTRUCTOR
@@ -103,17 +113,22 @@ namespace AutoWeighbridgeSystem.Services
             _getIsProcessingSave = getIsProcessingSave;
             _getSelectedProductName = getSelectedProductName;
 
-            _scaleService.WeightChanged += OnScaleWeightChanged;
-            _rfidService.CardRead += OnRfidCardRead;
+            _scaleService.WeightChanged          += OnScaleWeightChanged;
+            _rfidService.CardRead                 += OnRfidCardRead;
 
             // Subscribe trạng thái kết nối phần cứng — chuyển tiếp thông báo lên UI
-            _scaleService.Disconnected += OnScaleDisconnected;
-            _scaleService.Reconnected += OnScaleReconnected;
-            _scaleService.ReconnectAttempting += OnScaleReconnectAttempting;
-            _rfidService.ReaderDisconnected += OnRfidReaderDisconnected;
-            _rfidService.ReaderReconnected += OnRfidReaderReconnected;
+            _scaleService.Disconnected            += OnScaleDisconnected;
+            _scaleService.Reconnected             += OnScaleReconnected;
+            _scaleService.ReconnectAttempting     += OnScaleReconnectAttempting;
+            _rfidService.ReaderDisconnected       += OnRfidReaderDisconnected;
+            _rfidService.ReaderReconnected        += OnRfidReaderReconnected;
 
             StartHardwareWatchdog();
+
+            // Replay trạng thái ban đầu: hardware có thể đã mở port TRƯỚC khi
+            // Coordinator kịp subscribe vào events → kiểm tra trực tiếp, không qua event chain
+            // (không dùng NotifyInitialStatus để tránh trigger toast "đã kết nối lại")
+            RefreshInitialHardwareStatus();
 
             Log.Information("[COORDINATOR] Coordinator đã khởi động và lắng nghe phần cứng.");
         }
@@ -150,6 +165,14 @@ namespace AutoWeighbridgeSystem.Services
             // Thông báo watchdog vẫn nhận được tín hiệu
             _hardwareWatchdog.NotifyScaleDataReceived();
 
+            // Chỉ set Online khi dữ liệu thực tế chạy vào — port open không đảm bảo thiết bị kết nối
+            if (!_scaleDataReceived)
+            {
+                _scaleDataReceived = true;
+                Application.Current?.Dispatcher.BeginInvoke(() =>
+                    HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Online));
+            }
+
             var decision = _dashboardWorkflow.EvaluateScaleEvent(
                 weight,
                 isStable,
@@ -185,6 +208,10 @@ namespace AutoWeighbridgeSystem.Services
 
         private void OnRfidCardRead(string readerRole, string cardId)
         {
+            // Ghi nhận reader này đã thực sự đọc được thẻ — mới set Online (không chỉ port open)
+            Application.Current?.Dispatcher.BeginInvoke(() =>
+                HardwareStatusChanged?.Invoke(readerRole, HardwareConnectionStatus.Online));
+
             Application.Current?.Dispatcher.InvokeAsync(async () =>
             {
                 try
@@ -226,19 +253,56 @@ namespace AutoWeighbridgeSystem.Services
         {
             _hardwareWatchdog.StartHardwareWatchdog(
                 _hardwareWatchdogSeconds,
-                () => CameraMessageRequested?.Invoke("⚠️ MẤT TÍN HIỆU ĐẦU CÂN!", false));
+                () =>
+                {
+                    // Mất tín hiệu đầu cân: reset cờ để lần data tiếp theo sẽ set Online lại
+                    _scaleDataReceived = false;
+                    Application.Current?.Dispatcher.BeginInvoke(() =>
+                    {
+                        HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Offline);
+                        CameraMessageRequested?.Invoke("⚠️ MẤT TÍN HIỆU ĐẦU CÂN!", false);
+                    });
+                });
         }
 
         // =========================================================================
         // HARDWARE CONNECTION STATUS HANDLERS
         // =========================================================================
 
+        /// <summary>
+        /// Đọc trạng thái thực của hardware ngay sau khi Subscribe events (giải quyết race condition
+        /// khởi động). Chỉ set dot màu — không trigger toast hay camera message.
+        /// </summary>
+        private void RefreshInitialHardwareStatus()
+        {
+            // Scale: Nếu port mở được thì 'Connecting' (vàng) — chưa có dữ liệu nên chưa thể xác nhận Online
+            // Port mở không đảm bảo cáp được cắm vào thiết bị thực tế
+            var scaleStatus = _scaleService.IsConnected
+                ? HardwareConnectionStatus.Connecting   // port mở, chờ dữ liệu đầu tiên
+                : HardwareConnectionStatus.Offline;     // port không mở được
+            HardwareStatusChanged?.Invoke("Scale", scaleStatus);
+
+            // RFID: 'Connecting' (vàng) cho các reader có port đang mở
+            // → sẽ chuyển 'Online' (xanh) chỉ khi đọc được thẻ (OnRfidCardRead)
+            var connectedRoles = _rfidService.ConnectedReaderRoles;
+            foreach (var role in new[] { ReaderRoles.ScaleIn, ReaderRoles.ScaleOut, ReaderRoles.Desk })
+            {
+                var status = connectedRoles.Contains(role)
+                    ? HardwareConnectionStatus.Connecting  // port mở, chờ card
+                    : HardwareConnectionStatus.Offline;    // port không mở
+                HardwareStatusChanged?.Invoke(role, status);
+            }
+        }
+
+
         /// <summary>Phản ứng khi đầu cân mất kết nối: reset form và hiển thị cảnh báo.</summary>
         private void OnScaleDisconnected()
         {
+            _scaleDataReceived = false; // reset để lần kết nối lại phải nhận data mới được set Online
             _dashboardWorkflow.ClearPendingData();
             Application.Current?.Dispatcher.InvokeAsync(() =>
             {
+                HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Offline);
                 FormResetRequested?.Invoke("⚠️ ĐẦU CÂN MẤT KẾT NỐI! Đang thử kết nối lại...");
             });
         }
@@ -246,29 +310,46 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary>Phản ứng khi đầu cân kết nối lại thành công.</summary>
         private void OnScaleReconnected()
         {
+            // Kết nối lại thành công — reset cờ, đợi dữ liệu thực tế mới set Online
+            // (OnScaleWeightChanged sẽ set Online khi frame đầu tiên đến)
+            _scaleDataReceived = false;
             Application.Current?.Dispatcher.InvokeAsync(() =>
-                CameraMessageRequested?.Invoke("✅ ĐẦU CÂN ĐÃ KẾT NỐI LẠI!", true));
+            {
+                HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Connecting);
+                CameraMessageRequested?.Invoke("✅ ĐẦU CÂN ĐÃ KẾT NỐI LẠI!", true);
+            });
         }
 
         /// <summary>Hiển thị thông tin lần thử kết nối lại đang diễn ra.</summary>
         private void OnScaleReconnectAttempting(int attempt)
         {
+            // Reset cờ khi đang thử lại
+            _scaleDataReceived = false;
             Application.Current?.Dispatcher.InvokeAsync(() =>
-                CameraMessageRequested?.Invoke($"🔄 ĐẦU CÂN: Đang thử kết nối lại lần {attempt}...", false));
+            {
+                HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Reconnecting);
+                CameraMessageRequested?.Invoke($"🔄 ĐẦU CÂN: Đang thử kết nối lại lần {attempt}...", false);
+            });
         }
 
-        /// <summary>Phản ứng khi một đầu đọ RFID mất kết nối.</summary>
+        /// <summary>Phản ứng khi một đầu đọc RFID mất kết nối.</summary>
         private void OnRfidReaderDisconnected(string roleName)
         {
             Application.Current?.Dispatcher.InvokeAsync(() =>
-                CameraMessageRequested?.Invoke($"⚠️ RFID {roleName} MẤT KẼT NỐI! Đang thử kết nối lại...", false));
+            {
+                HardwareStatusChanged?.Invoke(roleName, HardwareConnectionStatus.Offline);
+                CameraMessageRequested?.Invoke($"⚠️ RFID {roleName} MẤT KẾT NỐI! Đang thử kết nối lại...", false);
+            });
         }
 
-        /// <summary>Phản ứng khi một đầu đọ RFID kết nối lại thành công.</summary>
+        /// <summary>Phản ứng khi một đầu đọc RFID kết nối lại thành công.</summary>
         private void OnRfidReaderReconnected(string roleName)
         {
             Application.Current?.Dispatcher.InvokeAsync(() =>
-                CameraMessageRequested?.Invoke($"✅ RFID {roleName} ĐÃ KẾT NỐI LẠI!", true));
+            {
+                HardwareStatusChanged?.Invoke(roleName, HardwareConnectionStatus.Online);
+                CameraMessageRequested?.Invoke($"✅ RFID {roleName} ĐÃ KẾT NỐI LẠI!", true);
+            });
         }
 
         // =========================================================================
@@ -276,13 +357,13 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
         public void Dispose()
         {
-            _scaleService.WeightChanged -= OnScaleWeightChanged;
-            _scaleService.Disconnected -= OnScaleDisconnected;
-            _scaleService.Reconnected -= OnScaleReconnected;
-            _scaleService.ReconnectAttempting -= OnScaleReconnectAttempting;
-            _rfidService.CardRead -= OnRfidCardRead;
-            _rfidService.ReaderDisconnected -= OnRfidReaderDisconnected;
-            _rfidService.ReaderReconnected -= OnRfidReaderReconnected;
+            _scaleService.WeightChanged         -= OnScaleWeightChanged;
+            _scaleService.Disconnected           -= OnScaleDisconnected;
+            _scaleService.Reconnected            -= OnScaleReconnected;
+            _scaleService.ReconnectAttempting    -= OnScaleReconnectAttempting;
+            _rfidService.CardRead                -= OnRfidCardRead;
+            _rfidService.ReaderDisconnected      -= OnRfidReaderDisconnected;
+            _rfidService.ReaderReconnected       -= OnRfidReaderReconnected;
             _hardwareWatchdog.StopAll();
             Log.Information("[COORDINATOR] Coordinator đã dừng và giải phóng resources.");
         }

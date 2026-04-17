@@ -14,6 +14,7 @@
         <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:HardwareStatusToColorConverter x:Key="HardwareStatusToColorConverter"/>
 
         <Style x:Key="StabilityLightStyle" TargetType="Ellipse">
             <Setter Property="Fill" Value="#E53935"/>
@@ -95,12 +96,75 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,15">
-            <StackPanel Orientation="Horizontal">
+            <!-- TRÁI: Logo bar + Tiêu đề -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <Border Background="#2196F3" Width="4" Height="20" Margin="0,0,10,0"/>
-                <TextBlock Text="KHOÁNG SẢN RẠNG ĐÔNG - ĐIỀU HÀNH TRẠM CÂN" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Foreground="#AAA"/>
+                <TextBlock Text="KHOÁNG SẢN RẠNG ĐÔNG - ĐIỀU HÀNH TRẠM CÂN"
+                           FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Foreground="#AAA"/>
             </StackPanel>
-            <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, StringFormat='dd/MM/yyyy HH:mm'}" 
-                       HorizontalAlignment="Right" Foreground="#2196F3" FontSize="16" FontWeight="Bold"/>
+
+            <!-- PHẢI: Status Panel + Đồng hồ -->
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <!-- Hardware Connection Status Mini Panel -->
+                <Border Background="#1A1A1A" CornerRadius="6" Padding="10,4"
+                        BorderBrush="#2A2A2A" BorderThickness="1" Margin="0,0,16,0"
+                        ToolTip="Trạng thái kết nối thiết bị phần cứng">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                        <!-- Đầu cân -->
+                        <StackPanel Margin="0,0,10,0"
+                                    ToolTip="{Binding ScaleConnectionStatus, StringFormat='Đầu cân: {0}'}">
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
+                                     Fill="{Binding ScaleConnectionStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                            <TextBlock Text="CÂN" FontSize="8" FontWeight="Bold"
+                                       Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- RFID Vào -->
+                        <StackPanel Margin="0,0,10,0"
+                                    ToolTip="{Binding RfidInStatus, StringFormat='RFID Vào: {0}'}">
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
+                                     Fill="{Binding RfidInStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                            <TextBlock Text="RFID-V" FontSize="8" FontWeight="Bold"
+                                       Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- RFID Ra -->
+                        <StackPanel Margin="0,0,10,0"
+                                    ToolTip="{Binding RfidOutStatus, StringFormat='RFID Ra: {0}'}">
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
+                                     Fill="{Binding RfidOutStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                            <TextBlock Text="RFID-R" FontSize="8" FontWeight="Bold"
+                                       Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- RFID Bàn -->
+                        <StackPanel Margin="0,0,10,0"
+                                    ToolTip="{Binding RfidDeskStatus, StringFormat='RFID Bàn: {0}'}">
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
+                                     Fill="{Binding RfidDeskStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                            <TextBlock Text="BÀN" FontSize="8" FontWeight="Bold"
+                                       Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- Camera -->
+                        <StackPanel
+                                    ToolTip="{Binding CameraConnectionStatus, StringFormat='Camera: {0}'}">
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
+                                     Fill="{Binding CameraConnectionStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                            <TextBlock Text="CAM" FontSize="8" FontWeight="Bold"
+                                       Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </Border>
+
+                <!-- Đồng hồ -->
+                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, StringFormat='dd/MM/yyyy HH:mm'}"
+                           VerticalAlignment="Center" Foreground="#2196F3" FontSize="16" FontWeight="Bold"/>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1">
