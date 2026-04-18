@@ -556,6 +556,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             RfidInput = "";
             IsWeightLocked = false;
             LockedWeight = 0;
+            CameraStatus = "Camera Online"; // Xóa chữ chốt cân trên overlay camera
             _coordinator.ClearPendingData();
             _coordinator.CancelPendingTimeout();
         }

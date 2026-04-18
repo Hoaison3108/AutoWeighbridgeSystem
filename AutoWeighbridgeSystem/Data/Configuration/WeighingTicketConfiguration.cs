@@ -9,7 +9,7 @@ namespace AutoWeighbridgeSystem.Data.Configuration
     {
         public void Configure(EntityTypeBuilder<WeighingTicket> builder)
         {
-            // 1. CẤU HÌNH KHÓA CHÍNH (String ID: yyMMdd-xxx)
+            // 1. CẤU HÌNH KHÓA CHÍNH (String ID: yyMMddxxx)
             builder.HasKey(t => t.TicketID);
             builder.Property(t => t.TicketID).HasMaxLength(20);
 
@@ -47,11 +47,11 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             builder.Property(t => t.Note).IsRequired(false).HasMaxLength(500);
             builder.Property(t => t.VoidReason).IsRequired(false).HasMaxLength(500);
 
-            // 6. SEED DATA MẪU (Đúng định dạng yyMMdd-xxx)
+            // 6. SEED DATA MẪU (Đúng định dạng yyMMddxxx)
             builder.HasData(
                 new WeighingTicket
                 {
-                    TicketID = "260412-001", // Mã phiếu theo chuẩn SonK yêu cầu
+                    TicketID = "260412001", // Mã phiếu theo chuẩn SonK yêu cầu
                     VehicleId = 1,
                     LicensePlate = "86C-12345",
                     CustomerName = "Máy xay 1",

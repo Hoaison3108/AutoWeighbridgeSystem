@@ -32,6 +32,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private Customer _selectedCustomer;
         [ObservableProperty] private Vehicle _selectedRecord;
         [ObservableProperty] private bool _isEditMode = false;
+        [ObservableProperty] private bool _syncTareWeightToAll = false;
 
         // CẬP NHẬT 1: Thêm RfidBusinessService vào tham số Constructor
         public VehicleRegistrationViewModel(
@@ -254,6 +255,25 @@ namespace AutoWeighbridgeSystem.ViewModels
                         db.Vehicles.Update(v);
                     }
                 }
+
+                // Đồng bộ khối lượng bì cho tất cả các bản ghi có chung Biển số xe
+                if (SyncTareWeightToAll)
+                {
+                    var sameLicensePlateVehicles = await db.Vehicles
+                        .Where(v => v.LicensePlate == NewVehicle.LicensePlate)
+                        .ToListAsync();
+
+                    foreach (var vehicle in sameLicensePlateVehicles)
+                    {
+                        // Bỏ qua bản ghi đang thao tác hiện tại
+                        if (vehicle.VehicleId != NewVehicle.VehicleId)
+                        {
+                            vehicle.TareWeight = NewVehicle.TareWeight;
+                            db.Vehicles.Update(vehicle);
+                        }
+                    }
+                }
+
                 await db.SaveChangesAsync();
                 await LoadDataAsync();
                 ClearForm();
@@ -309,6 +329,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             SelectedCustomer = null;
             SelectedRecord = null;
             IsEditMode = false;
+            SyncTareWeightToAll = false; // Reset checkbox đồng bộ
             _isRfidAssignIntent = false; // reset intent khi xóa form
         }
 

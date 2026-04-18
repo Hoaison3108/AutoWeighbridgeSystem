@@ -245,7 +245,7 @@ namespace AutoWeighbridgeSystem.Services
         // HÀM BỔ TRỢ (Sinh mã tự động)
         // =========================================================================
         /// <summary>
-        /// Sinh mã phiếu cân theo định dạng <c>yyMMdd-xxx</c> (vd: 260416-001).
+        /// Sinh mã phiếu cân theo định dạng <c>yyMMddxxx</c> (vd: 260416001).
         /// Tìm mã lớn nhất trong ngày hiện tại và tăng lên 1.
         /// </summary>
         private async Task<string> GenerateTicketIdAsync(AppDbContext db)
@@ -264,12 +264,13 @@ namespace AutoWeighbridgeSystem.Services
                     .MaxAsync();
 
                 int nextNum = 1;
-                if (!string.IsNullOrEmpty(maxTicketId) && maxTicketId.Contains("-"))
+                if (!string.IsNullOrEmpty(maxTicketId) && maxTicketId.Length > prefix.Length)
                 {
-                    if (int.TryParse(maxTicketId.Split('-').Last(), out int num))
+                    string suffix = maxTicketId.Substring(prefix.Length).Replace("-", "");
+                    if (int.TryParse(suffix, out int num))
                         nextNum = num + 1;
                 }
-                return $"{prefix}-{nextNum:D3}";
+                return $"{prefix}{nextNum:D3}";
             }
             finally
             {

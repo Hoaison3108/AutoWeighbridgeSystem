@@ -282,7 +282,7 @@
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,0,10,0">
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="{Binding RfidLocationLabel}" Foreground="#00E676"/>
-                            <TextBox Text="{Binding RfidInput, UpdateSourceTrigger=PropertyChanged}" Height="45" FontSize="18" Background="#111" Foreground="#00E676" BorderBrush="#00E676" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Padding="10,0" Margin="0,0,0,15">
+                            <TextBox Text="{Binding RfidInput, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Height="45" FontSize="18" Background="#111" Foreground="#00E676" BorderBrush="#00E676" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Padding="10,0" Margin="0,0,0,15">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding ProcessRfidCommand}"/>
                                 </TextBox.InputBindings>
