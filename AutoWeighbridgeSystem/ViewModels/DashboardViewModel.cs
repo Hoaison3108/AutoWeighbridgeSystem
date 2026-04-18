@@ -31,6 +31,8 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IUserNotificationService _notificationService;
         private readonly AlarmService _alarmService;
         private readonly AppSession _appSession;
+        
+        public SystemClockService Clock { get; }
 
         /// <summary>
         /// Factory delegate được inject từ DI — tạo <see cref="QuickVehicleRegisterViewModel"/>
@@ -158,6 +160,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             IUserNotificationService notificationService,
             AlarmService alarmService,
             AppSession appSession,
+            SystemClockService clock,
             Func<string, QuickVehicleRegisterViewModel> quickRegisterVmFactory)
         {
             _configuration          = configuration;
@@ -169,6 +172,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _notificationService    = notificationService;
             _alarmService           = alarmService;
             _appSession             = appSession;
+            Clock                   = clock;
             _quickRegisterVmFactory = quickRegisterVmFactory;
 
             // Khởi tạo cached action một lần duy nhất — tái sử dụng mỗi frame (không tạo object mới 30 lần/giây)

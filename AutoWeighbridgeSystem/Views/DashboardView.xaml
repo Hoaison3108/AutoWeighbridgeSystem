@@ -162,7 +162,7 @@
                 </Border>
 
                 <!-- Đồng hồ -->
-                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, StringFormat='dd/MM/yyyy HH:mm'}"
+                <TextBlock Text="{Binding Clock.CurrentTime, StringFormat='dd/MM/yyyy HH:mm:ss'}"
                            VerticalAlignment="Center" Foreground="#2196F3" FontSize="16" FontWeight="Bold"/>
             </StackPanel>
         </Grid>

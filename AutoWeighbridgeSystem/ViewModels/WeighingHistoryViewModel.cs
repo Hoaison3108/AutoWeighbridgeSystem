@@ -283,7 +283,17 @@ namespace AutoWeighbridgeSystem.ViewModels
                 _notificationService.ShowInfo(UiText.Messages.NoDataToExport, UiText.Titles.Info);
                 return;
             }
-            await _exportService.ExportTicketsToExcelAsync(Tickets, "BÁO CÁO CHI TIẾT SẢN LƯỢNG TRẠM CÂN");
+
+            // Chỉ xuất các phiếu hợp lệ (không bị hủy) để hàm SUM trong Excel tính toán chính xác
+            var validTickets = Tickets.Where(t => !t.IsVoid).ToList();
+            
+            if (!validTickets.Any())
+            {
+                _notificationService.ShowInfo("Không có dữ liệu hợp lệ (tất cả các phiếu trong danh sách đều đã bị hủy) để xuất báo cáo.", UiText.Titles.Info);
+                return;
+            }
+
+            await _exportService.ExportTicketsToExcelAsync(validTickets, "BÁO CÁO CHI TIẾT SẢN LƯỢNG TRẠM CÂN");
         }
 
         // =========================================================================

@@ -182,7 +182,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                    <TextBlock Text="DESIGN BY SONK (v1.7.5)" FontSize="16" FontWeight="Bold" 
+                    <TextBlock Text="DESIGN BY SONK (v1.7.6)" FontSize="16" FontWeight="Bold" 
                                Foreground="#2196F3" HorizontalAlignment="Center"
                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
                 </StackPanel>

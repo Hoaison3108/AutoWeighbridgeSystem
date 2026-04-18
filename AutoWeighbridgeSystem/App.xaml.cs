@@ -116,6 +116,7 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<HardwareWatchdogService>();
             services.AddSingleton<DashboardEventCoordinator>();
             services.AddSingleton<IUserNotificationService, UserNotificationService>();
+            services.AddSingleton<SystemClockService>();
 
             services.AddSingleton<ScaleService>(provider =>
             {
