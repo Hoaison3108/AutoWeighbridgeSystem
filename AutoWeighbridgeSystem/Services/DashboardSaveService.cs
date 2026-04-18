@@ -37,20 +37,14 @@ namespace AutoWeighbridgeSystem.Services
         {
             try
             {
-                // Resolve VehicleId: ưu tiên từ SelectedVehicle, fallback khớp biển số đã chuẩn hóa
-                int vehicleId = request.SelectedVehicleId ?? 0;
+                // Chuẩn hóa biển số trước khi đẩy xuống tầng Database
                 string formattedPlate = request.LicensePlate.FormatLicensePlate();
 
-                if (vehicleId == 0 && !string.IsNullOrEmpty(formattedPlate))
-                {
-                    var matched = request.VehicleList.FirstOrDefault(v =>
-                        v.LicensePlate.Equals(formattedPlate, StringComparison.OrdinalIgnoreCase));
-                    if (matched != null) vehicleId = matched.VehicleId;
-                }
-
+                // Truyền trực tiếp định dạng chuỗi
+                // Để vehicleId bằng 0 sẽ ép WeighingBusinessService tự tìm kiếm Vehicle thật dưới Database
                 var result = await _weighingBusiness.ProcessWeighingAsync(
                     formattedPlate,
-                    vehicleId,
+                    0, 
                     request.CustomerName,
                     request.ProductName,
                     request.FinalWeight,
@@ -75,11 +69,9 @@ namespace AutoWeighbridgeSystem.Services
     // REQUEST / RESULT VALUE OBJECTS
     // =========================================================================
 
-    /// <summary>Dữ liệu đầu vào cho một lệnh lưu phiếu cân từ Dashboard.</summary>
+    /// <summary>Dữ liệu đầu vào cho một lệnh lưu phiếu cân từ Dashboard dạng thô (Raw string).</summary>
     public sealed record DashboardSaveRequest(
         string LicensePlate,
-        int? SelectedVehicleId,
-        IReadOnlyCollection<Vehicle> VehicleList,
         string CustomerName,
         string ProductName,
         decimal FinalWeight,

@@ -112,13 +112,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
         [ObservableProperty] private WeighingTicket _selectedRecentTicket;
 
-        // --- Danh mục (nguồn gốc) ---
-        [ObservableProperty] private ObservableCollection<Product> _productList = new();
-        [ObservableProperty] private ObservableCollection<Vehicle> _vehicleList = new();
-        [ObservableProperty] private ObservableCollection<Customer> _customerList = new();
-        [ObservableProperty] private Product _selectedProduct;
-        [ObservableProperty] private Vehicle _selectedVehicle;
-        [ObservableProperty] private Customer _selectedCustomer;
+        // --- Danh mục (nguồn gốc, nay chỉ chứa chuỗi thô) ---
+        [ObservableProperty] private ObservableCollection<string> _productList = new();
+        [ObservableProperty] private ObservableCollection<string> _vehicleList = new();
+        [ObservableProperty] private ObservableCollection<string> _customerList = new();
 
         // --- CollectionView cho Autocomplete (filter-as-you-type) ---
         /// <summary>View đã lọc dùng cho ComboBox Biển số — binding thay thế VehicleList.</summary>
@@ -192,7 +189,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 getIsAutoMode: () => IsAutoMode,
                 getIsWeightLocked: () => IsWeightLocked,
                 getIsProcessingSave: () => _saveLock.CurrentCount == 0,
-                getSelectedProductName: () => SelectedProduct?.ProductName ?? "Hàng hóa");
+                getSelectedProductName: () => !string.IsNullOrEmpty(ProductName) ? ProductName : "Hàng hóa");
 
             LoadInitialDataAsync().FireAndForgetSafe(ex =>
                 _notificationService.LogError(ex, "Lỗi tải danh mục lúc khởi động"));
@@ -305,31 +302,6 @@ namespace AutoWeighbridgeSystem.ViewModels
             => CameraConnectionStatus = status;
 
         // =========================================================================
-        // CẬP NHẬT FORM KHI CHỌN COMBO BOX
-        // =========================================================================
-
-        partial void OnSelectedVehicleChanged(Vehicle value)
-        {
-            if (value == null) return;
-            LicensePlate = value.LicensePlate;
-            if (value.Customer != null)
-            {
-                SelectedCustomer = CustomerList.FirstOrDefault(c => c.CustomerId == value.CustomerId);
-                CustomerName = value.Customer.CustomerName;
-            }
-        }
-
-        partial void OnSelectedCustomerChanged(Customer value)
-        {
-            if (value != null) CustomerName = value.CustomerName;
-        }
-
-        partial void OnSelectedProductChanged(Product value)
-        {
-            if (value != null) ProductName = value.ProductName;
-        }
-
-        // =========================================================================
         // AUTOCOMPLETE FILTER HANDLERS
         // =========================================================================
 
@@ -382,8 +354,6 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 var request = new DashboardSaveRequest(
                     LicensePlate,
-                    SelectedVehicle?.VehicleId,
-                    VehicleList,
                     CustomerName,
                     ProductName,
                     LockedWeight,
@@ -451,7 +421,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (!IsWeightLocked || LockedWeight <= 0) { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave); return; }
 
             // Bổ sung luồng chặn xử lý Đăng ký xe vãng lai
-            if (!VehicleList.Any(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
+            if (!VehicleList.Any(plate => plate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
             {
                 // Sử dụng factory delegate — DashboardViewModel không cần biết
                 // cách tạo QuickVehicleRegisterViewModel hay cần IDbContextFactory
@@ -465,8 +435,6 @@ namespace AutoWeighbridgeSystem.ViewModels
                 }
 
                 await LoadInitialDataAsync();
-                var newVehicle = VehicleList.FirstOrDefault(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase));
-                if (newVehicle != null) SelectedVehicle = newVehicle;
             }
 
             if (!_notificationService.Confirm(UiText.Messages.SaveTicketConfirm(LicensePlate, LockedWeight), UiText.Titles.Confirm))
@@ -512,33 +480,26 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             // Đẩy dữ liệu Text ngược lên form (Hỗ trợ nhập tay tự do)
             LicensePlate = SelectedRecentTicket.LicensePlate;
-            var matchedVehicle = VehicleList.FirstOrDefault(v => v.LicensePlate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase));
-            if (matchedVehicle != null) SelectedVehicle = matchedVehicle;
-
             CustomerName = SelectedRecentTicket.CustomerName;
-            var matchedCustomer = CustomerList.FirstOrDefault(c => c.CustomerName.Equals(CustomerName, StringComparison.OrdinalIgnoreCase));
-            if (matchedCustomer != null) SelectedCustomer = matchedCustomer;
-
             ProductName = SelectedRecentTicket.ProductName;
-            var matchedProduct = ProductList.FirstOrDefault(p => p.ProductName.Equals(ProductName, StringComparison.OrdinalIgnoreCase));
-            if (matchedProduct != null) SelectedProduct = matchedProduct;
         }
 
         // =========================================================================
         // TẢI DỮ LIỆU
         // =========================================================================
 
-        private async Task LoadInitialDataAsync()
+        public async Task LoadInitialDataAsync()
         {
             var initialData = await _dashboardDataService.LoadInitialDataAsync();
 
             Application.Current?.Dispatcher.Invoke(() =>
             {
-                VehicleList = new ObservableCollection<Vehicle>(initialData.Vehicles);
-                CustomerList = new ObservableCollection<Customer>(initialData.Customers);
-                ProductList = new ObservableCollection<Product>(initialData.Products);
+                // Nạp thẳng mảng chuỗi lên không cần lọc GroupBy ở đây nữa vì Database đã Select Distinct
+                VehicleList = new ObservableCollection<string>(initialData.Vehicles);
+                CustomerList = new ObservableCollection<string>(initialData.Customers);
+                ProductList = new ObservableCollection<string>(initialData.Products);
 
-                // Khởi tạo CollectionView với predicate filter — hỗ trợ autocomplete khi gõ
+                // Khởi tạo CollectionView với predicate filter (tương tác trực tiếp trên chuỗi string)
                 VehicleView = CollectionViewSource.GetDefaultView(VehicleList);
                 CustomerView = CollectionViewSource.GetDefaultView(CustomerList);
                 ProductView = CollectionViewSource.GetDefaultView(ProductList);
@@ -546,22 +507,22 @@ namespace AutoWeighbridgeSystem.ViewModels
                 VehicleView.Filter = item =>
                 {
                     if (string.IsNullOrWhiteSpace(VehicleFilterText)) return true;
-                    return item is Vehicle v &&
-                           v.LicensePlate.Contains(VehicleFilterText, StringComparison.OrdinalIgnoreCase);
+                    return item is string str &&
+                           str.Contains(VehicleFilterText, StringComparison.OrdinalIgnoreCase);
                 };
 
                 CustomerView.Filter = item =>
                 {
                     if (string.IsNullOrWhiteSpace(CustomerFilterText)) return true;
-                    return item is Customer c &&
-                           c.CustomerName.Contains(CustomerFilterText, StringComparison.OrdinalIgnoreCase);
+                    return item is string str &&
+                           str.Contains(CustomerFilterText, StringComparison.OrdinalIgnoreCase);
                 };
 
                 ProductView.Filter = item =>
                 {
                     if (string.IsNullOrWhiteSpace(ProductFilterText)) return true;
-                    return item is Product p &&
-                           p.ProductName.Contains(ProductFilterText, StringComparison.OrdinalIgnoreCase);
+                    return item is string str &&
+                           str.Contains(ProductFilterText, StringComparison.OrdinalIgnoreCase);
                 };
 
                 // Thông báo UI biết có View mới
@@ -569,9 +530,10 @@ namespace AutoWeighbridgeSystem.ViewModels
                 OnPropertyChanged(nameof(CustomerView));
                 OnPropertyChanged(nameof(ProductView));
 
+                // Gán tên hàng hóa mặc định
                 string defProd = initialData.DefaultProductName;
-                var prod = ProductList.FirstOrDefault(p => p.ProductName.Equals(defProd, StringComparison.OrdinalIgnoreCase));
-                if (prod != null) { SelectedProduct = prod; ProductName = prod.ProductName; }
+                var matched = ProductList.FirstOrDefault(p => p.Equals(defProd, StringComparison.OrdinalIgnoreCase));
+                if (matched != null) ProductName = matched;
                 else ProductName = defProd;
             });
         }
@@ -592,8 +554,6 @@ namespace AutoWeighbridgeSystem.ViewModels
             LicensePlate = "";
             CustomerName = "";
             RfidInput = "";
-            SelectedVehicle = null;
-            SelectedCustomer = null;
             IsWeightLocked = false;
             LockedWeight = 0;
             _coordinator.ClearPendingData();

@@ -34,14 +34,29 @@ namespace AutoWeighbridgeSystem.Services
         {
             using var db = _dbContextFactory.CreateDbContext();
 
-            var vehicles  = await db.Vehicles
+            // Trích xuất trực tiếp chuỗi dạng text thô từ DB, sử dụng hàm Distinct() SQL
+            // Đảm bảo không tốn RAM và tự dọn dẹp các biển số hay tên khách hàng trùng lặp.
+            var vehicles = await db.Vehicles
                 .AsNoTracking()
-                .Include(v => v.Customer)
-                .Where(v => !v.IsDeleted)
+                .Where(v => !v.IsDeleted && !string.IsNullOrEmpty(v.LicensePlate))
+                .Select(v => v.LicensePlate)
+                .Distinct()
                 .ToListAsync();
 
-            var customers          = await db.Customers.AsNoTracking().ToListAsync();
-            var products           = await db.Products.AsNoTracking().ToListAsync();
+            var customers = await db.Customers
+                .AsNoTracking()
+                .Where(c => !c.IsDeleted && !string.IsNullOrEmpty(c.CustomerName))
+                .Select(c => c.CustomerName)
+                .Distinct()
+                .ToListAsync();
+
+            var products = await db.Products
+                .AsNoTracking()
+                .Where(p => !p.IsDeleted && !string.IsNullOrEmpty(p.ProductName))
+                .Select(p => p.ProductName)
+                .Distinct()
+                .ToListAsync();
+
             var defaultProductName = _configuration["ScaleSettings:DefaultProductName"] ?? "Đá xô bồ";
 
             return new DashboardInitialData(vehicles, customers, products, defaultProductName);
@@ -64,10 +79,10 @@ namespace AutoWeighbridgeSystem.Services
         }
     }
 
-    /// <summary>Snapshot dữ liệu danh mục được tải khi Dashboard khởi động.</summary>
+    /// <summary>Snapshot dữ liệu danh mục (chỉ lưu dạng chuỗi thô để chống ngập RAM) được tải khi Dashboard khởi động.</summary>
     public sealed record DashboardInitialData(
-        IReadOnlyList<Vehicle>  Vehicles,
-        IReadOnlyList<Customer> Customers,
-        IReadOnlyList<Product>  Products,
+        IReadOnlyList<string>  Vehicles,
+        IReadOnlyList<string> Customers,
+        IReadOnlyList<string>  Products,
         string DefaultProductName);
 }

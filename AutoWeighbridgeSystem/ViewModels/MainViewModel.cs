@@ -112,6 +112,13 @@ namespace AutoWeighbridgeSystem.ViewModels
             if (CurrentView != viewModel)
             {
                 CurrentView = viewModel;
+
+                // Tự động làm mới danh sách gợi ý khi quay lại màn hình Dashboard
+                if (viewModel == _dashboardVm)
+                {
+                    _dashboardVm.LoadInitialDataAsync().FireAndForgetSafe(ex => 
+                        _notificationService.LogError(ex, "Lỗi làm mới dữ liệu Dashboard"));
+                }
             }
         }
     }

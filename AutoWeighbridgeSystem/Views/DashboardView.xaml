@@ -86,6 +86,39 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0,0,10,0"/>
         </Style>
+
+        <!-- Nút bật tắt ComboBox siêu to khổng lồ dành cho trạm cân cảm ứng (Touch-friendly) -->
+        <Style x:Key="BigDropdownButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Background" Value="#455A64"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}">
+                            <TextBlock Text="▼" FontFamily="Segoe UI Symbol" FontSize="20" FontWeight="Bold" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#00E676"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#2196F3"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.3"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="15">
@@ -270,13 +303,18 @@
                                 <ComboBox x:Name="VehicleComboBox"
                                           Grid.Column="1"
                                           ItemsSource="{Binding VehicleView}"
-                                          SelectedItem="{Binding SelectedVehicle}"
-                                          DisplayMemberPath="LicensePlate"
+                                          Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
                                           Height="45" FontSize="18"
                                           TextBoxBase.TextChanged="VehicleComboBox_TextChanged"
                                           ToolTip="Gõ để lọc danh sách xe — chỉ khả dụng ở chế độ Manual"/>
+                                          
+                                <!-- Phép thuật phủ nút to gấp 3 lần nút mặc định của WPF -->
+                                <ToggleButton Grid.Column="1" 
+                                              Style="{StaticResource BigDropdownButtonStyle}" 
+                                              IsChecked="{Binding IsDropDownOpen, ElementName=VehicleComboBox}" 
+                                              IsEnabled="{Binding IsManualMode}"/>
                             </Grid>
 
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="KHÁCH HÀNG (GÕ TRỰC TIẾP KHI MANUAL)"/>
@@ -292,13 +330,17 @@
                                 <ComboBox x:Name="CustomerComboBox"
                                           Grid.Column="1"
                                           ItemsSource="{Binding CustomerView}"
-                                          SelectedItem="{Binding SelectedCustomer}"
-                                          DisplayMemberPath="CustomerName"
+                                          Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
                                           Height="45" FontSize="16"
                                           TextBoxBase.TextChanged="CustomerComboBox_TextChanged"
                                           ToolTip="Gõ để lọc danh sách khách hàng — chỉ khả dụng ở chế độ Manual"/>
+                                          
+                                <ToggleButton Grid.Column="1" 
+                                              Style="{StaticResource BigDropdownButtonStyle}" 
+                                              IsChecked="{Binding IsDropDownOpen, ElementName=CustomerComboBox}" 
+                                              IsEnabled="{Binding IsManualMode}"/>
                             </Grid>
 
                             <TextBlock Style="{StaticResource FieldLabelStyle}" Text="LOẠI HÀNG (GÕ TRỰC TIẾP KHI MANUAL)"/>
@@ -314,13 +356,17 @@
                                 <ComboBox x:Name="ProductComboBox"
                                           Grid.Column="1"
                                           ItemsSource="{Binding ProductView}"
-                                          SelectedItem="{Binding SelectedProduct}"
-                                          DisplayMemberPath="ProductName"
+                                          Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
                                           Height="45" FontSize="16"
                                           TextBoxBase.TextChanged="ProductComboBox_TextChanged"
                                           ToolTip="Gõ để lọc danh sách hàng hóa — chỉ khả dụng ở chế độ Manual"/>
+                                          
+                                <ToggleButton Grid.Column="1" 
+                                              Style="{StaticResource BigDropdownButtonStyle}" 
+                                              IsChecked="{Binding IsDropDownOpen, ElementName=ProductComboBox}" 
+                                              IsEnabled="{Binding IsManualMode}"/>
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
@@ -359,8 +405,21 @@
                             </Button.Style>
                         </Button>
 
-                        <Button Grid.Column="2" Command="{Binding ManualSaveCommand}" Content="💾 LƯU PHIẾU" Height="48" Margin="3,0,3,0" Background="#2196F3" Foreground="White" FontWeight="Bold" Cursor="Hand"
-            Visibility="{Binding IsAutoMode, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                        <Button Grid.Column="2" Command="{Binding ManualSaveCommand}" Content="💾 LƯU PHIẾU" Height="48" Margin="3,0,3,0" FontWeight="Bold" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="Background" Value="#2196F3"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="IsEnabled" Value="{Binding IsManualMode}"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Opacity" Value="0.3"/>
+                                            <Setter Property="Cursor" Value="No"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
                         <Button Grid.Column="3" Command="{Binding TriggerManualAlarmCommand}" Content="🔔 HÚ CÒI" Height="48" Margin="3,0,0,0" Background="#FF9800" Foreground="White" FontWeight="Bold" Cursor="Hand"/>
                     </Grid>
