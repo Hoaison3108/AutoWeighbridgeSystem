@@ -134,7 +134,7 @@
                 </Grid>
 
                 <CheckBox IsChecked="{Binding SyncTareWeightToAll}" 
-                          Content="Đồng bộ Khối lượng thân xe cùng Biển số" 
+                          Content="Đồng bộ Khối lượng thân xe cùng biển số" 
                           Foreground="#FF9800" 
                           FontSize="14" 
                           FontWeight="SemiBold"
