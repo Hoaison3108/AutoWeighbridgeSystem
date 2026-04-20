@@ -72,19 +72,25 @@ namespace AutoWeighbridgeSystem
                 ConfigureServices(serviceCollection);
                 ServiceProvider = serviceCollection.BuildServiceProvider();
 
+                // Chế độ tắt máy thủ công để tránh app tự đóng khi SplashWindow đóng
+                Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
                 // =======================================================
                 // 3. HIỂN THỊ MÀN HÌNH CHỜ (SPLASH) & KHỞI TẠO SONG SONG
                 // =======================================================
-                // Thay vì đợi tuần tự, ta hiện Splash và để SplashViewModel điều phối
                 var splashVm = ServiceProvider.GetRequiredService<SplashViewModel>();
                 var splashWindow = ServiceProvider.GetRequiredService<SplashWindow>();
                 splashWindow.DataContext = splashVm;
-                splashWindow.ShowDialog(); // Chờ Splash khởi tạo xong các Service (Scale, RFID, DB)
+                splashWindow.ShowDialog(); 
 
                 // =======================================================
                 // 4. HIỂN THỊ MÀN HÌNH ĐĂNG NHẬP
                 // =======================================================
+                // Trả về chế độ đóng app khi hết window
+                Current.ShutdownMode = ShutdownMode.OnLastWindowClose;
+                
                 var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
+                Current.MainWindow = loginWindow;
                 loginWindow.Show();
             }
             catch (Exception ex)

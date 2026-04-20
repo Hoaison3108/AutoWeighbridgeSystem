@@ -613,3 +613,5 @@ D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\ManualTicketWindow.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\EditTicketWindow.baml
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\EditTicketWindow.g.cs
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\SplashWindow.baml
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\SplashWindow.g.cs
