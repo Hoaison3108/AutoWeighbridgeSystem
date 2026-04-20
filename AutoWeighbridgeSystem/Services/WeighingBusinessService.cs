@@ -192,9 +192,11 @@ namespace AutoWeighbridgeSystem.Services
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "[WEIGHING] Lỗi cơ sở dữ liệu");
+                Log.Error(ex, "[WEIGHING] Lỗi cơ sở dữ liệu khi xử lý phiếu");
                 result.IsSuccess = false;
-                result.Message = "Lỗi hệ thống: " + ex.Message;
+                string msg = ex.Message;
+                if (ex.InnerException != null) msg += "\nChi tiết: " + ex.InnerException.Message;
+                result.Message = "Lỗi hệ thống: " + msg;
             }
 
             return result;
@@ -242,7 +244,9 @@ namespace AutoWeighbridgeSystem.Services
             {
                 Log.Error(ex, "[WEIGHING-MANUAL] Lỗi cơ sở dữ liệu khi nhập thủ công");
                 result.IsSuccess = false;
-                result.Message = "Lỗi hệ thống: " + ex.Message;
+                string msg = ex.Message;
+                if (ex.InnerException != null) msg += "\nChi tiết: " + ex.InnerException.Message;
+                result.Message = "Lỗi hệ thống: " + msg;
             }
             return result;
         }
@@ -284,7 +288,9 @@ namespace AutoWeighbridgeSystem.Services
             catch (Exception ex)
             {
                 Log.Error(ex, "[WEIGHING] Lỗi khi hủy phiếu {TicketId}", ticketId);
-                return (false, "Lỗi hệ thống: " + ex.Message);
+                string msg = ex.Message;
+                if (ex.InnerException != null) msg += "\nChi tiết: " + ex.InnerException.Message;
+                return (false, "Lỗi hệ thống: " + msg);
             }
         }
 
@@ -292,7 +298,7 @@ namespace AutoWeighbridgeSystem.Services
         // HÀM BỔ TRỢ (Sinh mã tự động)
         // =========================================================================
         /// <summary>
-        /// Sinh mã phiếu cân theo định dạng <c>yyMMddxxxx</c> (vd: 2604160001).
+        /// Sinh mã phiếu cân theo định dạng <c>yyMMddxxx</c> (vd: 260416001).
         /// Tìm mã lớn nhất trong ngày hiện tại và tăng lên 1.
         /// </summary>
         private async Task<string> GenerateTicketIdAsync(AppDbContext db)
@@ -317,7 +323,7 @@ namespace AutoWeighbridgeSystem.Services
                     if (int.TryParse(suffix, out int num))
                         nextNum = num + 1;
                 }
-                return $"{prefix}{nextNum:D4}";
+                return $"{prefix}{nextNum:D3}";
             }
             finally
             {

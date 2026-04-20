@@ -344,8 +344,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 }
                 else
                 {
-                    if (!result.HasException)
+                    if (result.HasException)
+                        _notificationService.ShowError("Lỗi hệ thống không xác định. Vui lòng kiểm tra Logs.", "LỖI NGHIÊM TRỌNG");
+                    else
                         _notificationService.ShowWarning(result.Message);
+
                     IsWeightLocked = false;
                 }
             }

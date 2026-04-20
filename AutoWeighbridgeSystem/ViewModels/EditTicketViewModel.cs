@@ -35,7 +35,8 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private ObservableCollection<string> _availableCustomers = new();
         [ObservableProperty] private ObservableCollection<string> _availableProducts = new();
 
-        public Action CloseAction { get; set; }
+        public Action RequestClose { get; set; }
+        public Action SuccessCallback { get; set; }
         public bool IsSavedSuccessfully { get; private set; } = false;
 
         public EditTicketViewModel(
@@ -76,6 +77,12 @@ namespace AutoWeighbridgeSystem.ViewModels
         private void CalculateNet()
         {
             NetWeight = GrossWeight - TareWeight;
+        }
+
+        [RelayCommand]
+        private void Cancel()
+        {
+            RequestClose?.Invoke();
         }
 
         [RelayCommand]
@@ -149,11 +156,14 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 _notificationService.ShowInfo("Đã cập nhật phiếu thành công.", "THÀNH CÔNG");
                 IsSavedSuccessfully = true;
-                CloseAction?.Invoke();
+                SuccessCallback?.Invoke();
+                RequestClose?.Invoke();
             }
             catch (Exception ex)
             {
-                _notificationService.ShowError($"Lỗi hệ thống: {ex.Message}", "LỖI");
+                string msg = ex.Message;
+                if (ex.InnerException != null) msg += "\nChi tiết: " + ex.InnerException.Message;
+                _notificationService.ShowError($"Lỗi hệ thống: {msg}", "LỖI");
             }
         }
     }

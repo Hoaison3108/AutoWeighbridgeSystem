@@ -44,8 +44,8 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             builder.Property(t => t.TareWeight).HasPrecision(18, 2);
             builder.Property(t => t.NetWeight).HasPrecision(18, 2); // Cột thực để báo cáo nhanh
 
-            builder.Property(t => t.Note).IsRequired(false).HasMaxLength(500);
-            builder.Property(t => t.VoidReason).IsRequired(false).HasMaxLength(500);
+            builder.Property(t => t.Note).IsRequired(false).HasMaxLength(2000);
+            builder.Property(t => t.VoidReason).IsRequired(false).HasMaxLength(1000);
 
             // 6. SEED DATA MẪU (Đúng định dạng yyMMddxxx)
             builder.HasData(

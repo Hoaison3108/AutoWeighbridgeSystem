@@ -31,7 +31,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private System.Collections.ObjectModel.ObservableCollection<string> _availableProducts = new();
 
         // Cờ báo hiệu đã lưu xong để Window tự đóng
-        public Action CloseAction { get; set; }
+        // Cờ báo hiệu đã lưu xong hoặc hủy để View cha tự đóng tab
+        public Action RequestClose { get; set; }
+        public Action SuccessCallback { get; set; }
         public bool IsSavedSuccessfully { get; private set; } = false;
 
         public ManualTicketViewModel(
@@ -93,6 +95,12 @@ namespace AutoWeighbridgeSystem.ViewModels
         }
 
         [RelayCommand]
+        private void Cancel()
+        {
+            RequestClose?.Invoke();
+        }
+
+        [RelayCommand]
         private async Task SaveAsync()
         {
             if (string.IsNullOrWhiteSpace(LicensePlate))
@@ -145,7 +153,8 @@ namespace AutoWeighbridgeSystem.ViewModels
             {
                 _notificationService.ShowInfo(result.Message, "THÀNH CÔNG");
                 IsSavedSuccessfully = true;
-                CloseAction?.Invoke();
+                SuccessCallback?.Invoke();
+                RequestClose?.Invoke();
             }
             else
             {

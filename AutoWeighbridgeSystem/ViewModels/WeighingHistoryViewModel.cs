@@ -36,6 +36,15 @@ namespace AutoWeighbridgeSystem.ViewModels
             _fromDate = DateTime.Today;
             _toDate   = DateTime.Today.AddDays(1).AddSeconds(-1);
 
+            // Initialize Manual Ticket VM for the second tab
+            ManualTicketVM = App.ServiceProvider.GetRequiredService<ManualTicketViewModel>();
+            ManualTicketVM.SuccessCallback = () => _ = LoadHistoryAsync();
+            ManualTicketVM.RequestClose = () => SelectedTabIndex = 0;
+
+            EditTicketVM = App.ServiceProvider.GetRequiredService<EditTicketViewModel>();
+            EditTicketVM.SuccessCallback = () => _ = LoadHistoryAsync();
+            EditTicketVM.RequestClose = () => SelectedTabIndex = 0;
+
             _ = LoadHistoryAsync();
         }
 
@@ -56,7 +65,11 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private decimal _totalTare;
         [ObservableProperty] private decimal _totalNet;
 
-        // (Đã xóa Panel chỉnh sửa cũ để chuyển sang cửa sổ Popup)
+        // Tab Control management
+        [ObservableProperty] private int _selectedTabIndex = 0;
+        public ManualTicketViewModel ManualTicketVM { get; }
+        public EditTicketViewModel EditTicketVM { get; }
+
         [ObservableProperty] private bool _isSaving = false;
 
         // =========================================================================
@@ -105,22 +118,8 @@ namespace AutoWeighbridgeSystem.ViewModels
                 return;
             }
 
-            var vm = App.ServiceProvider.GetRequiredService<EditTicketViewModel>();
-            await vm.InitializeAsync(ticket);
-
-            var window = new Views.EditTicketWindow 
-            { 
-                DataContext = vm, 
-                Owner = Application.Current.MainWindow 
-            };
-            
-            vm.CloseAction = () => window.Close();
-            window.ShowDialog();
-
-            if (vm.IsSavedSuccessfully)
-            {
-                await LoadHistoryAsync();
-            }
+            await EditTicketVM.InitializeAsync(ticket);
+            SelectedTabIndex = 2; // Chuyển sang Tab "Chỉnh sửa phiếu"
         }
 
         // =========================================================================
@@ -130,14 +129,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [RelayCommand]
         private void OpenManualTicketForm()
         {
-            var vm = App.ServiceProvider.GetRequiredService<ManualTicketViewModel>();
-            var window = new Views.ManualTicketWindow { DataContext = vm, Owner = Application.Current.MainWindow };
-            window.ShowDialog();
-
-            if (vm.IsSavedSuccessfully)
-            {
-                _ = LoadHistoryAsync();
-            }
+            SelectedTabIndex = 1; // Chuyển sang Tab "Tạo phiếu sự cố"
         }
 
         [RelayCommand]
