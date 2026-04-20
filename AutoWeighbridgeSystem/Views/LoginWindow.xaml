@@ -15,7 +15,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" VerticalAlignment="Center">
-                <TextBlock Text="⚖️" Foreground="#FFD700" FontSize="45" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <TextBlock Text="⚖️" Foreground="#2196F3" FontSize="45" HorizontalAlignment="Center" Margin="0,0,0,5"/>
                 <TextBlock Text="TRẠM CÂN TỰ ĐỘNG" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
                 <TextBlock Text="KHOÁNG SẢN RẠNG ĐÔNG" FontSize="14" FontWeight="Bold" Foreground="#2196F3" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
