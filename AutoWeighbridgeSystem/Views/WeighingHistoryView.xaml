@@ -66,7 +66,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- ===== THANH TÌM KIẾM ===== -->
@@ -105,6 +104,16 @@
 
                     <Button Command="{Binding ExportExcelCommand}" Content="XUẤT EXCEL" 
                             Background="#388E3C" Foreground="White" Width="120" Height="35" Margin="0,18,0,0" FontWeight="Bold">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                    <Button Command="{Binding OpenManualTicketFormCommand}" Content="➕ PHIẾU T/C" 
+                            Background="#D32F2F" Foreground="White" Width="120" Height="35" Margin="10,18,0,0" FontWeight="Bold"
+                            ToolTip="CHUYÊN DÙNG: Cấp cứu tạo phiếu cân nhập liệu bằng tay khi phần mềm hoặc đầu cân bị lỗi.">
                         <Button.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="4"/>
@@ -268,13 +277,13 @@
                                     <!-- Nút SỬA: disabled khi phiếu đã bị hủy (IsVoid=True) -->
                                     <Button Command="{Binding DataContext.SelectForEditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                             CommandParameter="{Binding}"
-                                            Content="✏️ SỬA" Background="#1565C0" Foreground="White" Width="65" Height="28" Margin="2" FontSize="10" FontWeight="Bold" BorderThickness="0"
+                                            Content="✏️ SỬA" Background="#1565C0" Foreground="White" Width="60" Height="28" Margin="2" FontSize="10" FontWeight="Bold" BorderThickness="0"
                                             IsEnabled="{Binding IsVoid, Converter={StaticResource InvertBool}}"
                                             ToolTip="Chỉnh sửa khối lượng phiếu này"/>
                                     <!-- Hủy phiếu -->
                                     <Button Command="{Binding DataContext.VoidTicketCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                             CommandParameter="{Binding}"
-                                            Content="HỦY" Background="#C62828" Foreground="White" Width="55" Height="28" Margin="2" FontSize="10" FontWeight="Bold" BorderThickness="0"
+                                            Content="HỦY" Background="#C62828" Foreground="White" Width="60" Height="28" Margin="2" FontSize="10" FontWeight="Bold" BorderThickness="0"
                                             ToolTip="Hủy phiếu cân"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -285,107 +294,7 @@
             </DataGrid>
         </Border>
 
-        <!-- =====================================================================
-             PANEL CHỈNH SỬA KHỐI LƯỢNG
-             Hiển thị khi IsEditPanelVisible=True (bấm nút SỬA trên 1 dòng)
-             ===================================================================== -->
-        <Border Grid.Row="3"
-                Visibility="{Binding IsEditPanelVisible, Converter={StaticResource BoolToVis}}"
-                Background="#1A2744" CornerRadius="10" Padding="20,15"
-                Margin="0,12,0,0" BorderBrush="#2196F3" BorderThickness="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
 
-                <!-- TIÊU ĐỀ PANEL -->
-                <StackPanel Grid.Column="0" Margin="0,0,30,0" VerticalAlignment="Center">
-                    <TextBlock Text="✏️ CHỈNH SỬA PHIẾU" FontSize="13" FontWeight="Bold" Foreground="#2196F3"/>
-                    <TextBlock Text="{Binding SelectedTicket.TicketID, StringFormat='Mã: {0}'}" Foreground="#888" FontSize="11" Margin="0,3,0,0"/>
-                    <TextBlock Text="{Binding SelectedTicket.LicensePlate, StringFormat='Xe: {0}'}" Foreground="#AAA" FontSize="11"/>
-                </StackPanel>
-
-                <!-- CÁC Ô NHẬP LIỆU -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-
-                    <!-- GrossWeight -->
-                    <StackPanel Margin="0,0,20,0">
-                        <TextBlock Text="TỔNG CỘNG (GROSS)" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding EditGrossWeight, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="130" Height="36" Background="#2D2D2D" Foreground="White"
-                                     VerticalContentAlignment="Center" Padding="8,0"
-                                     BorderBrush="#2196F3" BorderThickness="1" FontSize="14" FontWeight="Bold"/>
-                            <TextBlock Text=" kg" Foreground="#888" VerticalAlignment="Center" Margin="4,0,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- TareWeight -->
-                    <StackPanel Margin="0,0,20,0">
-                        <TextBlock Text="THÂN XE (TARE)" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding EditTareWeight, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="130" Height="36" Background="#2D2D2D" Foreground="White"
-                                     VerticalContentAlignment="Center" Padding="8,0"
-                                     BorderBrush="#555" BorderThickness="1" FontSize="14"/>
-                            <TextBlock Text=" kg" Foreground="#888" VerticalAlignment="Center" Margin="4,0,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- NetWeight — chỉ đọc, tự tính -->
-                    <StackPanel Margin="0,0,30,0">
-                        <TextBlock Text="HÀNG THỰC (NET) — TỰ TÍNH" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <Border Background="#0A2A0A" CornerRadius="4" BorderBrush="#00E676" BorderThickness="1" Padding="12,0" Height="36">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding EditNetWeight, StringFormat=N0}" Foreground="#00E676"
-                                           FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
-                                <TextBlock Text=" kg" Foreground="#888" VerticalAlignment="Center" Margin="4,0,0,0"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                    <!-- Lý do chỉnh sửa -->
-                    <StackPanel MinWidth="230">
-                        <TextBlock Text="LÝ DO CHỈNH SỬA (BẮT BUỘC)" Foreground="#F57C00" FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBox Text="{Binding EditNote, UpdateSourceTrigger=PropertyChanged}"
-                                 Height="36" Background="#2D2D2D" Foreground="White"
-                                 VerticalContentAlignment="Center" Padding="8,0"
-                                 BorderBrush="#F57C00" BorderThickness="1"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <!-- NÚT HÀNH ĐỘNG -->
-                <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" Margin="20,0,0,0">
-                    <!-- Nút CẬP NHẬT: disable khi IsSaving=True (DataTrigger) -->
-                    <Button Command="{Binding UpdateWeightCommand}"
-                            Height="40" Width="140" Margin="0,0,0,8"
-                            FontWeight="Bold" FontSize="13" Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#1565C0"/>
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="Content" Value="💾 CẬP NHẬT"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsSaving}" Value="True">
-                                        <Setter Property="Content" Value="⏳ Đang lưu..."/>
-                                        <Setter Property="Background" Value="#555"/>
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <!-- Nút HỦY BỎ chỉnh sửa -->
-                    <Button Command="{Binding CancelEditCommand}"
-                            Content="❌ HỦY BỎ" Height="32" Width="140"
-                            Background="#424242" Foreground="#CCC" FontSize="11"
-                            BorderThickness="0" Cursor="Hand"/>
-                </StackPanel>
-            </Grid>
-        </Border>
 
     </Grid>
 </UserControl>

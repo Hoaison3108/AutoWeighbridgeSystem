@@ -44,6 +44,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         // Database
         [ObservableProperty] private string _dbConnectionString;
+        [ObservableProperty] private string _backupFolderPath;
 
         // Camera Settings
         [ObservableProperty] private string _camIpAddress;
@@ -96,6 +97,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _rfidDeskParity;
         [ObservableProperty] private string _rfidDeskStopBits;
 
+        // Danh sách cổng COM lấy từ Windows
+        [ObservableProperty] private ObservableCollection<string> _availableComPorts = new();
+
         public SettingsViewModel(
             IDbContextFactory<AppDbContext> dbContextFactory,
             IConfiguration configuration,
@@ -112,6 +116,10 @@ namespace AutoWeighbridgeSystem.ViewModels
             _scaleService        = scaleService;
             _rfidService         = rfidService;
             _protocolFactory     = protocolFactory;
+            
+            // Lấy danh sách cổng COM ban đầu
+            try { AvailableComPorts = new ObservableCollection<string>(SerialPort.GetPortNames().OrderBy(p => p)); } catch { }
+            
             LoadConfig();
             _ = LoadUsersAsync();
         }
@@ -128,6 +136,9 @@ namespace AutoWeighbridgeSystem.ViewModels
                 CamUsername  = _configuration["CameraSettings:Username"];
                 CamPassword  = _configuration["CameraSettings:Password"];
                 CamRtspUrl   = _configuration["CameraSettings:RtspUrl"];
+
+                // Database Settings (Backup)
+                BackupFolderPath = _configuration["DatabaseSettings:BackupFolderPath"] ?? @"D:\Backups";
 
                 // Scale
                 ScaleProtocol       = _configuration["ScaleSettings:Protocol"] ?? "VishayVT220";
@@ -195,6 +206,9 @@ namespace AutoWeighbridgeSystem.ViewModels
                 // ==========================================
                 if (root["ConnectionStrings"] == null) root["ConnectionStrings"] = new JsonObject();
                 root["ConnectionStrings"]["DefaultConnection"] = DbConnectionString;
+
+                if (root["DatabaseSettings"] == null) root["DatabaseSettings"] = new JsonObject();
+                root["DatabaseSettings"]["BackupFolderPath"] = BackupFolderPath;
 
                 if (root["CameraSettings"] == null) root["CameraSettings"] = new JsonObject();
                 root["CameraSettings"]["IpAddress"] = CamIpAddress;
@@ -366,11 +380,61 @@ namespace AutoWeighbridgeSystem.ViewModels
         }
 
         [RelayCommand]
+        private void RefreshComPorts()
+        {
+            try
+            {
+                var ports = SerialPort.GetPortNames();
+                AvailableComPorts = new ObservableCollection<string>(ports.OrderBy(p => p));
+                _notificationService.ShowInfo($"Đã tìm thấy {ports.Length} cổng COM đang cắm trên hệ thống.", "LÀM MỚI DANH SÁCH COM");
+            }
+            catch (Exception ex)
+            {
+                _notificationService.LogError(ex, "Lỗi quét cổng COM");
+            }
+        }
+
+        [RelayCommand]
         private async Task LoadUsersAsync()
         {
             using var db = _dbContextFactory.CreateDbContext();
             var users = await db.Users.AsNoTracking().OrderBy(u => u.Id).ToListAsync();
             Application.Current?.Dispatcher.Invoke(() => { UserList = new ObservableCollection<User>(users); });
+        }
+
+        [RelayCommand]
+        private async Task BackupDatabaseAsync()
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(BackupFolderPath))
+                {
+                    _notificationService.ShowWarning("Vui lòng cấu hình thư mục lưu Backup trước.", "CHÚ Ý");
+                    return;
+                }
+
+                if (!Directory.Exists(BackupFolderPath))
+                {
+                    Directory.CreateDirectory(BackupFolderPath);
+                }
+
+                string fileName = $"AutoWeighbridgeDB_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.bak";
+                string fullPath = Path.Combine(BackupFolderPath, fileName);
+
+                using var db = _dbContextFactory.CreateDbContext();
+                
+                string dbName = db.Database.GetDbConnection().Database;
+                string sql = $"BACKUP DATABASE [{dbName}] TO DISK = '{fullPath}'";
+
+                await db.Database.ExecuteSqlRawAsync(sql);
+
+                _notificationService.ShowInfo($"Đã sao lưu thành công CSDL vào:\n{fullPath}", "BACKUP HOÀN TẤT");
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError($"Lỗi khi sao lưu: {ex.Message}\n(Lưu ý: SQL Server cần có quyền Write vào thư mục này)", "LỖI BACKUP");
+                Serilog.Log.Error(ex, "[BACKUP] Lỗi khi sao lưu bằng tay");
+            }
         }
     }
 }

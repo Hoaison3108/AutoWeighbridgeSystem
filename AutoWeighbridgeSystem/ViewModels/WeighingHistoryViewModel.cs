@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoWeighbridgeSystem.ViewModels
 {
@@ -55,46 +56,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private decimal _totalTare;
         [ObservableProperty] private decimal _totalNet;
 
-        // =========================================================================
-        // CHỈNH SỬA PHIẾU (Edit Panel)
-        // =========================================================================
-
-        /// <summary>Khi người dùng chọn một dòng trong DataGrid → tự động điền form chỉnh sửa.</summary>
-        partial void OnSelectedTicketChanged(WeighingTicket value)
-        {
-            if (value == null || value.IsVoid)
-            {
-                IsEditPanelVisible = false;
-                return;
-            }
-
-            // Nạp giá trị hiện tại của phiếu vào các ô edit
-            EditGrossWeight = value.GrossWeight;
-            EditTareWeight  = value.TareWeight;
-            EditNote        = value.Note ?? "";
-            IsEditPanelVisible = true;
-        }
-
-        /// <summary>GrossWeight đang được chỉnh sửa (không sửa trực tiếp trên model).</summary>
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EditNetWeight))]
-        private decimal _editGrossWeight;
-
-        /// <summary>TareWeight đang được chỉnh sửa.</summary>
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EditNetWeight))]
-        private decimal _editTareWeight;
-
-        /// <summary>Net = Gross - Tare — tự tính lại khi một trong hai thay đổi.</summary>
-        public decimal EditNetWeight => EditGrossWeight - EditTareWeight;
-
-        /// <summary>Ghi chú lý do chỉnh sửa (bắt buộc).</summary>
-        [ObservableProperty] private string _editNote = "";
-
-        /// <summary>Trạng thái hiển thị của panel chỉnh sửa.</summary>
-        [ObservableProperty] private bool _isEditPanelVisible = false;
-
-        /// <summary>Trạng thái đang lưu — dùng để disable nút CẬP NHẬT khi đang xử lý.</summary>
+        // (Đã xóa Panel chỉnh sửa cũ để chuyển sang cửa sổ Popup)
         [ObservableProperty] private bool _isSaving = false;
 
         // =========================================================================
@@ -123,7 +85,6 @@ namespace AutoWeighbridgeSystem.ViewModels
                 UpdateStatistics(result);
 
                 // Reset panel chỉnh sửa sau khi reload
-                IsEditPanelVisible = false;
                 SelectedTicket     = null;
             }
             catch (Exception ex)
@@ -132,118 +93,52 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
         }
 
-        // =========================================================================
-        // COMMANDS — CHỈNH SỬA KHỐI LƯỢNG
-        // =========================================================================
-
         /// <summary>
-        /// Cập nhật GrossWeight, TareWeight, NetWeight của phiếu được chọn vào database.
-        /// Ghi lại log chỉnh sửa kèm lý do vào cột Note.
+        /// Mở cửa sổ Popup để chỉnh sửa toàn bộ thông tin phiếu cân.
         /// </summary>
         [RelayCommand]
-        private async Task UpdateWeightAsync()
-        {
-            if (SelectedTicket == null || SelectedTicket.IsVoid) return;
-
-            // Validate dữ liệu đầu vào
-            if (EditGrossWeight <= 0 || EditTareWeight < 0)
-            {
-                _notificationService.ShowWarning("Trọng lượng không hợp lệ (GrossWeight phải > 0).", UiText.Titles.Warning);
-                return;
-            }
-            if (EditGrossWeight < EditTareWeight)
-            {
-                _notificationService.ShowWarning("Tổng (Gross) không thể nhỏ hơn Thân Xe (Tare).", UiText.Titles.Warning);
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(EditNote))
-            {
-                _notificationService.ShowWarning("Vui lòng nhập lý do chỉnh sửa trước khi lưu.", UiText.Titles.Warning);
-                return;
-            }
-
-            // Xác nhận trước khi ghi đè
-            string confirmMsg = $"Cập nhật phiếu [{SelectedTicket.TicketID}]?\n\n" +
-                                $"   Tổng (Gross): {SelectedTicket.GrossWeight:N0} → {EditGrossWeight:N0} kg\n" +
-                                $"   Thân xe (Tare): {SelectedTicket.TareWeight:N0} → {EditTareWeight:N0} kg\n" +
-                                $"   Hàng thực (Net): {SelectedTicket.NetWeight:N0} → {EditNetWeight:N0} kg\n\n" +
-                                $"Lý do: {EditNote}";
-
-            if (!_notificationService.Confirm(confirmMsg, "XÁC NHẬN CẬP NHẬT", MessageBoxButton.YesNo, MessageBoxImage.Question))
-                return;
-
-            IsSaving = true;
-            try
-            {
-                using var context = _contextFactory.CreateDbContext();
-                var ticketInDb = await context.WeighingTickets
-                                              .IgnoreQueryFilters()
-                                              .FirstOrDefaultAsync(t => t.TicketID == SelectedTicket.TicketID);
-
-                if (ticketInDb == null)
-                {
-                    _notificationService.ShowError("Không tìm thấy phiếu trong database.", UiText.Titles.Error);
-                    return;
-                }
-
-                // Ghi lại log chỉnh sửa cũ trước khi ghi đè
-                string editLog = $"[Sửa {DateTime.Now:HH:mm dd/MM/yyyy}] " +
-                                 $"Gross: {ticketInDb.GrossWeight:N0}→{EditGrossWeight:N0}, " +
-                                 $"Tare: {ticketInDb.TareWeight:N0}→{EditTareWeight:N0}. " +
-                                 $"Lý do: {EditNote}";
-
-                ticketInDb.GrossWeight = EditGrossWeight;
-                ticketInDb.TareWeight  = EditTareWeight;
-                ticketInDb.NetWeight   = EditNetWeight;
-                ticketInDb.Note        = string.IsNullOrEmpty(ticketInDb.Note)
-                                            ? editLog
-                                            : ticketInDb.Note + " | " + editLog;
-
-                await context.SaveChangesAsync();
-
-                _notificationService.ShowInfo(
-                    $"✅ Đã cập nhật phiếu [{SelectedTicket.TicketID}] thành công.\nNet mới: {EditNetWeight:N0} kg",
-                    "CẬP NHẬT THÀNH CÔNG");
-
-                // Reload để cập nhật lại DataGrid
-                await LoadHistoryAsync();
-            }
-            catch (Exception ex)
-            {
-                _notificationService.ShowError($"Lỗi khi cập nhật: {ex.Message}", UiText.Titles.Error);
-            }
-            finally
-            {
-                IsSaving = false;
-            }
-        }
-
-        /// <summary>Hủy chỉnh sửa, đóng panel edit và bỏ chọn dòng.</summary>
-        [RelayCommand]
-        private void CancelEdit()
-        {
-            IsEditPanelVisible = false;
-            SelectedTicket     = null;
-        }
-
-        /// <summary>
-        /// Chọn một phiếu từ nút Sửa trong DataGrid để mở panel chỉnh sửa.
-        /// Không cho sửa phiếu đã bị hủy.
-        /// </summary>
-        [RelayCommand]
-        private void SelectForEdit(WeighingTicket ticket)
+        private async Task SelectForEdit(WeighingTicket ticket)
         {
             if (ticket == null || ticket.IsVoid)
             {
                 _notificationService.ShowWarning("Không thể chỉnh sửa phiếu đã bị hủy.", UiText.Titles.Warning);
                 return;
             }
-            SelectedTicket = ticket; // OnSelectedTicketChanged sẽ tự mở panel
+
+            var vm = App.ServiceProvider.GetRequiredService<EditTicketViewModel>();
+            await vm.InitializeAsync(ticket);
+
+            var window = new Views.EditTicketWindow 
+            { 
+                DataContext = vm, 
+                Owner = Application.Current.MainWindow 
+            };
+            
+            vm.CloseAction = () => window.Close();
+            window.ShowDialog();
+
+            if (vm.IsSavedSuccessfully)
+            {
+                await LoadHistoryAsync();
+            }
         }
 
         // =========================================================================
-        // COMMANDS — HỦY PHIẾU / IN / XUẤT EXCEL
+        // COMMANDS — HỦY PHIẾU / IN / XUẤT EXCEL / SỰ CỐ
         // =========================================================================
+
+        [RelayCommand]
+        private void OpenManualTicketForm()
+        {
+            var vm = App.ServiceProvider.GetRequiredService<ManualTicketViewModel>();
+            var window = new Views.ManualTicketWindow { DataContext = vm, Owner = Application.Current.MainWindow };
+            window.ShowDialog();
+
+            if (vm.IsSavedSuccessfully)
+            {
+                _ = LoadHistoryAsync();
+            }
+        }
 
         [RelayCommand]
         private async Task VoidTicketAsync(WeighingTicket ticket)

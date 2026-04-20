@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -24,31 +24,11 @@ namespace AutoWeighbridgeSystem.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<WeighingTicket> WeighingTickets { get; set; }
 
-        // Constructor mặc định (Cần thiết cho IDbContextFactory và Migrations)
-        public AppDbContext() { }
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // =========================================================================
-        // 2. CẤU HÌNH KẾT NỐI (OnConfiguring)
-        // =========================================================================
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // Chỉ cấu hình nếu optionsBuilder chưa được thiết lập từ bên ngoài (như trong App.xaml.cs)
-            if (!optionsBuilder.IsConfigured)
-            {
-                // Xây dựng trình đọc cấu hình từ file appsettings.json
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .Build();
 
-                string connectionString = configuration.GetConnectionString("DefaultConnection");
-
-                // Sử dụng SQL Server với chuỗi kết nối đã lấy
-                optionsBuilder.UseSqlServer(connectionString);
-            }
-        }
 
         // =========================================================================
         // 3. CẤU HÌNH FLUENT API & DATA SEEDING (OnModelCreating)

@@ -201,6 +201,53 @@ namespace AutoWeighbridgeSystem.Services
         }
 
         // =========================================================================
+        // HÀM TẠO PHIẾU CÂN SỰ CỐ (MANUAL INPUT)
+        // =========================================================================
+        public async Task<(bool IsSuccess, string Message)> CreateManualTicketAsync(string licensePlate, string customerName, string productName, decimal grossWeight, decimal tareWeight, DateTime timeIn, DateTime timeOut, string reason)
+        {
+            var result = (IsSuccess: false, Message: "");
+            try
+            {
+                using var db = _dbContextFactory.CreateDbContext();
+
+                string ticketId = await GenerateTicketIdAsync(db);
+                decimal netWeight = grossWeight - tareWeight;
+                
+                var vehicleInfo = await db.Vehicles.AsNoTracking().FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
+
+                var newTicket = new WeighingTicket
+                {
+                    TicketID = ticketId,
+                    VehicleId = vehicleInfo?.VehicleId,
+                    LicensePlate = licensePlate,
+                    CustomerName = customerName,
+                    ProductName = productName,
+                    GrossWeight = grossWeight,
+                    TareWeight = tareWeight,
+                    NetWeight = netWeight,
+                    TimeIn = timeIn,
+                    TimeOut = timeOut,
+                    IsVoid = false,
+                    Note = $"[NHẬP THỦ CÔNG - SỰ CỐ]: {reason}"
+                };
+
+                db.WeighingTickets.Add(newTicket);
+                await db.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Message = $"ĐÃ LƯU: {ticketId} ({netWeight:N0} kg)";
+                Log.Information("[WEIGHING-MANUAL] Tạo phiếu sự cố {TicketId} xe {Plate}. Net: {Net}", ticketId, licensePlate, netWeight);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "[WEIGHING-MANUAL] Lỗi cơ sở dữ liệu khi nhập thủ công");
+                result.IsSuccess = false;
+                result.Message = "Lỗi hệ thống: " + ex.Message;
+            }
+            return result;
+        }
+
+        // =========================================================================
         // HÀM HỦY PHIẾU CÂN
         // =========================================================================
 
@@ -245,7 +292,7 @@ namespace AutoWeighbridgeSystem.Services
         // HÀM BỔ TRỢ (Sinh mã tự động)
         // =========================================================================
         /// <summary>
-        /// Sinh mã phiếu cân theo định dạng <c>yyMMddxxx</c> (vd: 260416001).
+        /// Sinh mã phiếu cân theo định dạng <c>yyMMddxxxx</c> (vd: 2604160001).
         /// Tìm mã lớn nhất trong ngày hiện tại và tăng lên 1.
         /// </summary>
         private async Task<string> GenerateTicketIdAsync(AppDbContext db)
@@ -270,7 +317,7 @@ namespace AutoWeighbridgeSystem.Services
                     if (int.TryParse(suffix, out int num))
                         nextNum = num + 1;
                 }
-                return $"{prefix}{nextNum:D3}";
+                return $"{prefix}{nextNum:D4}";
             }
             finally
             {

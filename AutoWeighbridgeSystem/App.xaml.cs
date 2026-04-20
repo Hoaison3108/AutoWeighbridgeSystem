@@ -72,16 +72,18 @@ namespace AutoWeighbridgeSystem
                 ConfigureServices(serviceCollection);
                 ServiceProvider = serviceCollection.BuildServiceProvider();
 
-                using (var scope = ServiceProvider.CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    dbContext.Database.Migrate();
-                }
+                // =======================================================
+                // 3. HIỂN THỊ MÀN HÌNH CHỜ (SPLASH) & KHỞI TẠO SONG SONG
+                // =======================================================
+                // Thay vì đợi tuần tự, ta hiện Splash và để SplashViewModel điều phối
+                var splashVm = ServiceProvider.GetRequiredService<SplashViewModel>();
+                var splashWindow = ServiceProvider.GetRequiredService<SplashWindow>();
+                splashWindow.DataContext = splashVm;
+                splashWindow.ShowDialog(); // Chờ Splash khởi tạo xong các Service (Scale, RFID, DB)
 
-                // Ép hệ thống khởi tạo RFID Service và Scale Service
-                ServiceProvider.GetRequiredService<ScaleService>();
-                ServiceProvider.GetRequiredService<RfidMultiService>();
-
+                // =======================================================
+                // 4. HIỂN THỊ MÀN HÌNH ĐĂNG NHẬP
+                // =======================================================
                 var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
                 loginWindow.Show();
             }
@@ -190,10 +192,14 @@ namespace AutoWeighbridgeSystem
                     sp.GetRequiredService<ScaleService>()));
 
             services.AddSingleton<VehicleRegistrationViewModel>();
+            services.AddTransient<ManualTicketViewModel>();
+            services.AddTransient<EditTicketViewModel>();
+            services.AddTransient<SplashViewModel>();
             services.AddTransient<LoginViewModel>();
 
             // --- Nhóm 4: Views (Giao diện) ---
             services.AddSingleton<MainWindow>();
+            services.AddTransient<SplashWindow>();
             services.AddTransient<LoginWindow>();
             services.AddTransient<DashboardView>();
             services.AddTransient<VehicleRegistrationView>();

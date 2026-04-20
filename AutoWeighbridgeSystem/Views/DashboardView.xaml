@@ -302,7 +302,7 @@
                                 <!-- IsEditable=True + TextChanged: tạo hiệu ứng filter-as-you-type autocomplete -->
                                 <ComboBox x:Name="VehicleComboBox"
                                           Grid.Column="1"
-                                          ItemsSource="{Binding VehicleView}"
+                                          ItemsSource="{Binding VehicleAutocomplete.View}"
                                           Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
@@ -329,7 +329,7 @@
                      VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="16"/>
                                 <ComboBox x:Name="CustomerComboBox"
                                           Grid.Column="1"
-                                          ItemsSource="{Binding CustomerView}"
+                                          ItemsSource="{Binding CustomerAutocomplete.View}"
                                           Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"
@@ -355,7 +355,7 @@
                      VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="16"/>
                                 <ComboBox x:Name="ProductComboBox"
                                           Grid.Column="1"
-                                          ItemsSource="{Binding ProductView}"
+                                          ItemsSource="{Binding ProductAutocomplete.View}"
                                           Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}"
                                           IsEditable="True"
                                           IsEnabled="{Binding IsManualMode}"

@@ -70,12 +70,40 @@ namespace AutoWeighbridgeSystem.Services
         public async Task<IReadOnlyList<WeighingTicket>> LoadRecentTicketsAsync(int take = 15)
         {
             using var db = _dbContextFactory.CreateDbContext();
-            return await db.WeighingTickets
+
+            // 1. Ưu tiên: Lấy TẤT CẢ các phiếu đang chờ cân lần 2 (Chưa hoàn thành và chưa bị hủy)
+            var pendingTickets = await db.WeighingTickets
                 .IgnoreQueryFilters()
                 .AsNoTracking()
-                .OrderByDescending(t => t.TimeIn)
+                .Where(t => t.TimeOut == null && !t.IsVoid)
+                .OrderBy(t => t.TimeIn) // Đưa phiếu chờ lâu nhất lên đầu
+                .ToListAsync();
+
+            // 2. Lịch sử: Lấy giới hạn N phiếu gần nhất ĐÃ HOÀN THÀNH hoặc BỊ HỦY
+            var completedTickets = await db.WeighingTickets
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(t => t.TimeOut != null || t.IsVoid)
+                .OrderByDescending(t => t.TimeIn) // Lấy phiếu mới nhất lên đầu
                 .Take(take)
                 .ToListAsync();
+
+            // 3. Gộp lại: Nhóm "Đợi cân" nằm trên, Nhóm "Lịch sử" nối theo sau.
+            return pendingTickets.Concat(completedTickets).ToList();
+        }
+
+        /// <summary>
+        /// Lấy thông tin chi tiết của một xe dựa trên biển số.
+        /// Sử dụng để điền nhanh thông tin (Bì, Khách hàng) trong các form nhập liệu.
+        /// </summary>
+        public async Task<Vehicle?> GetVehicleByPlateAsync(string plate)
+        {
+            if (string.IsNullOrWhiteSpace(plate)) return null;
+            using var db = _dbContextFactory.CreateDbContext();
+            return await db.Vehicles
+                .Include(v => v.Customer)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(v => v.LicensePlate == plate && !v.IsDeleted);
         }
     }
 

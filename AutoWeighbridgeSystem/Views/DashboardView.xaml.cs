@@ -80,7 +80,7 @@ namespace AutoWeighbridgeSystem.Views
         {
             if (DataContext is DashboardViewModel vm && vm.IsManualMode)
             {
-                vm.VehicleFilterText = VehicleComboBox.Text;
+                vm.VehicleAutocomplete.FilterText = VehicleComboBox.Text;
                 // Mở dropdown để hiển thị gợi ý ngay khi gõ
                 if (!string.IsNullOrEmpty(VehicleComboBox.Text))
                     VehicleComboBox.IsDropDownOpen = true;
@@ -94,7 +94,7 @@ namespace AutoWeighbridgeSystem.Views
         {
             if (DataContext is DashboardViewModel vm && vm.IsManualMode)
             {
-                vm.CustomerFilterText = CustomerComboBox.Text;
+                vm.CustomerAutocomplete.FilterText = CustomerComboBox.Text;
                 if (!string.IsNullOrEmpty(CustomerComboBox.Text))
                     CustomerComboBox.IsDropDownOpen = true;
             }
@@ -107,7 +107,7 @@ namespace AutoWeighbridgeSystem.Views
         {
             if (DataContext is DashboardViewModel vm && vm.IsManualMode)
             {
-                vm.ProductFilterText = ProductComboBox.Text;
+                vm.ProductAutocomplete.FilterText = ProductComboBox.Text;
                 if (!string.IsNullOrEmpty(ProductComboBox.Text))
                     ProductComboBox.IsDropDownOpen = true;
             }

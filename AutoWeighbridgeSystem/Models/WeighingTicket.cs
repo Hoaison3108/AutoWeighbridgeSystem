@@ -10,7 +10,7 @@ namespace AutoWeighbridgeSystem.Models
         [Key]
         [Required]
         [StringLength(20)]
-        public string TicketID { get; set; } // Định dạng: yyMMddxxx
+        public string TicketID { get; set; } // Định dạng: yyMMddxxxx
 
         public int? VehicleId { get; set; }
         [ForeignKey("VehicleId")]

@@ -28,9 +28,9 @@ namespace AutoWeighbridgeSystem.Services
         private SerialPort _serialPort;
         private IScaleProtocol _protocol;
 
-        private readonly Queue<decimal> _weightBuffer     = new Queue<decimal>();
+        private readonly Queue<decimal> _weightBuffer = new Queue<decimal>();
         private readonly StringBuilder _incomingDataBuffer = new StringBuilder();
-        private const int BufferSize = 10;
+        private const int BufferSize = 10; // Số mẫu để tính trung bình
 
         // =========================================================================
         // THROTTLING UI
@@ -66,9 +66,9 @@ namespace AutoWeighbridgeSystem.Services
         private decimal _currentWeight;
 
         /// <summary>Trọng lượng hiện tại đọc được từ đầu cân (kg).</summary>
-        public decimal CurrentWeight 
-        { 
-            get 
+        public decimal CurrentWeight
+        {
+            get
             {
                 lock (_weightLock)
                 {
@@ -79,7 +79,7 @@ namespace AutoWeighbridgeSystem.Services
 
         /// <summary>
         /// <c>true</c> nếu đầu cân đang báo trạng thái ổn định (P+) hoặc
-        /// bộ đệm phần mềm xác nhận dao động trong ngưỡng cho phép (&lt;= 10kg).
+        /// bộ đệm phần mềm xác nhận dao động trong ngưỡng cho phép (&lt;= 50kg).
         /// </summary>
         public bool IsScaleStable { get; private set; }
 
@@ -132,12 +132,12 @@ namespace AutoWeighbridgeSystem.Services
         public void Initialize(string portName, int baudRate, int dataBits, Parity parity, StopBits stopBits, IScaleProtocol protocol)
         {
             // Lưu lại thông số để dùng khi reconnect
-            _portName  = portName;
-            _baudRate  = baudRate;
-            _dataBits  = dataBits;
-            _parity    = parity;
-            _stopBits  = stopBits;
-            _protocol  = protocol;
+            _portName = portName;
+            _baudRate = baudRate;
+            _dataBits = dataBits;
+            _parity = parity;
+            _stopBits = stopBits;
+            _protocol = protocol;
 
             OpenPort();
         }
@@ -154,12 +154,12 @@ namespace AutoWeighbridgeSystem.Services
 
                 _serialPort = new SerialPort(_portName, _baudRate, _parity, _dataBits, _stopBits)
                 {
-                    Encoding              = Encoding.ASCII,
-                    ReadTimeout           = 500,
+                    Encoding = Encoding.ASCII,
+                    ReadTimeout = 500,
                     ReceivedBytesThreshold = 1
                 };
 
-                _serialPort.DataReceived  += SerialPort_DataReceived;
+                _serialPort.DataReceived += SerialPort_DataReceived;
                 _serialPort.ErrorReceived += SerialPort_ErrorReceived;
                 _serialPort.Open();
 
@@ -262,7 +262,7 @@ namespace AutoWeighbridgeSystem.Services
                     if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
 
                     decimal delta = _weightBuffer.Count > 0 ? _weightBuffer.Max() - _weightBuffer.Min() : 0;
-                    IsScaleStable = (_weightBuffer.Count >= BufferSize) && (delta <= 10);
+                    IsScaleStable = (_weightBuffer.Count >= BufferSize) && (delta <= 50);
                 }
             }
             else
@@ -293,7 +293,7 @@ namespace AutoWeighbridgeSystem.Services
             // Chỉ xử lý một lần nếu đang reconnect
             if (_isReconnecting) return;
 
-            _isConnected   = false;
+            _isConnected = false;
             _isReconnecting = true;
 
             Log.Warning("[SCALE] Phát hiện mất kết nối đầu cân tại {Port}. Bắt đầu thử kết nối lại...", _portName);
@@ -312,7 +312,7 @@ namespace AutoWeighbridgeSystem.Services
             {
                 if (_serialPort != null)
                 {
-                    _serialPort.DataReceived  -= SerialPort_DataReceived;
+                    _serialPort.DataReceived -= SerialPort_DataReceived;
                     _serialPort.ErrorReceived -= SerialPort_ErrorReceived;
                     if (_serialPort.IsOpen) _serialPort.Close();
                     _serialPort.Dispose();
@@ -360,17 +360,17 @@ namespace AutoWeighbridgeSystem.Services
                         // Thử mở lại cổng
                         var testPort = new SerialPort(_portName, _baudRate, _parity, _dataBits, _stopBits)
                         {
-                            Encoding              = Encoding.ASCII,
-                            ReadTimeout           = 500,
+                            Encoding = Encoding.ASCII,
+                            ReadTimeout = 500,
                             ReceivedBytesThreshold = 1
                         };
-                        testPort.DataReceived  += SerialPort_DataReceived;
+                        testPort.DataReceived += SerialPort_DataReceived;
                         testPort.ErrorReceived += SerialPort_ErrorReceived;
                         testPort.Open();
 
                         // Thành công
-                        _serialPort     = testPort;
-                        _isConnected    = true;
+                        _serialPort = testPort;
+                        _isConnected = true;
                         _isReconnecting = false;
                         _weightBuffer.Clear();
                         _incomingDataBuffer.Clear();
