@@ -130,7 +130,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 if (string.IsNullOrEmpty(changes))
                 {
                     _notificationService.ShowInfo("Không có thông tin nào thay đổi.", "THÔNG BÁO");
-                    CloseAction?.Invoke();
+                    RequestClose?.Invoke();
                     return;
                 }
 

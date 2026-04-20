@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using Microsoft.Win32;
 using AutoWeighbridgeSystem.Models;
 using System;
@@ -89,8 +89,8 @@ namespace AutoWeighbridgeSystem.Services
                             }
 
                             // Định dạng số và ngày tháng cho 10 cột
-                            worksheet.Cell(currentRow, 6).Style.DateFormat.Format = "dd/MM/yy HH:mm";
-                            worksheet.Cell(currentRow, 7).Style.DateFormat.Format = "dd/MM/yy HH:mm";
+                            worksheet.Cell(currentRow, 6).Style.DateFormat.Format = "HH:mm:ss";
+                            worksheet.Cell(currentRow, 7).Style.DateFormat.Format = "HH:mm:ss";
                             worksheet.Cell(currentRow, 8).Style.NumberFormat.Format = "#,##0";
                             worksheet.Cell(currentRow, 9).Style.NumberFormat.Format = "#,##0";
                             worksheet.Cell(currentRow, 10).Style.NumberFormat.Format = "#,##0";
