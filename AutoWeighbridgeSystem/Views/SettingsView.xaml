@@ -346,7 +346,7 @@
                                                         <TextBox Text="{Binding RelayStopBits}"/>
                                                     </StackPanel>
                                                     <StackPanel Margin="2">
-                                                        <TextBlock Text="Còi (ms):" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBlock Text="Chuông (ms):" Style="{StaticResource LabelStyle}"/>
                                                         <TextBox Text="{Binding RelayAlarmDuration}"/>
                                                     </StackPanel>
                                                 </UniformGrid>

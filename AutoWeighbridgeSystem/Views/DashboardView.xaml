@@ -196,7 +196,7 @@
                                     ToolTip="{Binding AlarmStatus, StringFormat='Chuông báo: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
                                      Fill="{Binding AlarmStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
-                            <TextBlock Text="CHUÔNG" FontSize="8" FontWeight="Bold"
+                            <TextBlock Text="B/L" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
                     </StackPanel>

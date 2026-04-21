@@ -156,12 +156,12 @@ namespace AutoWeighbridgeSystem.ViewModels
                 DefaultToOnePassMode= bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool op) ? op  : true;
 
                 // Relay
-                RelayComPort      = _configuration["RelaySettings:ComPort"];
-                RelayBaudRate     = int.TryParse(_configuration["RelaySettings:BaudRate"],     out int rb)  ? rb  : 9600;
-                RelayDataBits     = int.TryParse(_configuration["RelaySettings:DataBits"],     out int rdb) ? rdb : 8;
-                RelayParity       = _configuration["RelaySettings:Parity"]   ?? "None";
-                RelayStopBits     = _configuration["RelaySettings:StopBits"] ?? "One";
-                RelayAlarmDuration= int.TryParse(_configuration["RelaySettings:AlarmDurationMs"], out int rad) ? rad : 1500;
+                RelayComPort       = _configuration["RelaySettings:ComPort"];
+                RelayBaudRate      = int.TryParse(_configuration["RelaySettings:BaudRate"],     out int rb)  ? rb  : 9600;
+                RelayDataBits      = int.TryParse(_configuration["RelaySettings:DataBits"],     out int rdb) ? rdb : 8;
+                RelayParity        = _configuration["RelaySettings:Parity"]   ?? "None";
+                RelayStopBits      = _configuration["RelaySettings:StopBits"] ?? "One";
+                RelayAlarmDuration = int.TryParse(_configuration["RelaySettings:AlarmDurationMs"], out int rad) ? rad : 1500;
 
                 // RFID Scale In
                 RfidInPort     = _configuration["RfidSettings:ScaleIn:ComPort"];
@@ -241,11 +241,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 // ==========================================
                 if (root["RelaySettings"] == null) root["RelaySettings"] = new JsonObject();
                 var relay = root["RelaySettings"];
-                relay["ComPort"]       = RelayComPort;
-                relay["BaudRate"]      = RelayBaudRate;
-                relay["DataBits"]      = RelayDataBits;
-                relay["Parity"]       = RelayParity;
-                relay["StopBits"]     = RelayStopBits;
+                relay["ComPort"]         = RelayComPort;
+                relay["BaudRate"]        = RelayBaudRate;
+                relay["DataBits"]        = RelayDataBits;
+                relay["Parity"]          = RelayParity;
+                relay["StopBits"]        = RelayStopBits;
                 relay["AlarmDurationMs"] = RelayAlarmDuration;
 
                 // ==========================================

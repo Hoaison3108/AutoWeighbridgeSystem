@@ -96,9 +96,12 @@ namespace AutoWeighbridgeSystem.ViewModels
                 using var context = _contextFactory.CreateDbContext();
                 
                 // 1. QUERY CƠ SỞ (Base Query)
+                var searchStart = FromDate.Date;
+                var searchEnd = ToDate.Date.AddDays(1).AddTicks(-1);
+
                 var baseQuery = context.WeighingTickets
                                    .IgnoreQueryFilters()
-                                   .Where(t => t.TimeIn >= FromDate && t.TimeIn <= ToDate);
+                                   .Where(t => t.TimeIn >= searchStart && t.TimeIn <= searchEnd);
 
                 if (!string.IsNullOrWhiteSpace(SearchText))
                 {
@@ -153,9 +156,12 @@ namespace AutoWeighbridgeSystem.ViewModels
                 _currentPage++;
 
                 using var context = _contextFactory.CreateDbContext();
+                var searchStart = FromDate.Date;
+                var searchEnd = ToDate.Date.AddDays(1).AddTicks(-1);
+
                 var query = context.WeighingTickets
                                    .IgnoreQueryFilters()
-                                   .Where(t => t.TimeIn >= FromDate && t.TimeIn <= ToDate);
+                                   .Where(t => t.TimeIn >= searchStart && t.TimeIn <= searchEnd);
 
                 if (!string.IsNullOrWhiteSpace(SearchText))
                 {
@@ -245,24 +251,47 @@ namespace AutoWeighbridgeSystem.ViewModels
         [RelayCommand]
         private async Task ExportExcelAsync()
         {
-            if (Tickets == null || !Tickets.Any())
+            try
             {
-                _notificationService.ShowInfo(UiText.Messages.NoDataToExport, UiText.Titles.Info);
-                return;
-            }
+                IsLoading = true;
 
-            // Sắp xếp theo thứ tự tăng dần (cũ đến mới) cho báo cáo Excel
-            var validTickets = Tickets.Where(t => !t.IsVoid)
-                                      .OrderBy(t => t.TimeIn)
-                                      .ToList();
-            
-            if (!validTickets.Any())
+                using var context = _contextFactory.CreateDbContext();
+                var searchStart = FromDate.Date;
+                var searchEnd = ToDate.Date.AddDays(1).AddTicks(-1);
+
+                var query = context.WeighingTickets
+                                   .IgnoreQueryFilters()
+                                   .Where(t => t.TimeIn >= searchStart && t.TimeIn <= searchEnd);
+
+                if (!string.IsNullOrWhiteSpace(SearchText))
+                {
+                    string search = SearchText.ToLower();
+                    query = query.Where(t => t.LicensePlate.ToLower().Contains(search) ||
+                                             t.CustomerName.ToLower().Contains(search));
+                }
+
+                // Lấy toàn bộ dữ liệu không phân trang
+                var allTickets = await query.OrderBy(t => t.TimeIn).ToListAsync();
+
+                if (allTickets == null || !allTickets.Any())
+                {
+                    _notificationService.ShowInfo(UiText.Messages.NoDataToExport, UiText.Titles.Info);
+                    return;
+                }
+
+                // Sắp xếp lại danh sách (thường báo cáo Excel cần từ cũ đến mới)
+                var validTickets = allTickets.OrderBy(t => t.TimeIn).ToList();
+                
+                await _exportService.ExportTicketsToExcelAsync(validTickets, "BÁO CÁO CHI TIẾT SẢN LƯỢNG TRẠM CÂN");
+            }
+            catch (Exception ex)
             {
-                _notificationService.ShowInfo("Không có dữ liệu hợp lệ (tất cả các phiếu trong danh sách đều đã bị hủy) để xuất báo cáo.", UiText.Titles.Info);
-                return;
+                _notificationService.ShowError("Lỗi hệ thống khi xuất Excel: " + ex.Message, UiText.Titles.SystemError);
             }
-
-            await _exportService.ExportTicketsToExcelAsync(validTickets, "BÁO CÁO CHI TIẾT SẢN LƯỢNG TRẠM CÂN");
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         // =========================================================================

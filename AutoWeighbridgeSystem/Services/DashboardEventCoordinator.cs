@@ -22,12 +22,13 @@ namespace AutoWeighbridgeSystem.Services
         private readonly RfidMultiService _rfidService;
         private readonly DashboardWorkflowService _dashboardWorkflow;
         private readonly HardwareWatchdogService _hardwareWatchdog;
+        private readonly AlarmService _alarmService;
 
         // =========================================================================
         // CẤU HÌNH (đọc từ appsettings — tách ra khỏi ViewModel)
         // =========================================================================
         private int _queueTimeoutSeconds = 45;
-        private int _hardwareWatchdogSeconds = 60;
+        private int _hardwareWatchdogSeconds = 1800;
 
         // =========================================================================
         // STATE DELEGATES — ViewModel cung cấp giá trị hiện tại qua Func<>
@@ -75,12 +76,14 @@ namespace AutoWeighbridgeSystem.Services
             RfidMultiService rfidService,
             DashboardWorkflowService dashboardWorkflow,
             HardwareWatchdogService hardwareWatchdog,
+            AlarmService alarmService,
             IConfiguration configuration)
         {
             _scaleService = scaleService;
             _rfidService = rfidService;
             _dashboardWorkflow = dashboardWorkflow;
             _hardwareWatchdog = hardwareWatchdog;
+            _alarmService = alarmService;
 
             LoadConfiguration(configuration);
         }
@@ -219,7 +222,7 @@ namespace AutoWeighbridgeSystem.Services
                     // Bộ lọc chống đọc trùng (cooldown)
                     if (_dashboardWorkflow.ShouldIgnoreRfidRead(readerRole)) return;
 
-                    // Đầu đọc tại bàn (Desk) không tham gia vào luồng cân tự động
+                    // Đầu đọc tại bàn (Desk) không tham gia vào luồng cân tự động và không kích đèn báo quẹt
                     if (readerRole == ReaderRoles.Desk) return;
 
                     // Thông báo cho ViewModel biết mã thẻ vừa đọc được
