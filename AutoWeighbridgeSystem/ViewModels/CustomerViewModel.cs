@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
@@ -22,6 +22,20 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private ObservableCollection<Customer> _customerList = new();
         [ObservableProperty] private Customer _gridSelectedItem;
         [ObservableProperty] private bool _isEditMode = false;
+        
+        // --- AUTOCOMPLETE & SEARCH ---
+        [ObservableProperty] private string _searchText = "";
+        
+        /// <summary>
+        /// Gợi ý tên khách hàng (giống Dashboard).
+        /// </summary>
+        public AutocompleteProvider<string> CustomerAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// View để lọc danh sách DataGrid bên phải dựa trên SearchText.
+        /// </summary>
+        public System.ComponentModel.ICollectionView CustomerListView { get; private set; }
 
         public CustomerViewModel(
             IDbContextFactory<AppDbContext> dbContextFactory,
@@ -29,7 +43,24 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             _dbContextFactory = dbContextFactory;
             _notificationService = notificationService;
+
+            // Khởi tạo View Collection để lọc DataGrid
+            CustomerListView = System.Windows.Data.CollectionViewSource.GetDefaultView(CustomerList);
+            CustomerListView.Filter = c => {
+                if (string.IsNullOrWhiteSpace(SearchText)) return true;
+                var customer = c as Customer;
+                if (customer == null) return true;
+                string search = SearchText.ToLower();
+                return customer.CustomerName.ToLower().Contains(search) || 
+                       customer.CustomerId.ToLower().Contains(search);
+            };
+
             _ = LoadDataAsync();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            CustomerListView.Refresh();
         }
 
         // --- XỬ LÝ KHI CHỌN DÒNG TRÊN GRID ---
@@ -167,7 +198,12 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 Application.Current?.Dispatcher.Invoke(() =>
                 {
-                    CustomerList = new ObservableCollection<Customer>(list);
+                    CustomerList.Clear();
+                    foreach (var c in list) CustomerList.Add(c);
+
+                    // Cập nhật gợi ý tên khách hàng
+                    var names = list.Select(c => c.CustomerName).Distinct().ToArray();
+                    CustomerAutocomplete.UpdateItems(names);
                 });
             }
             catch (Exception ex) { _notificationService.LogError(ex, "Lỗi load dữ liệu khách hàng"); }

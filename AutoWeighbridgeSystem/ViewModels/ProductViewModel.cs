@@ -1,4 +1,4 @@
-﻿using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
@@ -22,6 +22,20 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private ObservableCollection<Product> _productList = new();
         [ObservableProperty] private Product _gridSelectedItem;
         [ObservableProperty] private bool _isEditMode = false;
+        
+        // --- AUTOCOMPLETE & SEARCH ---
+        [ObservableProperty] private string _searchText = "";
+        
+        /// <summary>
+        /// Gợi ý tên sản phẩm (giống Dashboard).
+        /// </summary>
+        public AutocompleteProvider<string> ProductAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// View để lọc danh sách DataGrid bên phải dựa trên SearchText.
+        /// </summary>
+        public System.ComponentModel.ICollectionView ProductListView { get; private set; }
 
         public ProductViewModel(
             IDbContextFactory<AppDbContext> dbContextFactory,
@@ -29,7 +43,24 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             _dbContextFactory = dbContextFactory;
             _notificationService = notificationService;
+
+            // Khởi tạo View Collection để lọc DataGrid
+            ProductListView = System.Windows.Data.CollectionViewSource.GetDefaultView(ProductList);
+            ProductListView.Filter = p => {
+                if (string.IsNullOrWhiteSpace(SearchText)) return true;
+                var product = p as Product;
+                if (product == null) return true;
+                string search = SearchText.ToLower();
+                return product.ProductName.ToLower().Contains(search) || 
+                       product.ProductId.ToLower().Contains(search);
+            };
+
             _ = LoadDataAsync();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            ProductListView.Refresh();
         }
 
         partial void OnGridSelectedItemChanged(Product value)
@@ -194,7 +225,12 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 Application.Current?.Dispatcher.Invoke(() =>
                 {
-                    ProductList = new ObservableCollection<Product>(list);
+                    ProductList.Clear();
+                    foreach (var p in list) ProductList.Add(p);
+
+                    // Cập nhật gợi ý tên hàng hóa
+                    var names = list.Select(p => p.ProductName).Distinct().ToArray();
+                    ProductAutocomplete.UpdateItems(names);
                 });
             }
             catch (Exception ex) { _notificationService.LogError(ex, "Lỗi load dữ liệu sản phẩm"); }

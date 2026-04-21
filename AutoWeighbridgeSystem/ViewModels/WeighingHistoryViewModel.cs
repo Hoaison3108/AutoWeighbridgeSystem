@@ -56,6 +56,12 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private DateTime _fromDate;
         [ObservableProperty] private DateTime _toDate;
         [ObservableProperty] private string _searchText;
+        
+        // Pagination
+        private int _currentPage = 0;
+        private const int PageSize = 50;
+        [ObservableProperty] private bool _hasMoreData = true;
+        [ObservableProperty] private bool _isLoading = false;
 
         // =========================================================================
         // THỐNG KÊ
@@ -79,8 +85,73 @@ namespace AutoWeighbridgeSystem.ViewModels
         [RelayCommand]
         public async Task LoadHistoryAsync()
         {
+            if (IsLoading) return;
+            
             try
             {
+                IsLoading = true;
+                _currentPage = 0;
+                HasMoreData = true;
+
+                using var context = _contextFactory.CreateDbContext();
+                
+                // 1. QUERY CƠ SỞ (Base Query)
+                var baseQuery = context.WeighingTickets
+                                   .IgnoreQueryFilters()
+                                   .Where(t => t.TimeIn >= FromDate && t.TimeIn <= ToDate);
+
+                if (!string.IsNullOrWhiteSpace(SearchText))
+                {
+                    string search = SearchText.ToLower();
+                    baseQuery = baseQuery.Where(t => t.LicensePlate.ToLower().Contains(search) ||
+                                                     t.CustomerName.ToLower().Contains(search));
+                }
+
+                // 2. TÍNH TOÁN THỐNG KÊ TẠI DATABASE (Tối ưu nhất cho Pentium G5400)
+                // Thay vì tải hàng vạn dòng về RAM để Sum, ta chỉ lấy đúng 4 con số tổng.
+                var statsQuery = baseQuery.Where(t => !t.IsVoid && t.TimeOut.HasValue);
+                
+                TotalVehicles = await statsQuery.CountAsync();
+                if (TotalVehicles > 0)
+                {
+                    TotalGross = await statsQuery.SumAsync(t => t.GrossWeight);
+                    TotalTare  = await statsQuery.SumAsync(t => t.TareWeight);
+                    TotalNet   = await statsQuery.SumAsync(t => t.NetWeight);
+                }
+                else
+                {
+                    TotalGross = TotalTare = TotalNet = 0;
+                }
+
+                // 3. TẢI DỮ LIỆU PHÂN TRANG (Pagination)
+                var result = await baseQuery.OrderByDescending(t => t.TimeIn)
+                                           .Take(PageSize)
+                                           .ToListAsync();
+
+                Tickets = new ObservableCollection<WeighingTicket>(result);
+                HasMoreData = result.Count == PageSize;
+                SelectedTicket = null;
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError(UiText.Messages.DataQueryError(ex.Message), UiText.Titles.SystemError);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task LoadMoreAsync()
+        {
+            if (IsLoading || !HasMoreData) return;
+
+            try
+            {
+                IsLoading = true;
+                _currentPage++;
+
                 using var context = _contextFactory.CreateDbContext();
                 var query = context.WeighingTickets
                                    .IgnoreQueryFilters()
@@ -93,16 +164,25 @@ namespace AutoWeighbridgeSystem.ViewModels
                                              t.CustomerName.ToLower().Contains(search));
                 }
 
-                var result = await query.OrderByDescending(t => t.TimeIn).ToListAsync();
-                Tickets = new ObservableCollection<WeighingTicket>(result);
-                UpdateStatistics(result);
+                var nextBatch = await query.OrderByDescending(t => t.TimeIn)
+                                           .Skip(_currentPage * PageSize)
+                                           .Take(PageSize)
+                                           .ToListAsync();
 
-                // Reset panel chỉnh sửa sau khi reload
-                SelectedTicket     = null;
+                foreach (var ticket in nextBatch)
+                {
+                    Tickets.Add(ticket);
+                }
+
+                HasMoreData = nextBatch.Count == PageSize;
             }
             catch (Exception ex)
             {
-                _notificationService.ShowError(UiText.Messages.DataQueryError(ex.Message), UiText.Titles.SystemError);
+                _notificationService.ShowError("Lỗi khi tải thêm dữ liệu: " + ex.Message, UiText.Titles.SystemError);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 

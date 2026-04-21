@@ -28,6 +28,14 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             // Index 2 — TimeIn: phục vụ ORDER BY TimeIn DESC trong LoadRecentTickets
             builder.HasIndex(t => t.TimeIn)
                    .HasDatabaseName("IX_WeighingTickets_TimeIn");
+
+            // Index 3 — Bổ sung Index cho Biển số xe và Khách hàng để tối ưu tìm kiếm (Search)
+            builder.HasIndex(t => t.LicensePlate)
+                   .HasDatabaseName("IX_WeighingTickets_LicensePlate");
+
+            builder.HasIndex(t => t.CustomerName)
+                   .HasDatabaseName("IX_WeighingTickets_CustomerName");
+
             // Lưu ý: TicketID là PRIMARY KEY (clustered index) — không cần index riêng.
             // Query WHERE TicketID LIKE '260417%' sử dụng clustered index range scan — O(log n).
 

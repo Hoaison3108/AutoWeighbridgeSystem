@@ -46,16 +46,41 @@
         <Style TargetType="ComboBox">
             <Setter Property="Height" Value="42"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Foreground" Value="#2196F3"/>
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#2196F3"/>
             <Setter Property="Padding" Value="12,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="White"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#2196F3"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
             <Style.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#2D2D2D" />
-                <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="White" />
+                <!-- Dành cho ô nhập liệu (TextBox) và nền tổng thể: Trắng chuẩn -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="Black" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2196F3" />
+                
+                <!-- Hiển thị chữ xanh trên nền trắng -->
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="Foreground" Value="#2196F3"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
             </Style.Resources>
         </Style>
 
@@ -80,11 +105,41 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Nút bật tắt ComboBox siêu to khổng lồ dành cho trạm cân cảm ứng (Touch-friendly) -->
+        <Style x:Key="BigDropdownButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Background" Value="#455A64"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}">
+                            <TextBlock Text="▼" FontFamily="Segoe UI Symbol" FontSize="20" FontWeight="Bold" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#00E676"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#2196F3"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="420"/>
+            <ColumnDefinition Width="550"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -100,10 +155,30 @@
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="Biển số xe" Foreground="LightGray" Margin="0,0,0,6"/>
-                <TextBox Text="{Binding NewVehicle.LicensePlate, UpdateSourceTrigger=PropertyChanged}" 
-                         CharacterCasing="Upper" FontSize="16" FontWeight="Bold" Height="42" Margin="0,0,0,18" 
-                         Background="#2D2D2D" Foreground="White" Padding="12,0" VerticalContentAlignment="Center"/>
+                <TextBlock Text="Biển số xe (Gõ mới hoặc chọn bên phải)" Foreground="LightGray" Margin="0,0,0,6"/>
+                <Grid Margin="0,0,0,18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="4*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding NewVehicle.LicensePlate, UpdateSourceTrigger=PropertyChanged}" 
+                             CharacterCasing="Upper" FontSize="16" FontWeight="Bold" Height="42" 
+                             Background="#2D2D2D" Foreground="#2196F3" Padding="12,0" VerticalContentAlignment="Center" Margin="0,0,5,0"/>
+                    
+                    <ComboBox x:Name="VehicleComboBox"
+                              Grid.Column="1"
+                              ItemsSource="{Binding VehicleAutocomplete.View}"
+                              Text="{Binding NewVehicle.LicensePlate, UpdateSourceTrigger=PropertyChanged}"
+                              IsEditable="True"
+                              Height="42" FontSize="16"
+                              TextBoxBase.TextChanged="VehicleComboBox_TextChanged"
+                              Foreground="#2196F3" FontWeight="Bold"
+                              ToolTip="Gõ để lọc hoặc chọn từ danh sách xe đã đăng ký"/>
+
+                    <ToggleButton Grid.Column="1" 
+                                  Style="{StaticResource BigDropdownButtonStyle}" 
+                                  IsChecked="{Binding IsDropDownOpen, ElementName=VehicleComboBox}" />
+                </Grid>
 
                 <TextBlock Text="Khách hàng chủ quản" Foreground="LightGray" Margin="0,0,0,6"/>
                 <ComboBox ItemsSource="{Binding AllCustomers}"
@@ -180,9 +255,16 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="DANH SÁCH XE ĐÃ ĐĂNG KÝ" FontSize="20" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,15"/>
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <TextBlock Text="DANH SÁCH XE ĐÃ ĐĂNG KÝ" FontSize="20" FontWeight="Bold" Foreground="#2196F3" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Text="🔍 TÌM KIẾM:" Foreground="#888" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="11" FontWeight="Bold"/>
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="200" Height="32" 
+                                 Background="#252525" Foreground="White" BorderBrush="#444" VerticalContentAlignment="Center" Padding="8,0"/>
+                    </StackPanel>
+                </Grid>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding RegisteredVehicles}" 
+                <DataGrid Grid.Row="1" ItemsSource="{Binding RegisteredVehiclesView}" 
           SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
           AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
                     <DataGrid.Columns>

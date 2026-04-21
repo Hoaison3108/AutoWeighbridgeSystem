@@ -33,6 +33,20 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private Vehicle _selectedRecord;
         [ObservableProperty] private bool _isEditMode = false;
         [ObservableProperty] private bool _syncTareWeightToAll = false;
+        
+        // --- AUTOCOMPLETE & SEARCH ---
+        [ObservableProperty] private string _searchText = "";
+        
+        /// <summary>
+        /// Gợi ý biển số xe khi đăng ký/tìm kiếm (giống Dashboard).
+        /// </summary>
+        public AutocompleteProvider<string> VehicleAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// View để lọc danh sách DataGrid bên phải dựa trên SearchText.
+        /// </summary>
+        public System.ComponentModel.ICollectionView RegisteredVehiclesView { get; private set; }
 
         // CẬP NHẬT 1: Thêm RfidBusinessService vào tham số Constructor
         public VehicleRegistrationViewModel(
@@ -55,7 +69,25 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
 
             _rfidService.CardRead += OnCardReadAtDesk;
+            
+            // Khởi tạo View Collection để lọc DataGrid
+            RegisteredVehiclesView = System.Windows.Data.CollectionViewSource.GetDefaultView(RegisteredVehicles);
+            RegisteredVehiclesView.Filter = v => {
+                if (string.IsNullOrWhiteSpace(SearchText)) return true;
+                var vehicle = v as Vehicle;
+                if (vehicle == null) return true;
+                string search = SearchText.ToLower();
+                return vehicle.LicensePlate.ToLower().Contains(search) || 
+                       (vehicle.Customer?.CustomerName?.ToLower().Contains(search) ?? false) ||
+                       (vehicle.RfidCardId?.ToLower().Contains(search) ?? false);
+            };
+
             _ = LoadDataAsync();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            RegisteredVehiclesView.Refresh();
         }
 
         partial void OnSelectedRecordChanged(Vehicle value)
@@ -340,8 +372,14 @@ namespace AutoWeighbridgeSystem.ViewModels
             var customers = await db.Customers.AsNoTracking().ToListAsync();
 
             Application.Current?.Dispatcher.Invoke(() => {
-                RegisteredVehicles = new ObservableCollection<Vehicle>(vehicles);
+                RegisteredVehicles.Clear();
+                foreach (var v in vehicles) RegisteredVehicles.Add(v);
+                
                 AllCustomers = new ObservableCollection<Customer>(customers);
+
+                // Cập nhật danh sách gợi ý biển số (chỉ lấy biển không trùng lặp)
+                var uniquePlates = vehicles.Select(v => v.LicensePlate).Distinct().ToArray();
+                VehicleAutocomplete.UpdateItems(uniquePlates);
             });
         }
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using AutoWeighbridgeSystem.Data;
+using AutoWeighbridgeSystem.Common;
 
 namespace AutoWeighbridgeSystem.ViewModels
 {
@@ -34,6 +35,14 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private ObservableCollection<string> _availableVehicles = new();
         [ObservableProperty] private ObservableCollection<string> _availableCustomers = new();
         [ObservableProperty] private ObservableCollection<string> _availableProducts = new();
+        
+        // --- AUTOCOMPLETE ---
+        public AutocompleteProvider<string> VehicleAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+        public AutocompleteProvider<string> CustomerAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+        public AutocompleteProvider<string> ProductAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
 
         public Action RequestClose { get; set; }
         public Action SuccessCallback { get; set; }
@@ -68,6 +77,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 AvailableVehicles = new(data.Vehicles);
                 AvailableCustomers = new(data.Customers);
                 AvailableProducts = new(data.Products);
+
+                // Cập nhật bộ gợi ý thông minh
+                VehicleAutocomplete.UpdateItems(data.Vehicles);
+                CustomerAutocomplete.UpdateItems(data.Customers);
+                ProductAutocomplete.UpdateItems(data.Products);
             });
         }
 

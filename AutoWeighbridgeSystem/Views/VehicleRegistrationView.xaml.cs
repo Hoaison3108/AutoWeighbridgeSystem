@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,17 @@ namespace AutoWeighbridgeSystem.Views
         public VehicleRegistrationView()
         {
             InitializeComponent();
+        }
+
+        private void VehicleComboBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (DataContext is ViewModels.VehicleRegistrationViewModel vm)
+            {
+                vm.VehicleAutocomplete.FilterText = VehicleComboBox.Text;
+                // Mở dropdown để hiển thị gợi ý ngay khi gõ
+                if (!string.IsNullOrEmpty(VehicleComboBox.Text))
+                    VehicleComboBox.IsDropDownOpen = true;
+            }
         }
     }
 }

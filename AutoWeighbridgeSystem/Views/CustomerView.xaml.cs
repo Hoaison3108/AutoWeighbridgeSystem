@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +23,17 @@ namespace AutoWeighbridgeSystem.Views
         public CustomerView()
         {
             InitializeComponent();
+        }
+
+        private void CustomerComboBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (DataContext is ViewModels.CustomerViewModel vm)
+            {
+                vm.CustomerAutocomplete.FilterText = CustomerComboBox.Text;
+                // Mở gợi ý khi gõ
+                if (!string.IsNullOrEmpty(CustomerComboBox.Text))
+                    CustomerComboBox.IsDropDownOpen = true;
+            }
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)

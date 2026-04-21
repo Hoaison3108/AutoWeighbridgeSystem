@@ -1,3 +1,4 @@
+using AutoWeighbridgeSystem.Common;
 using AutoWeighbridgeSystem.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -24,6 +25,14 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private DateTime _timeIn = DateTime.Now.AddMinutes(-30);
         [ObservableProperty] private DateTime _timeOut = DateTime.Now;
         [ObservableProperty] private string _reason = "Nhập thủ công";
+        
+        // --- AUTOCOMPLETE ---
+        public AutocompleteProvider<string> VehicleAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+        public AutocompleteProvider<string> CustomerAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
+        public AutocompleteProvider<string> ProductAutocomplete { get; } 
+            = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
 
         // Danh sách gợi ý từ DB
         [ObservableProperty] private System.Collections.ObjectModel.ObservableCollection<string> _availableVehicles = new();
@@ -57,6 +66,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 AvailableVehicles = new(data.Vehicles);
                 AvailableCustomers = new(data.Customers);
                 AvailableProducts = new(data.Products);
+
+                // Cập nhật bộ gợi ý thông minh
+                VehicleAutocomplete.UpdateItems(data.Vehicles);
+                CustomerAutocomplete.UpdateItems(data.Customers);
+                ProductAutocomplete.UpdateItems(data.Products);
 
                 // Gán giá trị mặc định sau khi đã có danh sách gợi ý
                 if (string.IsNullOrEmpty(ProductName))

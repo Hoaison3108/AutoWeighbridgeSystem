@@ -55,29 +55,44 @@
         </Style>
 
         <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="#EEEEEE"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="Height" Value="45"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#2196F3"/>
+            <Setter Property="Height" Value="42"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderBrush" Value="#333"/>
+            <Setter Property="BorderBrush" Value="#2196F3"/>
+            <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="White"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#2196F3"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
             <Style.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#EEEEEE" />
+                <!-- Dành cho ô nhập liệu (TextBox) và nền tổng thể: Trắng chuẩn -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="Black" />
-                
-                <Style TargetType="ComboBoxItem">
-                    <Setter Property="Foreground" Value="Black"/>
-                    <Setter Property="Background" Value="White"/>
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="Padding" Value="10,8"/>
-                </Style>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2196F3" />
+
+                <!-- Ép kiểu ô nhập nội bộ -->
                 <Style TargetType="TextBox">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Foreground" Value="Black"/>
-                    <Setter Property="SelectionBrush" Value="#2196F3"/>
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="Foreground" Value="#2196F3"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
                     <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Padding" Value="0"/>
                 </Style>
             </Style.Resources>
         </Style>
@@ -148,22 +163,26 @@
                         <StackPanel>
                             <TextBlock Text="BIỂN SỐ XE (*)" Style="{StaticResource FieldLabelStyle}"/>
                             <Grid Margin="0,0,0,15">
-                                <ComboBox x:Name="VehicleCombo" ItemsSource="{Binding AvailableVehicles}" 
-                                          Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"/>
+                                <ComboBox x:Name="VehicleCombo" ItemsSource="{Binding VehicleAutocomplete.View}" 
+                                          Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"
+                                          TextBoxBase.TextChanged="VehicleCombo_TextChanged"
+                                          Foreground="#2196F3" FontWeight="Bold"/>
                                 <ToggleButton Style="{StaticResource ModernDropdownButtonStyle}" IsChecked="{Binding IsDropDownOpen, ElementName=VehicleCombo}"/>
                             </Grid>
 
                             <TextBlock Text="KHÁCH HÀNG / ĐƠN VỊ" Style="{StaticResource FieldLabelStyle}"/>
                             <Grid Margin="0,0,0,15">
-                                <ComboBox x:Name="CustomerCombo" ItemsSource="{Binding AvailableCustomers}"
-                                          Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"/>
+                                <ComboBox x:Name="CustomerCombo" ItemsSource="{Binding CustomerAutocomplete.View}"
+                                          Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"
+                                          TextBoxBase.TextChanged="CustomerCombo_TextChanged"/>
                                 <ToggleButton Style="{StaticResource ModernDropdownButtonStyle}" IsChecked="{Binding IsDropDownOpen, ElementName=CustomerCombo}"/>
                             </Grid>
 
                             <TextBlock Text="LOẠI HÀNG HÓA" Style="{StaticResource FieldLabelStyle}"/>
                             <Grid>
-                                <ComboBox x:Name="ProductCombo" ItemsSource="{Binding AvailableProducts}"
-                                          Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"/>
+                                <ComboBox x:Name="ProductCombo" ItemsSource="{Binding ProductAutocomplete.View}"
+                                          Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"
+                                          TextBoxBase.TextChanged="ProductCombo_TextChanged"/>
                                 <ToggleButton Style="{StaticResource ModernDropdownButtonStyle}" IsChecked="{Binding IsDropDownOpen, ElementName=ProductCombo}"/>
                             </Grid>
                         </StackPanel>
