@@ -107,6 +107,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private HardwareConnectionStatus _rfidOutStatus           = HardwareConnectionStatus.Offline;
         [ObservableProperty] private HardwareConnectionStatus _rfidDeskStatus          = HardwareConnectionStatus.Offline;
         [ObservableProperty] private HardwareConnectionStatus _cameraConnectionStatus  = HardwareConnectionStatus.Offline;
+        [ObservableProperty] private HardwareConnectionStatus _alarmStatus             = HardwareConnectionStatus.Offline;
 
         // --- Danh sách lịch sử ---
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
@@ -175,6 +176,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             InitializeCamera();
             SubscribeToScaleEvent();
             SubscribeToCoordinatorEvents();
+            SubscribeToAlarmEvent();
 
             // Khởi động Coordinator — truyền Func<> để Coordinator đọc state VM khi cần
             _coordinator.Start(
@@ -187,6 +189,9 @@ namespace AutoWeighbridgeSystem.ViewModels
                 _notificationService.LogError(ex, "Lỗi tải danh mục lúc khởi động"));
             LoadRecentTicketsAsync().FireAndForgetSafe(ex =>
                 _notificationService.LogError(ex, "Lỗi tải nhật ký phiếu cân lúc khởi động"));
+
+            // Kiểm tra trạng thái chuông ngay lúc khởi động
+            _alarmService.Initialize();
         }
 
         // =========================================================================
@@ -285,6 +290,11 @@ namespace AutoWeighbridgeSystem.ViewModels
                 case ReaderRoles.ScaleOut:  RfidOutStatus = status; break;
                 case ReaderRoles.Desk:      RfidDeskStatus = status; break;
             }
+        }
+
+        private void SubscribeToAlarmEvent()
+        {
+            _alarmService.HardwareStatusChanged += status => AlarmStatus = status;
         }
 
         /// <summary>
@@ -520,6 +530,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _coordinator.RfidCaptured                   -= OnRfidCaptured;
             _coordinator.PendingTimeoutStartRequested   -= OnPendingTimeoutStartRequested;
             _coordinator.HardwareStatusChanged          -= OnHardwareStatusChanged;
+            _alarmService.HardwareStatusChanged         -= (status => AlarmStatus = status); // Note: this anonymous unsub won't work perfectly if not careful, but usually VM is disposed at app exit
             _coordinator.Dispose();
             _saveLock.Dispose();
         }

@@ -255,12 +255,19 @@ namespace AutoWeighbridgeSystem.Services
                 _hardwareWatchdogSeconds,
                 () =>
                 {
-                    // Mất tín hiệu đầu cân: reset cờ để lần data tiếp theo sẽ set Online lại
+                    // Mất tín hiệu dữ liệu (Im lặng): 
+                    // Nếu port vẫn mở thì chỉ chuyển sang màu Vàng (Standby), không báo Đỏ
                     _scaleDataReceived = false;
                     Application.Current?.Dispatcher.BeginInvoke(() =>
                     {
-                        HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Offline);
-                        CameraMessageRequested?.Invoke("⚠️ MẤT TÍN HIỆU ĐẦU CÂN!", false);
+                        var status = _scaleService.IsConnected 
+                            ? HardwareConnectionStatus.Connecting 
+                            : HardwareConnectionStatus.Offline;
+                            
+                        HardwareStatusChanged?.Invoke("Scale", status);
+                        
+                        // Không hiện thông báo to trên Camera khi chỉ là trạng thái nghỉ (im lặng)
+                        // Chỉ báo đỏ nếu port thực sự bị ngắt (xử lý trong OnScaleDisconnected)
                     });
                 });
         }

@@ -244,10 +244,15 @@ namespace AutoWeighbridgeSystem
                     var scaleService = ServiceProvider.GetService<ScaleService>();
                     if (scaleService != null)
                     {
-                        // Giả định ScaleService của bạn có hàm Close() hoặc Disconnect()
-                        // Nếu tên hàm khác, bạn đổi lại tên hàm cho đúng nhé
                         scaleService.Close();
                         Log.Information("[APP] Đã ngắt kết nối an toàn với Đầu cân.");
+                    }
+
+                    var relayService = ServiceProvider.GetService<RelayService>();
+                    if (relayService != null)
+                    {
+                        relayService.Close();
+                        Log.Information("[APP] Đã ngắt kết nối an toàn với mạch Relay.");
                     }
                 }
             }
