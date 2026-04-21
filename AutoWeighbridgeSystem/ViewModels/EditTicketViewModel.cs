@@ -124,8 +124,8 @@ namespace AutoWeighbridgeSystem.ViewModels
                 if (ticketInDb.ProductName != ProductName) changes += $"Prod: {ticketInDb.ProductName}->{ProductName}, ";
                 if (ticketInDb.GrossWeight != GrossWeight) changes += $"G: {ticketInDb.GrossWeight:N0}->{GrossWeight:N0}, ";
                 if (ticketInDb.TareWeight != TareWeight) changes += $"T: {ticketInDb.TareWeight:N0}->{TareWeight:N0}, ";
-                if (ticketInDb.TimeIn != TimeIn) changes += $"In: {ticketInDb.TimeIn:HH:mm}->{TimeIn:HH:mm}, ";
-                if (ticketInDb.TimeOut != TimeOut) changes += $"Out: {ticketInDb.TimeOut:HH:mm}->{TimeOut:HH:mm}, ";
+                if (ticketInDb.TimeIn != TimeIn) changes += $"In: {ticketInDb.TimeIn:HH:mm:ss}->{TimeIn:HH:mm:ss}, ";
+                if (ticketInDb.TimeOut != TimeOut) changes += $"Out: {ticketInDb.TimeOut:HH:mm:ss}->{TimeOut:HH:mm:ss}, ";
 
                 if (string.IsNullOrEmpty(changes))
                 {

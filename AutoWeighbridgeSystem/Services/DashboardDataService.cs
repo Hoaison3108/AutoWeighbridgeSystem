@@ -70,25 +70,26 @@ namespace AutoWeighbridgeSystem.Services
         public async Task<IReadOnlyList<WeighingTicket>> LoadRecentTicketsAsync(int take = 15)
         {
             using var db = _dbContextFactory.CreateDbContext();
+            var today = DateTime.Today;
 
             // 1. Ưu tiên: Lấy TẤT CẢ các phiếu đang chờ cân lần 2 (Chưa hoàn thành và chưa bị hủy)
+            // Không lọc theo ngày để tránh bỏ sót xe nằm chờ qua đêm.
             var pendingTickets = await db.WeighingTickets
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .Where(t => t.TimeOut == null && !t.IsVoid)
-                .OrderBy(t => t.TimeIn) // Đưa phiếu chờ lâu nhất lên đầu
+                .OrderBy(t => t.TimeIn) 
                 .ToListAsync();
 
-            // 2. Lịch sử: Lấy giới hạn N phiếu gần nhất ĐÃ HOÀN THÀNH hoặc BỊ HỦY
+            // 2. Lịch sử: Lấy TẤT CẢ các phiếu ĐÃ HOÀN THÀNH hoặc BỊ HỦY của NGÀY HÔM NAY.
             var completedTickets = await db.WeighingTickets
                 .IgnoreQueryFilters()
                 .AsNoTracking()
-                .Where(t => t.TimeOut != null || t.IsVoid)
+                .Where(t => (t.TimeOut != null || t.IsVoid) && t.TimeIn >= today)
                 .OrderByDescending(t => t.TimeIn) // Lấy phiếu mới nhất lên đầu
-                .Take(take)
                 .ToListAsync();
 
-            // 3. Gộp lại: Nhóm "Đợi cân" nằm trên, Nhóm "Lịch sử" nối theo sau.
+            // 3. Gộp lại: Nhóm "Đợi cân" nằm trên, Nhóm "Lịch sử trong ngày" nối theo sau.
             return pendingTickets.Concat(completedTickets).ToList();
         }
 

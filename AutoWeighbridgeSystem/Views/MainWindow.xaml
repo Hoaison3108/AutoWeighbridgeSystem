@@ -156,6 +156,19 @@
 
                     <Separator Background="#333" Margin="15,5"/>
 
+                    <!-- Nút mở Lịch sử thông báo (Chuyển sang điều hướng Tab) -->
+                    <Button Command="{Binding ShowNotificationHistoryCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="🔔" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="LỊCH SỬ THÔNG BÁO" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
                     <Button Command="{Binding ShowSettingsCommand}" Style="{StaticResource MenuButtonStyle}">
                         <Grid Width="260" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
@@ -179,10 +192,11 @@
                                        Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
                         </Grid>
                     </Button>
+                    
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                    <TextBlock Text="DESIGN BY SONK (v1.9.7)" FontSize="16" FontWeight="Bold" 
+                    <TextBlock Text="DESIGN BY SONK (v1.9.8)" FontSize="16" FontWeight="Bold" 
                                Foreground="#2196F3" HorizontalAlignment="Center"
                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
                 </StackPanel>
@@ -208,6 +222,23 @@
             <Grid Visibility="{Binding IsSettingsVisible, Converter={StaticResource BoolToVis}}">
                 <views:SettingsView DataContext="{Binding SettingsVM}" />
             </Grid>
+            <Grid Visibility="{Binding IsNotificationHistoryVisible, Converter={StaticResource BoolToVis}}">
+                <views:NotificationHistoryView DataContext="{Binding NotificationHistoryVM}" />
+            </Grid>
         </Grid>
+
+        <!-- LAYER OVERLAY: DANH SÁCH TOAST THÔNG BÁO -->
+        <ItemsControl Grid.Column="1" 
+                      ItemsSource="{Binding NotificationManager.ActiveToasts}"
+                      VerticalAlignment="Top" 
+                      HorizontalAlignment="Right" 
+                      Margin="0,10,10,0"
+                      Panel.ZIndex="1000">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <views:NotificationToast />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Window>

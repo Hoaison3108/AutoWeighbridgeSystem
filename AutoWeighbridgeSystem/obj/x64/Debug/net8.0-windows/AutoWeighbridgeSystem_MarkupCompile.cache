@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\App.xaml
-12-296878214
+141656736101
 426710527216
-831787366580
+90522456986
 247-700688099
-Views\CustomerView.xaml;Views\DashboardView.xaml;Views\EditTicketView.xaml;Views\LoginWindow.xaml;Views\MainWindow.xaml;Views\ManualTicketView.xaml;Views\ProductView.xaml;Views\QuickVehicleRegisterWindow.xaml;Views\SettingsView.xaml;Views\SplashWindow.xaml;Views\VehicleRegistrationView.xaml;Views\WeighingHistoryView.xaml;
+Views\CustomerView.xaml;Views\DashboardView.xaml;Views\EditTicketView.xaml;Views\LoginWindow.xaml;Views\MainWindow.xaml;Views\ManualTicketView.xaml;Views\NotificationHistoryView.xaml;Views\NotificationToast.xaml;Views\ProductView.xaml;Views\QuickVehicleRegisterWindow.xaml;Views\SettingsView.xaml;Views\SplashWindow.xaml;Views\VehicleRegistrationView.xaml;Views\WeighingHistoryView.xaml;
 
 False
 

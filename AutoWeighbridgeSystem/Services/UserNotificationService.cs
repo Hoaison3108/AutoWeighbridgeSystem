@@ -48,30 +48,37 @@ namespace AutoWeighbridgeSystem.Services
     /// </summary>
     public sealed class UserNotificationService : IUserNotificationService
     {
+        private readonly NotificationManagerService _notificationManager;
         private const string DefaultCameraStatus    = UiText.Camera.OnlineStatus;
         private const int    CameraStatusAutoHideMs = 3000;
+
+        public UserNotificationService(NotificationManagerService notificationManager)
+        {
+            _notificationManager = notificationManager;
+        }
 
         /// <inheritdoc/>
         public void ShowWarning(string message, string title = UiText.Titles.WarningUpper)
         {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            _notificationManager.Notify(title, message, Models.NotificationType.Warning);
         }
 
         /// <inheritdoc/>
         public void ShowInfo(string message, string title = UiText.Titles.Info)
         {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+            _notificationManager.Notify(title, message, Models.NotificationType.Info);
         }
 
         /// <inheritdoc/>
         public void ShowError(string message, string title = UiText.Titles.Error)
         {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            _notificationManager.Notify(title, message, Models.NotificationType.Error);
         }
 
         /// <inheritdoc/>
         public bool Confirm(string message, string title, MessageBoxButton buttons = MessageBoxButton.YesNo, MessageBoxImage image = MessageBoxImage.Question)
         {
+            // Vẫn giữ MessageBox cho việc xác nhận vì cần chặn để lấy kết quả (Yes/No)
             return MessageBox.Show(message, title, buttons, image) == MessageBoxResult.Yes;
         }
 

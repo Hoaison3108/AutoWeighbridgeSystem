@@ -116,6 +116,7 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<RelayService>();
             services.AddSingleton<AppSession>();
             services.AddSingleton<RfidBusinessService>();
+            services.AddSingleton<NotificationManagerService>();
             services.AddSingleton<AlarmService>();
             services.AddSingleton<WeighingBusinessService>();
             services.AddSingleton<DashboardWorkflowService>();
@@ -216,6 +217,8 @@ namespace AutoWeighbridgeSystem
             services.AddTransient<ProductView>();
             services.AddSingleton<SettingsViewModel>();
             services.AddTransient<SettingsView>();
+            services.AddSingleton<NotificationHistoryViewModel>();
+            services.AddTransient<NotificationHistoryView>();
             services.AddTransient<WeighingHistoryViewModel>();
             services.AddTransient<WeighingHistoryView>();
         }

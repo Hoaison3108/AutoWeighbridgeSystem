@@ -171,8 +171,10 @@ namespace AutoWeighbridgeSystem.ViewModels
                 return;
             }
 
-            // Chỉ xuất các phiếu hợp lệ (không bị hủy) để hàm SUM trong Excel tính toán chính xác
-            var validTickets = Tickets.Where(t => !t.IsVoid).ToList();
+            // Sắp xếp theo thứ tự tăng dần (cũ đến mới) cho báo cáo Excel
+            var validTickets = Tickets.Where(t => !t.IsVoid)
+                                      .OrderBy(t => t.TimeIn)
+                                      .ToList();
             
             if (!validTickets.Any())
             {

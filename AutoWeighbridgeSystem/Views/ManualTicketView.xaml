@@ -46,6 +46,11 @@
                     <Setter Property="BorderBrush" Value="#2196F3"/>
                     <Setter Property="Background" Value="#2D2D2D"/>
                 </Trigger>
+                <!-- Thêm hiệu ứng khi có lỗi dữ liệu -->
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF5252"/>
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
 
@@ -174,11 +179,11 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="THỜI GIAN VÀO" Style="{StaticResource FieldLabelStyle}"/>
-                                <TextBox Text="{Binding TimeIn, StringFormat='dd/MM/yyyy HH:mm'}" FontSize="13" Foreground="#999"/>
+                                <TextBox Text="{Binding TimeIn, Converter={StaticResource DateTimeStringConverter}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontSize="13" Foreground="#999"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="THỜI GIAN RA" Style="{StaticResource FieldLabelStyle}"/>
-                                <TextBox Text="{Binding TimeOut, StringFormat='dd/MM/yyyy HH:mm'}" FontSize="13" Foreground="#999"/>
+                                <TextBox Text="{Binding TimeOut, Converter={StaticResource DateTimeStringConverter}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontSize="13" Foreground="#999"/>
                             </StackPanel>
                         </Grid>
                     </Border>

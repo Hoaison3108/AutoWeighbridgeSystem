@@ -17,6 +17,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [NotifyPropertyChangedFor(nameof(IsProductVisible))]
         [NotifyPropertyChangedFor(nameof(IsHistoryVisible))]
         [NotifyPropertyChangedFor(nameof(IsSettingsVisible))]
+        [NotifyPropertyChangedFor(nameof(IsNotificationHistoryVisible))]
         private object _currentView;
 
         [ObservableProperty] private bool _isSidebarExpanded = true;
@@ -27,10 +28,12 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly VehicleRegistrationViewModel _registrationVm;
         private readonly CustomerViewModel _customerVm;
         private readonly ProductViewModel _productVm;
-        private readonly WeighingHistoryViewModel _historyVm; // Bổ sung module Lịch sử
+        private readonly WeighingHistoryViewModel _historyVm;
         private readonly SettingsViewModel _settingsVm;
+        private readonly NotificationHistoryViewModel _notificationHistoryVm;
         private readonly AppSession _appSession;
         private readonly IUserNotificationService _notificationService;
+        private readonly NotificationManagerService _notificationManager;
 
         // Bộc lộ cho View (UI Caching)
         public DashboardViewModel DashboardVM => _dashboardVm;
@@ -39,6 +42,8 @@ namespace AutoWeighbridgeSystem.ViewModels
         public ProductViewModel ProductVM => _productVm;
         public WeighingHistoryViewModel HistoryVM => _historyVm;
         public SettingsViewModel SettingsVM => _settingsVm;
+        public NotificationHistoryViewModel NotificationHistoryVM => _notificationHistoryVm;
+        public NotificationManagerService NotificationManager => _notificationManager;
 
         // Các biến quyết định cờ hiển thị
         public bool IsDashboardVisible => CurrentView == _dashboardVm;
@@ -47,6 +52,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         public bool IsProductVisible => CurrentView == _productVm;
         public bool IsHistoryVisible => CurrentView == _historyVm;
         public bool IsSettingsVisible => CurrentView == _settingsVm;
+        public bool IsNotificationHistoryVisible => CurrentView == _notificationHistoryVm;
 
         // --- 3. CONSTRUCTOR (Đồng nhất qua Injection) ---
 
@@ -55,10 +61,12 @@ namespace AutoWeighbridgeSystem.ViewModels
             VehicleRegistrationViewModel registrationVm,
             CustomerViewModel customerVm,
             ProductViewModel productVm,
-            WeighingHistoryViewModel historyVm, // Inject module Lịch sử
+            WeighingHistoryViewModel historyVm,
             SettingsViewModel settingsVm,
+            NotificationHistoryViewModel notificationHistoryVm,
             AppSession appSession,
-            IUserNotificationService notificationService)
+            IUserNotificationService notificationService,
+            NotificationManagerService notificationManager)
         {
             _dashboardVm = dashboardVm;
             _registrationVm = registrationVm;
@@ -66,8 +74,10 @@ namespace AutoWeighbridgeSystem.ViewModels
             _productVm = productVm;
             _historyVm = historyVm;
             _settingsVm = settingsVm;
+            _notificationHistoryVm = notificationHistoryVm;
             _appSession = appSession;
             _notificationService = notificationService;
+            _notificationManager = notificationManager;
 
             // Mặc định hiển thị Dashboard khi khởi động
             _currentView = _dashboardVm;
@@ -92,6 +102,9 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         [RelayCommand]
         private void ShowSettings() => Navigate(_settingsVm);
+
+        [RelayCommand]
+        private void ShowNotificationHistory() => Navigate(_notificationHistoryVm);
 
         [RelayCommand]
         private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;

@@ -442,7 +442,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="NHẬT KÝ VẬN HÀNH (GẦN NHẤT)" FontSize="14" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,10"/>
+                <TextBlock Text="NHẬT KÝ VẬN HÀNH (DỮ LIỆU TRONG NGÀY)" FontSize="14" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,10"/>
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding RecentTickets}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
                           SelectedItem="{Binding SelectedRecentTicket}">

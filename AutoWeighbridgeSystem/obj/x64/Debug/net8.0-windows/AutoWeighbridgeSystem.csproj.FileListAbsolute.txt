@@ -615,3 +615,8 @@ D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\ManualTicketView.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\EditTicketView.baml
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\EditTicketView.g.cs
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\NotificationToast.g.cs
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\NotificationToast.baml
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\NotificationHistoryView.g.cs
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\NotificationHistoryView.baml
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\App.baml

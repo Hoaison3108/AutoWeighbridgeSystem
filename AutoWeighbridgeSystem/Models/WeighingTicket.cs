@@ -37,7 +37,7 @@ namespace AutoWeighbridgeSystem.Models
         public string? Note { get; set; }
 
         [NotMapped]
-        public string Status => IsVoid ? "Bị Hủy" : (TimeOut.HasValue ? "Đã Hoàn Thành" : "Đợi cân lần 2");
+        public string Status => IsVoid ? "Đã Hủy" : (TimeOut.HasValue ? "Đã Hoàn Thành" : "Đợi cân lần 2");
 
         [NotMapped]
         public string StatusColor => IsVoid ? "#FF5252" : (TimeOut.HasValue ? "#00E676" : "#FFEB3B");
