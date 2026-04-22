@@ -137,7 +137,7 @@ namespace AutoWeighbridgeSystem
                     var section = config.GetSection("ScaleSettings");
                     string port = section["ComPort"];
 
-                    if (!string.IsNullOrEmpty(port))
+                    if (!string.IsNullOrEmpty(port) && port != "None")
                     {
                         int baud = int.TryParse(section["BaudRate"], out int b) ? b : 2400;
                         int dataBits = int.TryParse(section["DataBits"], out int d) ? d : 7;
@@ -174,11 +174,11 @@ namespace AutoWeighbridgeSystem
                 int outBaud  = int.TryParse(config["RfidSettings:ScaleOut:BaudRate"], out int ob) ? ob  : 9600;
                 int deskBaud = int.TryParse(config["RfidSettings:Desk:BaudRate"],     out int db) ? db  : 9600;
 
-                if (!string.IsNullOrEmpty(deskPort))
+                if (!string.IsNullOrEmpty(deskPort) && deskPort != "None")
                     rfidService.AddReader(ReaderRoles.Desk,     deskPort, deskBaud);
-                if (!string.IsNullOrEmpty(inPort))
+                if (!string.IsNullOrEmpty(inPort) && inPort != "None")
                     rfidService.AddReader(ReaderRoles.ScaleIn,  inPort,   inBaud);
-                if (!string.IsNullOrEmpty(outPort))
+                if (!string.IsNullOrEmpty(outPort) && outPort != "None")
                     rfidService.AddReader(ReaderRoles.ScaleOut, outPort,  outBaud);
 
                 return rfidService;

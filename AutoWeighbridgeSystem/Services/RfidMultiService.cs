@@ -145,9 +145,9 @@ namespace AutoWeighbridgeSystem.Services
         /// <param name="baudRate">Tốc độ truyền (thường là 9600).</param>
         public void AddReader(string roleName, string comPort, int baudRate)
         {
-            if (string.IsNullOrWhiteSpace(comPort))
+            if (string.IsNullOrWhiteSpace(comPort) || comPort == "None")
             {
-                Log.Warning("[RFID] Không thể thêm đầu đọc {Role} vì ComPort bị trống!", roleName);
+                Log.Information("[RFID] Đầu đọc {Role} được cấu hình là 'None' hoặc trống. Bỏ qua.", roleName);
                 return;
             }
 
@@ -193,9 +193,9 @@ namespace AutoWeighbridgeSystem.Services
             Log.Information("[RFID] Đang khởi động lại tất cả đầu đọc RFID...");
             CloseAll();
 
-            if (!string.IsNullOrEmpty(deskPort))  AddReader(ReaderRoles.Desk,     deskPort, deskBaud);
-            if (!string.IsNullOrEmpty(inPort))    AddReader(ReaderRoles.ScaleIn,  inPort,  inBaud);
-            if (!string.IsNullOrEmpty(outPort))   AddReader(ReaderRoles.ScaleOut, outPort, outBaud);
+            if (!string.IsNullOrEmpty(deskPort) && deskPort != "None")  AddReader(ReaderRoles.Desk,     deskPort, deskBaud);
+            if (!string.IsNullOrEmpty(inPort) && inPort != "None")    AddReader(ReaderRoles.ScaleIn,  inPort,  inBaud);
+            if (!string.IsNullOrEmpty(outPort) && outPort != "None")   AddReader(ReaderRoles.ScaleOut, outPort, outBaud);
 
             Log.Information("[RFID] Khởi động lại hoàn tất — {Count} đầu đọc đang hoạt động.", _readers.Count);
         }
@@ -377,6 +377,7 @@ namespace AutoWeighbridgeSystem.Services
 
                 while (!token.IsCancellationRequested)
                 {
+                    if (string.IsNullOrEmpty(entry.ComPort) || entry.ComPort == "None") break;
                     int delaySec = ReconnectDelaysSeconds[Math.Min(attempt, ReconnectDelaysSeconds.Length - 1)];
                     Log.Information("[RFID] [{Role}] Thử kết nối lại lần {Attempt} sau {Delay}s...",
                         entry.RoleName, attempt + 1, delaySec);

@@ -111,6 +111,7 @@ namespace AutoWeighbridgeSystem.Services
 
         private bool EnsureOpenInternal(string comPort, int baudRate, Parity parity, int dataBits, StopBits stopBits)
         {
+            if (string.IsNullOrEmpty(comPort) || comPort == "None") return false;
             try
             {
                 if (_serialPort != null && (_lastPort != comPort || _lastBaud != baudRate))

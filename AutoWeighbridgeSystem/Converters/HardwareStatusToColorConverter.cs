@@ -28,6 +28,7 @@ namespace AutoWeighbridgeSystem.Converters
                     HardwareConnectionStatus.Connecting   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEB3B")),
                     HardwareConnectionStatus.Reconnecting => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF9800")),
                     HardwareConnectionStatus.Offline      => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E53935")),
+                    HardwareConnectionStatus.Disabled     => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#555555")),
                     _                                     => new SolidColorBrush(Colors.Gray)
                 };
             }

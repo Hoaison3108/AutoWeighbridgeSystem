@@ -34,9 +34,9 @@ namespace AutoWeighbridgeSystem.Services
             try
             {
                 var settings = GetRelaySettings();
-                if (string.IsNullOrEmpty(settings.Port))
+                if (string.IsNullOrEmpty(settings.Port) || settings.Port == "None")
                 {
-                    HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Offline);
+                    HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Disabled);
                     return;
                 }
 
@@ -67,8 +67,12 @@ namespace AutoWeighbridgeSystem.Services
             try
             {
                 var settings = GetRelaySettings();
-                if (string.IsNullOrEmpty(settings.Port)) return;
-
+                if (string.IsNullOrEmpty(settings.Port) || settings.Port == "None")
+                {
+                    Log.Debug("[ALARM] Bỏ qua kích chuông vì cổng Relay là 'None'.");
+                    return;
+                }
+                
                 await _relayService.TriggerBellAsync(
                     settings.Port, 
                     settings.Baud, 

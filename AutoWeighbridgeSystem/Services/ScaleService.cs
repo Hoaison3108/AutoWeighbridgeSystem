@@ -86,6 +86,9 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary><c>true</c> khi đầu cân đang kết nối bình thường.</summary>
         public bool IsConnected => _isConnected;
 
+        /// <summary><c>true</c> nếu đầu cân bị vô hiệu hóa (cấu hình là 'None').</summary>
+        public bool IsDisabled => _portName == "None";
+
         // =========================================================================
         // EVENTS
         // =========================================================================
@@ -129,8 +132,6 @@ namespace AutoWeighbridgeSystem.Services
         /// Khởi tạo và mở kết nối với đầu cân qua cổng COM.
         /// Lưu lại thông số kết nối để dùng khi auto-reconnect.
         /// </summary>
-        public void Initialize(string portName, int baudRate, int dataBits, Parity parity, StopBits stopBits, IScaleProtocol protocol)
-        {
             // Lưu lại thông số để dùng khi reconnect
             _portName = portName;
             _baudRate = baudRate;
@@ -138,6 +139,13 @@ namespace AutoWeighbridgeSystem.Services
             _parity = parity;
             _stopBits = stopBits;
             _protocol = protocol;
+
+            if (string.IsNullOrEmpty(portName) || portName == "None")
+            {
+                _isConnected = false;
+                Log.Information("[SCALE] Thiết bị đầu cân được cấu hình là 'None'. Bỏ qua kết nối.");
+                return;
+            }
 
             OpenPort();
         }
@@ -147,6 +155,7 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         private void OpenPort()
         {
+            if (string.IsNullOrEmpty(_portName) || _portName == "None") return;
             try
             {
                 // Giải phóng port cũ nếu còn tồn tại
@@ -340,6 +349,7 @@ namespace AutoWeighbridgeSystem.Services
 
                 while (!token.IsCancellationRequested)
                 {
+                    if (string.IsNullOrEmpty(_portName) || _portName == "None") break;
                     int delaySec = ReconnectDelaysSeconds[Math.Min(attempt, ReconnectDelaysSeconds.Length - 1)];
                     Log.Information("[SCALE] Thử kết nối lại lần {Attempt} sau {Delay}s...", attempt + 1, delaySec);
                     ReconnectAttempting?.Invoke(attempt + 1);

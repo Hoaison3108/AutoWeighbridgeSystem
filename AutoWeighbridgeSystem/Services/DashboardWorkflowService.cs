@@ -20,6 +20,7 @@ namespace AutoWeighbridgeSystem.Services
     {
         private readonly RfidBusinessService _rfidBusiness;
         private readonly ConcurrentDictionary<string, DateTime> _rfidCooldowns = new();
+        private readonly object _stateLock = new();
 
         private int _rfidCooldownSeconds = 3;
 
@@ -67,21 +68,27 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary>Xóa toàn bộ dữ liệu xe đang chờ, đặt lại <see cref="HasPendingVehicle"/> = false.</summary>
         public void ClearPendingData()
         {
-            _pendingLicensePlate = null;
-            _pendingCustomerName = null;
-            _pendingProductName  = null;
-            _pendingVehicleId    = 0;
-            HasPendingVehicle    = false;
+            lock (_stateLock)
+            {
+                _pendingLicensePlate = null;
+                _pendingCustomerName = null;
+                _pendingProductName  = null;
+                _pendingVehicleId    = 0;
+                HasPendingVehicle    = false;
+            }
         }
 
         /// <summary>Lấy snapshot dữ liệu xe đang chờ (dùng để truyền vào lệnh lưu phiếu).</summary>
         public PendingVehicleData GetPendingVehicleData()
         {
-            return new PendingVehicleData(
-                _pendingLicensePlate,
-                _pendingCustomerName,
-                _pendingProductName,
-                _pendingVehicleId);
+            lock (_stateLock)
+            {
+                return new PendingVehicleData(
+                    _pendingLicensePlate,
+                    _pendingCustomerName,
+                    _pendingProductName,
+                    _pendingVehicleId);
+            }
         }
 
         /// <summary>
@@ -99,22 +106,42 @@ namespace AutoWeighbridgeSystem.Services
         /// <param name="isWeightLocked">Trọng lượng đã bị chốt thủ công.</param>
         public ScaleWorkflowDecision EvaluateScaleEvent(decimal weight, bool isStable, bool isAutoMode, bool isProcessingSave, bool isWeightLocked)
         {
-            if (weight < MinWeightThreshold)
+            lock (_stateLock)
             {
-                if (HasPendingVehicle && !isWeightLocked)
+                if (weight < MinWeightThreshold)
                 {
-                    ClearPendingData();
-                    return ScaleWorkflowDecision.ClearPendingAndReset("CÂN VỀ KHÔNG - HỦY LỆNH CHỜ");
+                    if (HasPendingVehicle && !isWeightLocked)
+                    {
+                        // Reset trực tiếp trong lock
+                        _pendingLicensePlate = null;
+                        _pendingCustomerName = null;
+                        _pendingProductName  = null;
+                        _pendingVehicleId    = 0;
+                        HasPendingVehicle    = false;
+                        
+                        return ScaleWorkflowDecision.ClearPendingAndReset("CÂN VỀ KHÔNG - HỦY LỆNH CHỜ");
+                    }
+
+                    return ScaleWorkflowDecision.None();
                 }
 
-                return ScaleWorkflowDecision.None();
-            }
+                if (isAutoMode && isStable && HasPendingVehicle && !isProcessingSave && !isWeightLocked)
+                {
+                    var pending = new PendingVehicleData(
+                        _pendingLicensePlate,
+                        _pendingCustomerName,
+                        _pendingProductName,
+                        _pendingVehicleId);
 
-            if (isAutoMode && isStable && HasPendingVehicle && !isProcessingSave && !isWeightLocked)
-            {
-                var pending = GetPendingVehicleData();
-                ClearPendingData();
-                return ScaleWorkflowDecision.SaveWithPending(weight, pending);
+                    // Xóa dữ liệu sau khi đã lấy snapshot
+                    _pendingLicensePlate = null;
+                    _pendingCustomerName = null;
+                    _pendingProductName  = null;
+                    _pendingVehicleId    = 0;
+                    HasPendingVehicle    = false;
+
+                    return ScaleWorkflowDecision.SaveWithPending(weight, pending);
+                }
             }
 
             return ScaleWorkflowDecision.None();
@@ -138,26 +165,41 @@ namespace AutoWeighbridgeSystem.Services
         {
             if (!isAutoMode) return RfidWorkflowDecision.Message("CHẾ ĐỘ TAY - BỎ QUA THẺ!");
 
+            // DB check không cần lock
             var rfidResult = await _rfidBusiness.ProcessRawCardAsync(cardId);
 
             if (!rfidResult.IsSuccess || rfidResult.IsNewCard)
                 return RfidWorkflowDecision.Message($"THẺ {rfidResult.CleanCardId} CHƯA ĐĂNG KÝ!");
 
-            var vehicle = rfidResult.ExistingVehicle;
-            _pendingLicensePlate = vehicle.LicensePlate;
-            _pendingCustomerName = vehicle.Customer?.CustomerName ?? "Khách lẻ";
-            _pendingProductName  = selectedProductName ?? "Hàng hóa";
-            _pendingVehicleId    = vehicle.VehicleId;
-            HasPendingVehicle    = true;
-
-            if (isScaleStable && currentWeight >= MinWeightThreshold)
+            lock (_stateLock)
             {
-                var pending = GetPendingVehicleData();
-                ClearPendingData();
-                return RfidWorkflowDecision.SaveNow(currentWeight, pending);
-            }
+                var vehicle = rfidResult.ExistingVehicle;
+                _pendingLicensePlate = vehicle.LicensePlate;
+                _pendingCustomerName = vehicle.Customer?.CustomerName ?? "Khách lẻ";
+                _pendingProductName  = selectedProductName ?? "Hàng hóa";
+                _pendingVehicleId    = vehicle.VehicleId;
+                HasPendingVehicle    = true;
 
-            return RfidWorkflowDecision.Pending($"NHẬN XE: {_pendingLicensePlate}. ĐỢI ỔN ĐỊNH...");
+                if (isScaleStable && currentWeight >= MinWeightThreshold)
+                {
+                    var pending = new PendingVehicleData(
+                        _pendingLicensePlate,
+                        _pendingCustomerName,
+                        _pendingProductName,
+                        _pendingVehicleId);
+
+                    // Reset ngay lập tức vì lệnh lưu phiếu sẽ được thực thi
+                    _pendingLicensePlate = null;
+                    _pendingCustomerName = null;
+                    _pendingProductName  = null;
+                    _pendingVehicleId    = 0;
+                    HasPendingVehicle    = false;
+
+                    return RfidWorkflowDecision.SaveNow(currentWeight, pending);
+                }
+
+                return RfidWorkflowDecision.Pending($"NHẬN XE: {_pendingLicensePlate}. ĐỢI ỔN ĐỊNH...");
+            }
         }
     }
 

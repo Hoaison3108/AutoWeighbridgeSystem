@@ -126,7 +126,14 @@ namespace AutoWeighbridgeSystem.Services
             _rfidService.ReaderDisconnected       += OnRfidReaderDisconnected;
             _rfidService.ReaderReconnected        += OnRfidReaderReconnected;
 
-            StartHardwareWatchdog();
+            if (!_scaleService.IsDisabled)
+            {
+                StartHardwareWatchdog();
+            }
+            else
+            {
+                Log.Information("[COORDINATOR] Đầu cân bị vô hiệu hóa, không khởi động Watchdog.");
+            }
 
             // Replay trạng thái ban đầu: hardware có thể đã mở port TRƯỚC khi
             // Coordinator kịp subscribe vào events → kiểm tra trực tiếp, không qua event chain
@@ -287,19 +294,34 @@ namespace AutoWeighbridgeSystem.Services
         {
             // Scale: Nếu port mở được thì 'Connecting' (vàng) — chưa có dữ liệu nên chưa thể xác nhận Online
             // Port mở không đảm bảo cáp được cắm vào thiết bị thực tế
-            var scaleStatus = _scaleService.IsConnected
-                ? HardwareConnectionStatus.Connecting   // port mở, chờ dữ liệu đầu tiên
-                : HardwareConnectionStatus.Offline;     // port không mở được
+            HardwareConnectionStatus scaleStatus;
+            if (_scaleService.IsDisabled)
+                scaleStatus = HardwareConnectionStatus.Disabled;
+            else
+                scaleStatus = _scaleService.IsConnected ? HardwareConnectionStatus.Connecting : HardwareConnectionStatus.Offline;
+
             HardwareStatusChanged?.Invoke("Scale", scaleStatus);
 
             // RFID: 'Connecting' (vàng) cho các reader có port đang mở
             // → sẽ chuyển 'Online' (xanh) chỉ khi đọc được thẻ (OnRfidCardRead)
             var connectedRoles = _rfidService.ConnectedReaderRoles;
+            var config = _configuration; // assuming _configuration is available, need to check RfidSettings
+            
             foreach (var role in new[] { ReaderRoles.ScaleIn, ReaderRoles.ScaleOut, ReaderRoles.Desk })
             {
-                var status = connectedRoles.Contains(role)
-                    ? HardwareConnectionStatus.Connecting  // port mở, chờ card
-                    : HardwareConnectionStatus.Offline;    // port không mở
+                string port = config[$"RfidSettings:{role}:ComPort"];
+                HardwareConnectionStatus status;
+
+                if (port == "None")
+                {
+                    status = HardwareConnectionStatus.Disabled;
+                }
+                else
+                {
+                    status = connectedRoles.Contains(role)
+                        ? HardwareConnectionStatus.Connecting  // port mở, chờ card
+                        : HardwareConnectionStatus.Offline;    // port không mở
+                }
                 HardwareStatusChanged?.Invoke(role, status);
             }
         }

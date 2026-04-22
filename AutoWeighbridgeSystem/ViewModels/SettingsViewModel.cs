@@ -118,7 +118,13 @@ namespace AutoWeighbridgeSystem.ViewModels
             _protocolFactory     = protocolFactory;
             
             // Lấy danh sách cổng COM ban đầu
-            try { AvailableComPorts = new ObservableCollection<string>(SerialPort.GetPortNames().OrderBy(p => p)); } catch { }
+            try 
+            { 
+                var ports = SerialPort.GetPortNames().OrderBy(p => p).ToList();
+                ports.Insert(0, "None");
+                AvailableComPorts = new ObservableCollection<string>(ports); 
+            } 
+            catch { AvailableComPorts = new ObservableCollection<string> { "None" }; }
             
             LoadConfig();
             _ = LoadUsersAsync();
@@ -332,18 +338,23 @@ namespace AutoWeighbridgeSystem.ViewModels
                 // --- 1. Reinitialize Scale ---
                 try
                 {
-                    if (!string.IsNullOrWhiteSpace(ScaleComPort))
-                    {
-                        Enum.TryParse(ScaleParity,   ignoreCase: true, out Parity   parity);
-                        Enum.TryParse(ScaleStopBits, ignoreCase: true, out StopBits stopBits);
+                        if (ScaleComPort == "None")
+                        {
+                            _scaleService.Close();
+                            scaleOk = true;
+                        }
+                        else
+                        {
+                            Enum.TryParse(ScaleParity,   ignoreCase: true, out Parity   parity);
+                            Enum.TryParse(ScaleStopBits, ignoreCase: true, out StopBits stopBits);
 
-                        IScaleProtocol protocol = _protocolFactory.Create(ScaleProtocol);
+                            IScaleProtocol protocol = _protocolFactory.Create(ScaleProtocol);
 
-                        _scaleService.Reinitialize(
-                            ScaleComPort, ScaleBaudRate, ScaleDataBits,
-                            parity, stopBits, protocol);
-                        scaleOk = true;
-                    }
+                            _scaleService.Reinitialize(
+                                ScaleComPort, ScaleBaudRate, ScaleDataBits,
+                                parity, stopBits, protocol);
+                            scaleOk = true;
+                        }
                 }
                 catch (Exception ex)
                 {
@@ -384,9 +395,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             try
             {
-                var ports = SerialPort.GetPortNames();
-                AvailableComPorts = new ObservableCollection<string>(ports.OrderBy(p => p));
-                _notificationService.ShowInfo($"Đã tìm thấy {ports.Length} cổng COM đang cắm trên hệ thống.", "LÀM MỚI DANH SÁCH COM");
+                var ports = SerialPort.GetPortNames().OrderBy(p => p).ToList();
+                ports.Insert(0, "None");
+                AvailableComPorts = new ObservableCollection<string>(ports);
+                _notificationService.ShowInfo($"Đã tìm thấy {ports.Count - 1} cổng COM đang cắm trên hệ thống.", "LÀM MỚI DANH SÁCH COM");
             }
             catch (Exception ex)
             {

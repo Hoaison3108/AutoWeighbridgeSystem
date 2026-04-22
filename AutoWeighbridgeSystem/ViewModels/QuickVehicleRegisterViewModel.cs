@@ -75,6 +75,11 @@ namespace AutoWeighbridgeSystem.ViewModels
             {
                 if (_scaleService != null)
                 {
+                    if (_scaleService.IsDisabled)
+                    {
+                        _notificationService.ShowWarning("Không thể lấy khối lượng: Đầu cân đang bị vô hiệu hóa (None).");
+                        return;
+                    }
                     TareWeight = _scaleService.CurrentWeight;
                 }
             }

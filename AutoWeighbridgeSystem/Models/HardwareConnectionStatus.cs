@@ -12,6 +12,8 @@ namespace AutoWeighbridgeSystem.Models
         /// <summary>Đang thử kết nối lại sau khi mất kết nối.</summary>
         Reconnecting,
         /// <summary>Mất kết nối hoàn toàn, không thể kết nối lại.</summary>
-        Offline
+        Offline,
+        /// <summary>Thiết bị bị vô hiệu hóa chủ động (None).</summary>
+        Disabled
     }
 }
