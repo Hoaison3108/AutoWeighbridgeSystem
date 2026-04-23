@@ -50,10 +50,9 @@ namespace AutoWeighbridgeSystem.Views
 
         private void InitializeVLCAndPlay(Uri cameraUri)
         {
-            if (_libVLC == null)
-            {
-                // Cấu hình VLC: Bộ đệm 200ms để duy trì Low Latency, ép RTSP xài TCP (chống rác hình/giật lag do mất gói), tắt âm thanh
-                _libVLC = new LibVLC("--network-caching=200", "--rtsp-tcp", "--no-audio", "--drop-late-frames");
+                // Cấu hình VLC: Bộ đệm 800ms để cân bằng giữa Low Latency và sự ổn định (trước đây là 200ms - quá thấp gây mất kết nối)
+                // Ép RTSP xài TCP (chống rác hình/giật lag do mất gói), tắt âm thanh
+                _libVLC = new LibVLC("--network-caching=800", "--rtsp-tcp", "--no-audio", "--drop-late-frames", "--live-caching=800");
                 _mediaPlayer = new MediaPlayer(_libVLC);
                 
                 this.CameraPlayer.MediaPlayer = _mediaPlayer;
@@ -61,10 +60,12 @@ namespace AutoWeighbridgeSystem.Views
                 // Bind events
                 _mediaPlayer.Playing += MediaPlayer_Playing;
                 _mediaPlayer.EncounteredError += MediaPlayer_EncounteredError;
+                _mediaPlayer.EndReached += MediaPlayer_EncounteredError; // Khi luồng kết thúc đột ngột cũng kích hoạt reconnect
             }
 
             // Mỗi lần reconnect hoặc bắt đầu đều tạo Media mới để giải phóng buffer lỗi cũ
             var media = new Media(_libVLC, cameraUri.AbsoluteUri, FromType.FromLocation);
+            media.AddOption(":rtsp-frame-buffer-size=500000"); // Tăng buffer size cho frame hình
             _mediaPlayer.Play(media);
         }
 

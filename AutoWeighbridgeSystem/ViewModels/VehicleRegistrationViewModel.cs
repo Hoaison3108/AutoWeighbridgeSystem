@@ -75,6 +75,8 @@ namespace AutoWeighbridgeSystem.ViewModels
                 _minWeightThreshold = 200;
             }
 
+            IsAutoMode = bool.TryParse(configuration["ScaleSettings:RegistrationDefaultAutoMode"], out bool ram) ? ram : true;
+
             _rfidService.CardRead += OnCardReadAtDesk;
             _scaleService.WeightChanged += OnScaleWeightChanged;
 

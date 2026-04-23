@@ -198,8 +198,9 @@
                                                 <TextBox Text="{Binding ScaleStabilityDelta}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="6" Margin="15,0,0,0" VerticalAlignment="Bottom">
-                                                <CheckBox Content="Mặc định AUTO" IsChecked="{Binding DefaultToAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
-                                                <CheckBox Content="Mặc định Cân 1 Lần" IsChecked="{Binding DefaultToOnePassMode}" Foreground="#00E676" FontWeight="Bold"/>
+                                                <CheckBox Content="Mặc định CÂN XE AUTO" IsChecked="{Binding DefaultToAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
+                                                <CheckBox Content="Mặc định CÂN XE 1 LẦN" IsChecked="{Binding DefaultToOnePassMode}" Foreground="#00E676" FontWeight="Bold"/>
+                                                 <CheckBox Content="Mặc định ĐĂNG KÝ AUTO" IsChecked="{Binding RegistrationDefaultAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>

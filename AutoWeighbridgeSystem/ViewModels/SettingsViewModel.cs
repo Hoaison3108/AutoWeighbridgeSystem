@@ -81,6 +81,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private int _scaleWatchdog;
         [ObservableProperty] private bool _defaultToAutoMode;
         [ObservableProperty] private bool _defaultToOnePassMode;
+        [ObservableProperty] private bool _registrationDefaultAutoMode;
         [ObservableProperty] private bool _isOfficeMode;
 
         // Relay Settings
@@ -176,6 +177,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 ScaleWatchdog       = int.TryParse(_configuration["ScaleSettings:HardwareWatchdogSeconds"], out int swd) ? swd : 60;
                 DefaultToAutoMode   = bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"],   out bool am) ? am  : true;
                 DefaultToOnePassMode= bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool op) ? op  : true;
+                RegistrationDefaultAutoMode = bool.TryParse(_configuration["ScaleSettings:RegistrationDefaultAutoMode"], out bool ram) ? ram : true;
                 IsOfficeMode        = bool.TryParse(_configuration["IsOfficeMode"],                  out bool om) ? om  : false;
 
                 // Relay
@@ -259,6 +261,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 scale["HardwareWatchdogSeconds"] = ScaleWatchdog;
                 scale["DefaultToAutoMode"]    = DefaultToAutoMode;
                 scale["DefaultToOnePassMode"] = DefaultToOnePassMode;
+                scale["RegistrationDefaultAutoMode"] = RegistrationDefaultAutoMode;
 
                 root["IsOfficeMode"] = IsOfficeMode;
 
