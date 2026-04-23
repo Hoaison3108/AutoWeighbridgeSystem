@@ -29,9 +29,13 @@ namespace AutoWeighbridgeSystem.Views
             if (DataContext is ViewModels.VehicleRegistrationViewModel vm)
             {
                 vm.VehicleAutocomplete.FilterText = VehicleComboBox.Text;
-                // Mở dropdown để hiển thị gợi ý ngay khi gõ
-                if (!string.IsNullOrEmpty(VehicleComboBox.Text))
+                
+                // CHỈ mở dropdown nếu người dùng đang chủ động gõ (có focus)
+                // Tránh việc tự động bật lên khi quẹt thẻ RFID hoặc cập nhật từ code
+                if (!string.IsNullOrEmpty(VehicleComboBox.Text) && VehicleComboBox.IsKeyboardFocusWithin)
+                {
                     VehicleComboBox.IsDropDownOpen = true;
+                }
             }
         }
     }

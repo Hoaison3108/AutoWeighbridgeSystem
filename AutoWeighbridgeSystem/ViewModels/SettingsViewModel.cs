@@ -15,6 +15,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using System.Windows;
 
 namespace AutoWeighbridgeSystem.ViewModels
@@ -46,6 +50,15 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _dbConnectionString;
         [ObservableProperty] private string _backupFolderPath;
 
+        // DB Discovery & Manual Config
+        [ObservableProperty] private ObservableCollection<string> _discoveredServers = new();
+        [ObservableProperty] private string _selectedSqlServer;
+        [ObservableProperty] private string _dbServerName;
+        [ObservableProperty] private string _dbName;
+        [ObservableProperty] private string _dbUser;
+        [ObservableProperty] private string _dbPassword;
+        [ObservableProperty] private bool _isScanning;
+
         // Camera Settings
         [ObservableProperty] private string _camIpAddress;
         [ObservableProperty] private string _camRtspPort;
@@ -62,11 +75,13 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _scaleStopBits;
         [ObservableProperty] private string _scaleDefaultProduct;
         [ObservableProperty] private int _scaleMinWeight;
+        [ObservableProperty] private int _scaleStabilityDelta;
         [ObservableProperty] private int _scaleRfidCooldown;
         [ObservableProperty] private int _scaleQueueTimeout;
         [ObservableProperty] private int _scaleWatchdog;
         [ObservableProperty] private bool _defaultToAutoMode;
         [ObservableProperty] private bool _defaultToOnePassMode;
+        [ObservableProperty] private bool _isOfficeMode;
 
         // Relay Settings
         [ObservableProperty] private string _relayComPort;
@@ -155,11 +170,13 @@ namespace AutoWeighbridgeSystem.ViewModels
                 ScaleStopBits       = _configuration["ScaleSettings:StopBits"]  ?? "One";
                 ScaleDefaultProduct = _configuration["ScaleSettings:DefaultProductName"];
                 ScaleMinWeight      = int.TryParse(_configuration["ScaleSettings:MinWeightThreshold"],   out int smw) ? smw : 200;
+                ScaleStabilityDelta = int.TryParse(_configuration["ScaleSettings:StabilityDelta"],        out int ssd) ? ssd : 50;
                 ScaleRfidCooldown   = int.TryParse(_configuration["ScaleSettings:RfidCooldownSeconds"],  out int src) ? src : 3;
                 ScaleQueueTimeout   = int.TryParse(_configuration["ScaleSettings:QueueTimeoutSeconds"],  out int sqt) ? sqt : 45;
                 ScaleWatchdog       = int.TryParse(_configuration["ScaleSettings:HardwareWatchdogSeconds"], out int swd) ? swd : 60;
                 DefaultToAutoMode   = bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"],   out bool am) ? am  : true;
                 DefaultToOnePassMode= bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool op) ? op  : true;
+                IsOfficeMode        = bool.TryParse(_configuration["IsOfficeMode"],                  out bool om) ? om  : false;
 
                 // Relay
                 RelayComPort       = _configuration["RelaySettings:ComPort"];
@@ -236,11 +253,14 @@ namespace AutoWeighbridgeSystem.ViewModels
                 scale["StopBits"]             = ScaleStopBits;
                 scale["DefaultProductName"]   = ScaleDefaultProduct;
                 scale["MinWeightThreshold"]   = ScaleMinWeight;
+                scale["StabilityDelta"]      = ScaleStabilityDelta;
                 scale["RfidCooldownSeconds"]  = ScaleRfidCooldown;
                 scale["QueueTimeoutSeconds"]  = ScaleQueueTimeout;
                 scale["HardwareWatchdogSeconds"] = ScaleWatchdog;
                 scale["DefaultToAutoMode"]    = DefaultToAutoMode;
                 scale["DefaultToOnePassMode"] = DefaultToOnePassMode;
+
+                root["IsOfficeMode"] = IsOfficeMode;
 
                 // ==========================================
                 // 3. Relay Settings
@@ -352,7 +372,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                             _scaleService.Reinitialize(
                                 ScaleComPort, ScaleBaudRate, ScaleDataBits,
-                                parity, stopBits, protocol);
+                                parity, stopBits, protocol, ScaleMinWeight, ScaleStabilityDelta);
                             scaleOk = true;
                         }
                 }
@@ -446,6 +466,134 @@ namespace AutoWeighbridgeSystem.ViewModels
             {
                 _notificationService.ShowError($"Lỗi khi sao lưu: {ex.Message}\n(Lưu ý: SQL Server cần có quyền Write vào thư mục này)", "LỖI BACKUP");
                 Serilog.Log.Error(ex, "[BACKUP] Lỗi khi sao lưu bằng tay");
+            }
+        }
+
+        // =========================================================================
+        // TÍNH NĂNG KẾT NỐI DATABASE (SCAN & MANUAL)
+        // =========================================================================
+
+        [RelayCommand]
+        private async Task DiscoverServersAsync()
+        {
+            IsScanning = true;
+            DiscoveredServers.Clear();
+            _notificationService.ShowInfo("Đang quét các máy chủ SQL trong mạng nội bộ...", "ĐANG QUÉT");
+
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    using (var udpClient = new UdpClient())
+                    {
+                        udpClient.EnableBroadcast = true;
+                        var requestData = new byte[] { 0x02 }; // SQL Browser discovery packet
+                        var serverEndPoint = new IPEndPoint(IPAddress.Broadcast, 1434);
+
+                        // Gửi gói tin quảng bá
+                        await udpClient.SendAsync(requestData, requestData.Length, serverEndPoint);
+
+                        // Chờ phản hồi trong 3 giây
+                        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                        
+                        while (!cts.IsCancellationRequested)
+                        {
+                            try
+                            {
+                                // Sử dụng Task.WaitAsync để có timeout
+                                var receiveTask = udpClient.ReceiveAsync();
+                                var result = await receiveTask.WaitAsync(cts.Token);
+                                
+                                var response = Encoding.ASCII.GetString(result.Buffer);
+                                
+                                // Format phản hồi: ServerName;NAME;InstanceName;INST;...;;
+                                var parts = response.Split(';');
+                                string server = "";
+                                string instance = "";
+                                
+                                for (int i = 0; i < parts.Length - 1; i++)
+                                {
+                                    if (parts[i].Equals("ServerName", StringComparison.OrdinalIgnoreCase)) server = parts[i + 1];
+                                    if (parts[i].Equals("InstanceName", StringComparison.OrdinalIgnoreCase)) instance = parts[i + 1];
+                                }
+
+                                if (!string.IsNullOrEmpty(server))
+                                {
+                                    string fullName = string.IsNullOrEmpty(instance) ? server : $"{server}\\{instance}";
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        if (!DiscoveredServers.Contains(fullName))
+                                            DiscoveredServers.Add(fullName);
+                                    });
+                                }
+                            }
+                            catch (OperationCanceledException) { break; }
+                            catch { /* Bỏ qua gói tin rác hoặc lỗi nhận */ }
+                        }
+                    }
+                });
+
+                if (DiscoveredServers.Count == 0)
+                {
+                    _notificationService.ShowWarning("Không tìm thấy máy chủ nào. Hãy đảm bảo dịch vụ 'SQL Server Browser' đã được bật tại máy trạm.", "KẾT QUẢ");
+                }
+                else
+                {
+                    _notificationService.ShowInfo($"Tìm thấy {DiscoveredServers.Count} máy chủ SQL Server.", "HOÀN TẤT");
+                }
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError("Lỗi khi quét máy chủ: " + ex.Message, "LỖI");
+            }
+            finally
+            {
+                IsScanning = false;
+            }
+        }
+
+        [RelayCommand]
+        private void BuildConnectionString()
+        {
+            if (string.IsNullOrWhiteSpace(DbServerName) || string.IsNullOrWhiteSpace(DbName))
+            {
+                _notificationService.ShowWarning("Vui lòng nhập tên Server và tên Cơ sở dữ liệu.", "THIẾU THÔNG TIN");
+                return;
+            }
+
+            // Xây dựng connection string theo chuẩn SQL Server Auth (Kèm Timeout 5s chống treo)
+            string conn = $"Server={DbServerName};Database={DbName};User Id={DbUser};Password={DbPassword};Encrypt=True;TrustServerCertificate=True;Connect Timeout=5;";
+            DbConnectionString = conn;
+            _notificationService.ShowInfo("Đã tổng hợp chuỗi kết nối mới. Hãy nhấn 'Lưu toàn bộ' để áp dụng.", "THÀNH CÔNG");
+        }
+
+        [RelayCommand]
+        private async Task TestConnectionAsync()
+        {
+            if (string.IsNullOrWhiteSpace(DbServerName) || string.IsNullOrWhiteSpace(DbName))
+            {
+                _notificationService.ShowWarning("Vui lòng điền đủ thông tin Server và Database để kiểm tra.", "CHÚ Ý");
+                return;
+            }
+
+            string testConn = $"Server={DbServerName};Database={DbName};User Id={DbUser};Password={DbPassword};Encrypt=True;TrustServerCertificate=True;Connect Timeout=5;";
+
+            try
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+                optionsBuilder.UseSqlServer(testConn);
+
+                using var db = new AppDbContext(optionsBuilder.Options);
+                bool canConnect = await db.Database.CanConnectAsync();
+
+                if (canConnect)
+                    _notificationService.ShowInfo("Kết nối tới Database thành công!", "THÀNH CÔNG");
+                else
+                    _notificationService.ShowWarning("Không thể kết nối tới Database. Vui lòng kiểm tra lại IP/Tên máy, User/Pass và tường lửa.", "THẤT BẠI");
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError("Lỗi kết nối: " + ex.Message, "LỖI");
             }
         }
     }

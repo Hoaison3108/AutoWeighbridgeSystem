@@ -25,6 +25,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         // Đã khai báo RfidBusinessService
         private readonly RfidBusinessService _rfidBusiness;
         private readonly IUserNotificationService _notificationService;
+        private readonly AlarmService _alarmService;
+
+        private Vehicle _pendingAutoVehicle; // Xe đang chờ cân ổn định để lưu tự động
+        private readonly object _pendingLock = new object();
 
         [ObservableProperty] private Vehicle _newVehicle = new();
         [ObservableProperty] private ObservableCollection<Vehicle> _registeredVehicles = new();
@@ -33,14 +37,15 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private Vehicle _selectedRecord;
         [ObservableProperty] private bool _isEditMode = false;
         [ObservableProperty] private bool _syncTareWeightToAll = false;
-        
+        [ObservableProperty] private bool _isAutoMode = false;
+
         // --- AUTOCOMPLETE & SEARCH ---
         [ObservableProperty] private string _searchText = "";
-        
+
         /// <summary>
         /// Gợi ý biển số xe khi đăng ký/tìm kiếm (giống Dashboard).
         /// </summary>
-        public AutocompleteProvider<string> VehicleAutocomplete { get; } 
+        public AutocompleteProvider<string> VehicleAutocomplete { get; }
             = new AutocompleteProvider<string>(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
@@ -55,13 +60,15 @@ namespace AutoWeighbridgeSystem.ViewModels
             ScaleService scaleService,
             IConfiguration configuration,
             RfidBusinessService rfidBusiness,
-            IUserNotificationService notificationService)
+            IUserNotificationService notificationService,
+            AlarmService alarmService)
         {
             _dbContextFactory = dbContextFactory;
             _rfidService = rfidService;
             _scaleService = scaleService;
-            _rfidBusiness = rfidBusiness; // Gán giá trị tiêm vào
+            _rfidBusiness = rfidBusiness;
             _notificationService = notificationService;
+            _alarmService = alarmService;
 
             if (!decimal.TryParse(configuration["ScaleSettings:MinWeightThreshold"], out _minWeightThreshold))
             {
@@ -69,15 +76,17 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
 
             _rfidService.CardRead += OnCardReadAtDesk;
-            
+            _scaleService.WeightChanged += OnScaleWeightChanged;
+
             // Khởi tạo View Collection để lọc DataGrid
             RegisteredVehiclesView = System.Windows.Data.CollectionViewSource.GetDefaultView(RegisteredVehicles);
-            RegisteredVehiclesView.Filter = v => {
+            RegisteredVehiclesView.Filter = v =>
+            {
                 if (string.IsNullOrWhiteSpace(SearchText)) return true;
                 var vehicle = v as Vehicle;
                 if (vehicle == null) return true;
                 string search = SearchText.ToLower();
-                return vehicle.LicensePlate.ToLower().Contains(search) || 
+                return vehicle.LicensePlate.ToLower().Contains(search) ||
                        (vehicle.Customer?.CustomerName?.ToLower().Contains(search) ?? false) ||
                        (vehicle.RfidCardId?.ToLower().Contains(search) ?? false);
             };
@@ -137,6 +146,38 @@ namespace AutoWeighbridgeSystem.ViewModels
         /// </summary>
         private bool _isRfidAssignIntent = false;
 
+        partial void OnIsAutoModeChanged(bool value)
+        {
+            if (value) SyncTareWeightToAll = true;
+            else _pendingAutoVehicle = null; // Tắt Auto thì hủy hàng đợi
+        }
+
+        private void OnScaleWeightChanged(decimal weight, bool isStable)
+        {
+            if (!IsAutoMode || _pendingAutoVehicle == null || !isStable) return;
+
+            // Nếu xe đã dừng hẳn và đang có xe chờ lưu
+            Application.Current?.Dispatcher.InvokeAsync(async () =>
+            {
+                Vehicle vehicleToSave = null;
+                lock (_pendingLock)
+                {
+                    if (_pendingAutoVehicle == null) return;
+                    vehicleToSave = _pendingAutoVehicle;
+                    _pendingAutoVehicle = null; // Clear ngay để tránh lưu 2 lần
+                }
+
+                if (weight >= _minWeightThreshold)
+                {
+                    NewVehicle.TareWeight = weight;
+                    OnPropertyChanged(nameof(NewVehicle));
+                    await SaveAsync();
+                    await _alarmService.TriggerAlarmAsync();
+                    _notificationService.ShowInfo($"[AUTO] Xe dừng hẳn - Đã chốt bì: {weight:N0} kg");
+                }
+            });
+        }
+
         private void OnCardReadAtDesk(string readerRole, string cardId)
         {
             if (readerRole.Equals(ReaderRoles.Desk, StringComparison.OrdinalIgnoreCase))
@@ -188,6 +229,40 @@ namespace AutoWeighbridgeSystem.ViewModels
                         // Không có intent gán — quẹt để tra cứu: tự động trỏ đến xe chủ thẻ
                         SelectedRecord = RegisteredVehicles.FirstOrDefault(
                             v => v.VehicleId == result.ExistingVehicle.VehicleId);
+                    }
+
+                    // --- LOGIC AUTO MODE (Dành cho xe ĐÃ CÓ thẻ) ---
+                    if (IsAutoMode)
+                    {
+                        decimal currentWeight = _scaleService.CurrentWeight;
+                        bool isStable = _scaleService.IsScaleStable;
+
+                        if (currentWeight >= _minWeightThreshold)
+                        {
+                            if (isStable)
+                            {
+                                // 1. Điền thông tin lên UI ngay (đã làm ở trên qua SelectedRecord)
+                                // 2. Cập nhật cân nặng & Lưu
+                                NewVehicle.TareWeight = currentWeight;
+                                OnPropertyChanged(nameof(NewVehicle));
+                                await SaveAsync();
+                                await _alarmService.TriggerAlarmAsync();
+                            }
+                            else
+                            {
+                                // Đưa vào hàng chờ ổn định
+                                lock (_pendingLock)
+                                {
+                                    _pendingAutoVehicle = result.ExistingVehicle;
+                                }
+                                _notificationService.ShowInfo($"Đã nhận diện xe {result.ExistingVehicle.LicensePlate} - Đang chờ cân ổn định...");
+                            }
+                        }
+                        else
+                        {
+                            _notificationService.ShowWarning(
+                                UiText.Messages.ScaleBelowThreshold(currentWeight, _minWeightThreshold));
+                        }
                     }
                 }
                 else
@@ -308,8 +383,12 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 await db.SaveChangesAsync();
                 await LoadDataAsync();
+
+                // Hiển thị thông báo chi tiết để người dùng xác nhận
+                string detailMsg = $"Đã lưu thành công xe {NewVehicle.LicensePlate}\nKhối lượng thân vỏ: {NewVehicle.TareWeight:N0} kg";
+                _notificationService.ShowInfo(detailMsg, "XÁC NHẬN LƯU");
+
                 ClearForm();
-                _notificationService.ShowInfo(UiText.Messages.VehicleSaveSuccess);
             }
             catch (Exception ex) { _notificationService.ShowError(UiText.Messages.GenericError(ex.Message)); }
         }
@@ -355,6 +434,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         }
 
         [RelayCommand]
+        private async Task TriggerManualAlarmAsync() => await _alarmService.TriggerAlarmAsync();
+
+        [RelayCommand]
         private void ClearForm()
         {
             NewVehicle = new Vehicle();
@@ -365,16 +447,30 @@ namespace AutoWeighbridgeSystem.ViewModels
             _isRfidAssignIntent = false; // reset intent khi xóa form
         }
 
+        [RelayCommand]
+        private void ClearRfid()
+        {
+            NewVehicle.RfidCardId = null;
+            OnPropertyChanged(nameof(NewVehicle));
+            OnPropertyChanged("NewVehicle.RfidCardId");
+
+            // Tắt chế độ chờ gán thẻ để tránh cảnh báo thẻ rác
+            _isRfidAssignIntent = false;
+
+            _notificationService.ShowInfo("Đã gỡ mã thẻ trên Form. Vui lòng bấm LƯU để xác nhận thay đổi.");
+        }
+
         private async Task LoadDataAsync()
         {
             using var db = _dbContextFactory.CreateDbContext();
             var vehicles = await db.Vehicles.AsNoTracking().Include(v => v.Customer).ToListAsync();
             var customers = await db.Customers.AsNoTracking().ToListAsync();
 
-            Application.Current?.Dispatcher.Invoke(() => {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
                 RegisteredVehicles.Clear();
                 foreach (var v in vehicles) RegisteredVehicles.Add(v);
-                
+
                 AllCustomers = new ObservableCollection<Customer>(customers);
 
                 // Cập nhật danh sách gợi ý biển số (chỉ lấy biển không trùng lặp)
@@ -386,6 +482,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         public void Dispose()
         {
             _rfidService.CardRead -= OnCardReadAtDesk;
+            _scaleService.WeightChanged -= OnScaleWeightChanged;
         }
 
     }

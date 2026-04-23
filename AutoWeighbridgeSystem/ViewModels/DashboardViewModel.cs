@@ -294,7 +294,12 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         private void SubscribeToAlarmEvent()
         {
-            _alarmService.HardwareStatusChanged += status => AlarmStatus = status;
+            _alarmService.HardwareStatusChanged += OnAlarmHardwareStatusChanged;
+        }
+
+        private void OnAlarmHardwareStatusChanged(HardwareConnectionStatus status)
+        {
+            AlarmStatus = status;
         }
 
         /// <summary>
@@ -410,18 +415,27 @@ namespace AutoWeighbridgeSystem.ViewModels
             // Bổ sung luồng chặn xử lý Đăng ký xe vãng lai
             if (!VehicleAutocomplete.Items.Any(plate => plate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
             {
-                // Sử dụng factory delegate — DashboardViewModel không cần biết
-                // cách tạo QuickVehicleRegisterViewModel hay cần IDbContextFactory
-                var vm     = _quickRegisterVmFactory(LicensePlate);
-                var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
-                window.ShowDialog();
-
-                if (!vm.IsRegisteredAndSaved)
+                // Kiểm tra chéo dưới DB xem thực tế xe đã tồn tại chưa (phòng trường hợp vừa đăng ký ở tab khác)
+                var existingVehicle = await _dashboardDataService.GetVehicleByPlateAsync(LicensePlate);
+                if (existingVehicle != null)
                 {
-                    return;
+                    // Xe đã có trong DB, chỉ cần refresh lại danh sách gợi ý và chạy tiếp
+                    await LoadInitialDataAsync();
                 }
+                else
+                {
+                    // Thực sự là xe mới -> Mở cửa sổ đăng ký nhanh
+                    var vm = _quickRegisterVmFactory(LicensePlate);
+                    var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
+                    window.ShowDialog();
 
-                await LoadInitialDataAsync();
+                    if (!vm.IsRegisteredAndSaved)
+                    {
+                        return;
+                    }
+
+                    await LoadInitialDataAsync();
+                }
             }
 
             await ProcessAndSaveWeighingAsync(LockedWeight);
@@ -476,7 +490,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             var initialData = await _dashboardDataService.LoadInitialDataAsync();
 
-            Application.Current?.Dispatcher.Invoke(() =>
+            Application.Current?.Dispatcher?.Invoke(() =>
             {
                 VehicleAutocomplete.UpdateItems(initialData.Vehicles);
                 CustomerAutocomplete.UpdateItems(initialData.Customers);
@@ -493,7 +507,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         public async Task LoadRecentTicketsAsync()
         {
             var tickets = await _dashboardDataService.LoadRecentTicketsAsync();
-            Application.Current?.Dispatcher.Invoke(() =>
+            Application.Current?.Dispatcher?.Invoke(() =>
                 RecentTickets = new ObservableCollection<WeighingTicket>(tickets));
         }
 
@@ -530,7 +544,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _coordinator.RfidCaptured                   -= OnRfidCaptured;
             _coordinator.PendingTimeoutStartRequested   -= OnPendingTimeoutStartRequested;
             _coordinator.HardwareStatusChanged          -= OnHardwareStatusChanged;
-            _alarmService.HardwareStatusChanged         -= (status => AlarmStatus = status); // Note: this anonymous unsub won't work perfectly if not careful, but usually VM is disposed at app exit
+            _alarmService.HardwareStatusChanged         -= OnAlarmHardwareStatusChanged;
             _coordinator.Dispose();
             _saveLock.Dispose();
         }

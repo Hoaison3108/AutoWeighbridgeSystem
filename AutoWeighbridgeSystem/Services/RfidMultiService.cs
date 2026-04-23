@@ -154,7 +154,8 @@ namespace AutoWeighbridgeSystem.Services
             var entry = new RfidReaderEntry(roleName, comPort, baudRate);
             _readers.Add(entry);
 
-            OpenReaderPort(entry);
+            // TỐI ƯU: Chạy việc mở cổng trong background task để không block UI/Startup
+            Task.Run(() => OpenReaderPort(entry));
         }
 
         /// <summary>
@@ -243,7 +244,7 @@ namespace AutoWeighbridgeSystem.Services
                     Timeout.Infinite);
 
                 Log.Information("[RFID] ĐÃ MỞ CỔNG {Port} cho đầu đọc {Role}", entry.ComPort, entry.RoleName);
-                // Status event KHÔNG fire ở đây — phát từ NotifyInitialStatus() hoặc reconnect loop
+                ReaderReconnected?.Invoke(entry.RoleName);
             }
             catch (Exception ex)
             {
@@ -400,31 +401,40 @@ namespace AutoWeighbridgeSystem.Services
                             Encoding = Encoding.GetEncoding("ISO-8859-1")
                         };
 
-                        entry.DataHandler  = (s, e) => HandleDataReceived(entry, (SerialPort)s);
-                        entry.ErrorHandler = (s, e) =>
+                        try
                         {
-                            Log.Warning("[RFID] ErrorReceived từ {Role}: {Error}", entry.RoleName, e.EventType);
-                            HandleReaderDisconnect(entry);
-                        };
+                            testPort.Open();
 
-                        testPort.DataReceived  += entry.DataHandler;
-                        testPort.ErrorReceived += entry.ErrorHandler;
-                        testPort.Open();
+                            entry.DataHandler  = (s, e) => HandleDataReceived(entry, (SerialPort)s);
+                            entry.ErrorHandler = (s, e) =>
+                            {
+                                Log.Warning("[RFID] ErrorReceived từ {Role}: {Error}", entry.RoleName, e.EventType);
+                                HandleReaderDisconnect(entry);
+                            };
 
-                        // Thành công — khôi phục timer
-                        entry.Port = testPort;
-                        entry.FlushTimer = new Timer(
-                            _ => ProcessBufferedData(entry),
-                            null,
-                            Timeout.Infinite,
-                            Timeout.Infinite);
+                            testPort.DataReceived  += entry.DataHandler;
+                            testPort.ErrorReceived += entry.ErrorHandler;
 
-                        entry.IsReconnecting = false;
+                            // Thành công — khôi phục timer
+                            entry.Port = testPort;
+                            entry.FlushTimer = new Timer(
+                                _ => ProcessBufferedData(entry),
+                                null,
+                                Timeout.Infinite,
+                                Timeout.Infinite);
 
-                        Log.Information("[RFID] ✅ [{Role}] KẾT NỐI LẠI THÀNH CÔNG tại {Port} (sau {Attempt} lần thử).",
-                            entry.RoleName, entry.ComPort, attempt + 1);
-                        ReaderReconnected?.Invoke(entry.RoleName);
-                        return;
+                            entry.IsReconnecting = false;
+
+                            Log.Information("[RFID] ✅ [{Role}] KẾT NỐI LẠI THÀNH CÔNG tại {Port} (sau {Attempt} lần thử).",
+                                entry.RoleName, entry.ComPort, attempt + 1);
+                            ReaderReconnected?.Invoke(entry.RoleName);
+                            return;
+                        }
+                        catch
+                        {
+                            testPort.Dispose();
+                            throw;
+                        }
                     }
                     catch (Exception ex)
                     {

@@ -23,6 +23,7 @@ namespace AutoWeighbridgeSystem.Services
         private readonly DashboardWorkflowService _dashboardWorkflow;
         private readonly HardwareWatchdogService _hardwareWatchdog;
         private readonly AlarmService _alarmService;
+        private readonly IConfiguration _configuration;
 
         // =========================================================================
         // CẤU HÌNH (đọc từ appsettings — tách ra khỏi ViewModel)
@@ -84,6 +85,7 @@ namespace AutoWeighbridgeSystem.Services
             _dashboardWorkflow = dashboardWorkflow;
             _hardwareWatchdog = hardwareWatchdog;
             _alarmService = alarmService;
+            _configuration = configuration;
 
             LoadConfiguration(configuration);
         }
@@ -179,7 +181,7 @@ namespace AutoWeighbridgeSystem.Services
             if (!_scaleDataReceived)
             {
                 _scaleDataReceived = true;
-                Application.Current?.Dispatcher.BeginInvoke(() =>
+                Application.Current?.Dispatcher?.BeginInvoke(() =>
                     HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Online));
             }
 
@@ -305,11 +307,10 @@ namespace AutoWeighbridgeSystem.Services
             // RFID: 'Connecting' (vàng) cho các reader có port đang mở
             // → sẽ chuyển 'Online' (xanh) chỉ khi đọc được thẻ (OnRfidCardRead)
             var connectedRoles = _rfidService.ConnectedReaderRoles;
-            var config = _configuration; // assuming _configuration is available, need to check RfidSettings
             
             foreach (var role in new[] { ReaderRoles.ScaleIn, ReaderRoles.ScaleOut, ReaderRoles.Desk })
             {
-                string port = config[$"RfidSettings:{role}:ComPort"];
+                string port = _configuration[$"RfidSettings:{role}:ComPort"];
                 HardwareConnectionStatus status;
 
                 if (port == "None")
@@ -332,7 +333,7 @@ namespace AutoWeighbridgeSystem.Services
         {
             _scaleDataReceived = false; // reset để lần kết nối lại phải nhận data mới được set Online
             _dashboardWorkflow.ClearPendingData();
-            Application.Current?.Dispatcher.InvokeAsync(() =>
+            Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Offline);
                 FormResetRequested?.Invoke("⚠️ ĐẦU CÂN MẤT KẾT NỐI! Đang thử kết nối lại...");
@@ -345,7 +346,7 @@ namespace AutoWeighbridgeSystem.Services
             // Kết nối lại thành công — reset cờ, đợi dữ liệu thực tế mới set Online
             // (OnScaleWeightChanged sẽ set Online khi frame đầu tiên đến)
             _scaleDataReceived = false;
-            Application.Current?.Dispatcher.InvokeAsync(() =>
+            Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Connecting);
                 CameraMessageRequested?.Invoke("✅ ĐẦU CÂN ĐÃ KẾT NỐI LẠI!", true);
@@ -357,7 +358,7 @@ namespace AutoWeighbridgeSystem.Services
         {
             // Reset cờ khi đang thử lại
             _scaleDataReceived = false;
-            Application.Current?.Dispatcher.InvokeAsync(() =>
+            Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Reconnecting);
                 CameraMessageRequested?.Invoke($"🔄 ĐẦU CÂN: Đang thử kết nối lại lần {attempt}...", false);
@@ -367,7 +368,7 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary>Phản ứng khi một đầu đọc RFID mất kết nối.</summary>
         private void OnRfidReaderDisconnected(string roleName)
         {
-            Application.Current?.Dispatcher.InvokeAsync(() =>
+            Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 HardwareStatusChanged?.Invoke(roleName, HardwareConnectionStatus.Offline);
                 CameraMessageRequested?.Invoke($"⚠️ RFID {roleName} MẤT KẾT NỐI! Đang thử kết nối lại...", false);

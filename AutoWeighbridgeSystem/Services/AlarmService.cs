@@ -29,31 +29,39 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary>
         /// Kiểm tra và khởi tạo kết nối tới cổng COM lúc khởi động để giữ kết nối duy trì.
         /// </summary>
+        /// <summary>
+        /// Kiểm tra và khởi tạo kết nối tới cổng COM lúc khởi động để giữ kết nối duy trì.
+        /// Chạy bất đồng bộ để tránh làm treo UI Thread khi khởi tạo Dashboard.
+        /// </summary>
         public void Initialize()
         {
-            try
+            Task.Run(async () =>
             {
-                var settings = GetRelaySettings();
-                if (string.IsNullOrEmpty(settings.Port) || settings.Port == "None")
+                try
                 {
-                    HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Disabled);
-                    return;
-                }
+                    var settings = GetRelaySettings();
+                    if (string.IsNullOrEmpty(settings.Port) || settings.Port == "None")
+                    {
+                        HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Disabled);
+                        return;
+                    }
 
-                // Thử mở kết nối duy trì (Persistent)
-                bool success = _relayService.OpenAsync(
-                    settings.Port, 
-                    settings.Baud, 
-                    settings.Parity, 
-                    settings.DataBits, 
-                    settings.StopBits).GetAwaiter().GetResult();
-                
-                HardwareStatusChanged?.Invoke(success ? HardwareConnectionStatus.Online : HardwareConnectionStatus.Offline);
-            }
-            catch
-            {
-                HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Offline);
-            }
+                    // Thử mở kết nối duy trì (Persistent) - Không dùng .GetResult() để tránh block UI
+                    bool success = await _relayService.OpenAsync(
+                        settings.Port, 
+                        settings.Baud, 
+                        settings.Parity, 
+                        settings.DataBits, 
+                        settings.StopBits);
+                    
+                    HardwareStatusChanged?.Invoke(success ? HardwareConnectionStatus.Online : HardwareConnectionStatus.Offline);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "[ALARM] Lỗi khi khởi tạo kết nối Relay");
+                    HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Offline);
+                }
+            });
         }
 
         /// <summary>

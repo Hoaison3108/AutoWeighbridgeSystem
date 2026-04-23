@@ -135,6 +135,47 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
+        <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+            <Setter Property="Background" Value="#424242"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid x:Name="BackgroundGrid" Width="55" Height="28">
+                                <Border x:Name="Track" CornerRadius="14" Background="{TemplateBinding Background}" BorderThickness="0"/>
+                                <Ellipse x:Name="Thumb" Width="22" Height="22" Fill="White" HorizontalAlignment="Left" Margin="3,0">
+                                    <Ellipse.RenderTransform>
+                                        <TranslateTransform X="0"/>
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                            </Grid>
+                            <ContentPresenter Margin="12,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="#2196F3"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Thumb" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="27" Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Thumb" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="20">
@@ -151,7 +192,7 @@
                     <StackPanel>
                         <TextBlock Text="MÃ THẺ RFID (Quẹt tại bàn)" FontWeight="Bold" Foreground="#00E676" Margin="0,0,0,12"/>
                         <TextBox Text="{Binding NewVehicle.RfidCardId, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsReadOnly="True" FontSize="16" Height="48" Background="#252525" Foreground="#FFEB3B" FontWeight="Bold" TextAlignment="Center" VerticalContentAlignment="Center"/>
-                        <Button Command="{Binding ClearRfidCommand}" Content="🔃 LÀM MỚI" Background="#424242" Foreground="White" Margin="0,15,0,0" Height="35" FontSize="13"/>
+                        <Button Command="{Binding ClearRfidCommand}" Content="🗑️ XÓA THẺ RFID" Background="#424242" Foreground="White" Margin="0,15,0,0" Height="35" FontSize="13"/>
                     </StackPanel>
                 </Border>
 
@@ -208,8 +249,16 @@
                     </Button>
                 </Grid>
 
+                <CheckBox IsChecked="{Binding IsAutoMode}" 
+                          Content="Auto Mode (Quẹt thẻ RFID = Lưu Khối lượng xe)" 
+                          Style="{StaticResource ToggleSwitchStyle}"
+                          Foreground="#2196F3" 
+                          FontSize="15" 
+                          FontWeight="Bold"
+                          Margin="0,0,0,15"/>
+
                 <CheckBox IsChecked="{Binding SyncTareWeightToAll}" 
-                          Content="Đồng bộ Khối lượng thân xe cùng biển số" 
+                          Content="Đồng bộ thân xe cho cùng biển số" 
                           Foreground="#FF9800" 
                           FontSize="14" 
                           FontWeight="SemiBold"
@@ -219,6 +268,8 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="65"/>
+                        <ColumnDefinition Width="10"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -227,7 +278,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Button Grid.Row="0" Grid.ColumnSpan="3" Command="{Binding SaveCommand}" Foreground="White">
+                    <Button Grid.Row="0" Grid.ColumnSpan="5" Command="{Binding SaveCommand}" Foreground="White">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                 <Setter Property="Background" Value="#FF9800"/>
@@ -243,7 +294,8 @@
                     </Button>
 
                     <Button Grid.Row="2" Grid.Column="0" Command="{Binding DeleteCommand}" Background="#E53935" Foreground="White" Content="🗑️ XÓA XE"/>
-                    <Button Grid.Row="2" Grid.Column="2" Command="{Binding ClearFormCommand}" Background="#424242" Foreground="White" Content="🔄 LÀM MỚI"/>
+                    <Button Grid.Row="2" Grid.Column="2" Command="{Binding TriggerManualAlarmCommand}" Background="#FFD600" Foreground="Black" Content="🔔" ToolTip="Kích hoạt chuông báo"/>
+                    <Button Grid.Row="2" Grid.Column="4" Command="{Binding ClearFormCommand}" Background="#424242" Foreground="White" Content="🔄 LÀM MỚI"/>
                 </Grid>
             </StackPanel>
         </Border>

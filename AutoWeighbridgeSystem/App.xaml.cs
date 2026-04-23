@@ -149,7 +149,10 @@ namespace AutoWeighbridgeSystem
                         var protocolFactory = provider.GetRequiredService<IScaleProtocolFactory>();
                         IScaleProtocol selectedProtocol = protocolFactory.Create(protocolName);
 
-                        scaleService.Initialize(port, baud, dataBits, parity, stopBits, selectedProtocol);
+                        decimal minWeight = decimal.TryParse(section["MinWeightThreshold"], out decimal mw) ? mw : 50;
+                        decimal stableDelta = decimal.TryParse(section["StabilityDelta"], out decimal sd) ? sd : 50;
+
+                        scaleService.Initialize(port, baud, dataBits, parity, stopBits, selectedProtocol, minWeight, stableDelta);
                     }
                 }
                 catch (Exception ex)

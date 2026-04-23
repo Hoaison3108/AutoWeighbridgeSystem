@@ -24,6 +24,7 @@ namespace AutoWeighbridgeSystem.Services
         private DateTime _lastScaleDataReceivedTime = DateTime.Now;
         private CancellationTokenSource _pendingTimeoutCts;
         private CancellationTokenSource _watchdogCts;
+        private readonly object _lock = new object();
 
         /// <summary>
         /// Cập nhật mốc thời gian nhận tín hiệu từ đầu cân.
@@ -44,25 +45,27 @@ namespace AutoWeighbridgeSystem.Services
         /// <param name="onSignalLost">Callback được gọi khi phát hiện mất tín hiệu đầu cân.</param>
         public void StartHardwareWatchdog(int hardwareWatchdogSeconds, Action onSignalLost)
         {
-            _watchdogCts?.Cancel();
-            _watchdogCts = new CancellationTokenSource();
+            lock (_lock)
+            {
+                _watchdogCts?.Cancel();
+                _watchdogCts = new CancellationTokenSource();
+            }
 
+            var token = _watchdogCts.Token;
             Task.Run(async () =>
             {
                 try
                 {
-                    while (!_watchdogCts.Token.IsCancellationRequested)
+                    while (!token.IsCancellationRequested)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(hardwareWatchdogSeconds), _watchdogCts.Token);
+                        await Task.Delay(TimeSpan.FromSeconds(hardwareWatchdogSeconds), token);
                         if ((DateTime.Now - _lastScaleDataReceivedTime).TotalSeconds > hardwareWatchdogSeconds)
                             onSignalLost?.Invoke();
                     }
                 }
-                catch (TaskCanceledException)
-                {
-                    // Ngoại lệ hủy Task được bắt tiêu chuẩn, chặn sập (crash ngầm) hệ thống
-                }
-            }, _watchdogCts.Token);
+                catch (TaskCanceledException) { }
+                catch (OperationCanceledException) { }
+            }, token);
         }
 
         /// <summary>
@@ -75,21 +78,22 @@ namespace AutoWeighbridgeSystem.Services
         /// <param name="onPendingTimeout">Callback được gọi khi hàng chờ hết thời gian.</param>
         public void StartPendingTimeout(int queueTimeoutSeconds, Action onPendingTimeout)
         {
-            _pendingTimeoutCts?.Cancel();
-            _pendingTimeoutCts = new CancellationTokenSource();
+            lock (_lock)
+            {
+                _pendingTimeoutCts?.Cancel();
+                _pendingTimeoutCts = new CancellationTokenSource();
+            }
 
+            var token = _pendingTimeoutCts.Token;
             Task.Run(async () =>
             {
                 try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(queueTimeoutSeconds), _pendingTimeoutCts.Token);
+                    await Task.Delay(TimeSpan.FromSeconds(queueTimeoutSeconds), token);
                     onPendingTimeout?.Invoke();
                 }
-                catch (OperationCanceledException)
-                {
-                    // CancelPendingTimeout() đã được gọi — timeout bị hủy chủ động, không phải lỗi
-                }
-            }, _pendingTimeoutCts.Token);
+                catch (OperationCanceledException) { }
+            }, token);
         }
 
         /// <summary>
@@ -97,14 +101,20 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         public void CancelPendingTimeout()
         {
-            _pendingTimeoutCts?.Cancel();
+            lock (_lock)
+            {
+                _pendingTimeoutCts?.Cancel();
+            }
         }
 
         /// <summary>Dừng cả watchdog và pending timeout. Gọi trong <c>Dispose</c> của ViewModel.</summary>
         public void StopAll()
         {
-            _watchdogCts?.Cancel();
-            _pendingTimeoutCts?.Cancel();
+            lock (_lock)
+            {
+                _watchdogCts?.Cancel();
+                _pendingTimeoutCts?.Cancel();
+            }
         }
 
         /// <inheritdoc/>

@@ -127,7 +127,8 @@ namespace AutoWeighbridgeSystem.ViewModels
                 }
 
                 // 3. TẢI DỮ LIỆU PHÂN TRANG (Pagination)
-                var result = await baseQuery.OrderByDescending(t => t.TimeIn)
+                var result = await baseQuery.AsNoTracking()
+                                           .OrderByDescending(t => t.TimeIn)
                                            .Take(PageSize)
                                            .ToListAsync();
 
@@ -170,7 +171,8 @@ namespace AutoWeighbridgeSystem.ViewModels
                                              t.CustomerName.ToLower().Contains(search));
                 }
 
-                var nextBatch = await query.OrderByDescending(t => t.TimeIn)
+                var nextBatch = await query.AsNoTracking()
+                                           .OrderByDescending(t => t.TimeIn)
                                            .Skip(_currentPage * PageSize)
                                            .Take(PageSize)
                                            .ToListAsync();
@@ -271,7 +273,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 }
 
                 // Lấy toàn bộ dữ liệu không phân trang
-                var allTickets = await query.OrderBy(t => t.TimeIn).ToListAsync();
+                var allTickets = await query.AsNoTracking().OrderBy(t => t.TimeIn).ToListAsync();
 
                 if (allTickets == null || !allTickets.Any())
                 {

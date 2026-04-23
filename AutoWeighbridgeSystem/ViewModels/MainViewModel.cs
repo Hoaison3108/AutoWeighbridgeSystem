@@ -3,111 +3,69 @@ using AutoWeighbridgeSystem.Common;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoWeighbridgeSystem.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
         // --- 1. QUẢN LÝ TRẠNG THÁI GIAO DIỆN ---
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsDashboardVisible))]
-        [NotifyPropertyChangedFor(nameof(IsRegistrationVisible))]
-        [NotifyPropertyChangedFor(nameof(IsCustomerVisible))]
-        [NotifyPropertyChangedFor(nameof(IsProductVisible))]
-        [NotifyPropertyChangedFor(nameof(IsHistoryVisible))]
-        [NotifyPropertyChangedFor(nameof(IsSettingsVisible))]
-        [NotifyPropertyChangedFor(nameof(IsNotificationHistoryVisible))]
-        private object _currentView;
-
+        [ObservableProperty] private object _currentView;
         [ObservableProperty] private bool _isSidebarExpanded = true;
 
-        // --- 2. CÁC INSTANCE VIEWMODEL CON (Quản lý bởi DI Container) ---
-
-        private readonly DashboardViewModel _dashboardVm;
-        private readonly VehicleRegistrationViewModel _registrationVm;
-        private readonly CustomerViewModel _customerVm;
-        private readonly ProductViewModel _productVm;
-        private readonly WeighingHistoryViewModel _historyVm;
-        private readonly SettingsViewModel _settingsVm;
-        private readonly NotificationHistoryViewModel _notificationHistoryVm;
+        // --- 2. CÁC DỊCH VỤ CỐT LÕI (Inject luôn) ---
+        private readonly IServiceProvider _serviceProvider;
         private readonly AppSession _appSession;
         private readonly IUserNotificationService _notificationService;
         private readonly NotificationManagerService _notificationManager;
 
-        // Bộc lộ cho View (UI Caching)
-        public DashboardViewModel DashboardVM => _dashboardVm;
-        public VehicleRegistrationViewModel RegistrationVM => _registrationVm;
-        public CustomerViewModel CustomerVM => _customerVm;
-        public ProductViewModel ProductVM => _productVm;
-        public WeighingHistoryViewModel HistoryVM => _historyVm;
-        public SettingsViewModel SettingsVM => _settingsVm;
-        public NotificationHistoryViewModel NotificationHistoryVM => _notificationHistoryVm;
+        // --- 3. CÁC INSTANCE VIEWMODEL CON (Lazy Loading) ---
+        private DashboardViewModel _dashboardVm;
+        private VehicleRegistrationViewModel _registrationVm;
+        private CustomerViewModel _customerVm;
+        private ProductViewModel _productVm;
+        private WeighingHistoryViewModel _historyVm;
+        private SettingsViewModel _settingsVm;
+        private NotificationHistoryViewModel _notificationHistoryVm;
+
+        // Bộc lộ cho View (Sử dụng Getter để Lazy Load)
+        public DashboardViewModel DashboardVM => _dashboardVm ??= _serviceProvider.GetRequiredService<DashboardViewModel>();
+        public VehicleRegistrationViewModel RegistrationVM => _registrationVm ??= _serviceProvider.GetRequiredService<VehicleRegistrationViewModel>();
+        public CustomerViewModel CustomerVM => _customerVm ??= _serviceProvider.GetRequiredService<CustomerViewModel>();
+        public ProductViewModel ProductVM => _productVm ??= _serviceProvider.GetRequiredService<ProductViewModel>();
+        public WeighingHistoryViewModel HistoryVM => _historyVm ??= _serviceProvider.GetRequiredService<WeighingHistoryViewModel>();
+        public SettingsViewModel SettingsVM => _settingsVm ??= _serviceProvider.GetRequiredService<SettingsViewModel>();
+        public NotificationHistoryViewModel NotificationHistoryVM => _notificationHistoryVm ??= _serviceProvider.GetRequiredService<NotificationHistoryViewModel>();
+        
         public NotificationManagerService NotificationManager => _notificationManager;
 
-        // Các biến quyết định cờ hiển thị
-        public bool IsDashboardVisible => CurrentView == _dashboardVm;
-        public bool IsRegistrationVisible => CurrentView == _registrationVm;
-        public bool IsCustomerVisible => CurrentView == _customerVm;
-        public bool IsProductVisible => CurrentView == _productVm;
-        public bool IsHistoryVisible => CurrentView == _historyVm;
-        public bool IsSettingsVisible => CurrentView == _settingsVm;
-        public bool IsNotificationHistoryVisible => CurrentView == _notificationHistoryVm;
-
-        // --- 3. CONSTRUCTOR (Đồng nhất qua Injection) ---
-
+        // --- 4. CONSTRUCTOR ---
         public MainViewModel(
-            DashboardViewModel dashboardVm,
-            VehicleRegistrationViewModel registrationVm,
-            CustomerViewModel customerVm,
-            ProductViewModel productVm,
-            WeighingHistoryViewModel historyVm,
-            SettingsViewModel settingsVm,
-            NotificationHistoryViewModel notificationHistoryVm,
+            IServiceProvider serviceProvider,
             AppSession appSession,
             IUserNotificationService notificationService,
             NotificationManagerService notificationManager)
         {
-            _dashboardVm = dashboardVm;
-            _registrationVm = registrationVm;
-            _customerVm = customerVm;
-            _productVm = productVm;
-            _historyVm = historyVm;
-            _settingsVm = settingsVm;
-            _notificationHistoryVm = notificationHistoryVm;
+            _serviceProvider = serviceProvider;
             _appSession = appSession;
             _notificationService = notificationService;
             _notificationManager = notificationManager;
 
-            // Mặc định hiển thị Dashboard khi khởi động
-            _currentView = _dashboardVm;
+            // Mặc định hiển thị Dashboard khi khởi động (Dashboard sẽ được khởi tạo tại đây)
+            _currentView = DashboardVM;
         }
 
-        // --- 4. CÁC LỆNH ĐIỀU HƯỚNG ---
+        // --- 5. CÁC LỆNH ĐIỀU HƯỚNG ---
+        [RelayCommand] private void ShowDashboard() => Navigate(DashboardVM);
+        [RelayCommand] private void ShowRegistration() => Navigate(RegistrationVM);
+        [RelayCommand] private void ShowCustomer() => Navigate(CustomerVM);
+        [RelayCommand] private void ShowProduct() => Navigate(ProductVM);
+        [RelayCommand] private void ShowHistory() => Navigate(HistoryVM);
+        [RelayCommand] private void ShowSettings() => Navigate(SettingsVM);
+        [RelayCommand] private void ShowNotificationHistory() => Navigate(NotificationHistoryVM);
 
-        [RelayCommand]
-        private void ShowDashboard() => Navigate(_dashboardVm);
-
-        [RelayCommand]
-        private void ShowRegistration() => Navigate(_registrationVm);
-
-        [RelayCommand]
-        private void ShowCustomer() => Navigate(_customerVm);
-
-        [RelayCommand]
-        private void ShowProduct() => Navigate(_productVm);
-
-        [RelayCommand]
-        private void ShowHistory() => Navigate(_historyVm); // Lệnh hiển thị Lịch sử Phiếu cân
-
-        [RelayCommand]
-        private void ShowSettings() => Navigate(_settingsVm);
-
-        [RelayCommand]
-        private void ShowNotificationHistory() => Navigate(_notificationHistoryVm);
-
-        [RelayCommand]
-        private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
+        [RelayCommand] private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
 
         [RelayCommand]
         private void Logout()
@@ -118,8 +76,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             }
         }
 
-        // --- 5. HÀM TRỢ GIÚP ĐIỀU HƯỚNG ---
-
+        // --- 6. HÀM TRỢ GIÚP ĐIỀU HƯỚNG ---
         private void Navigate(object viewModel)
         {
             if (CurrentView != viewModel)
@@ -127,9 +84,9 @@ namespace AutoWeighbridgeSystem.ViewModels
                 CurrentView = viewModel;
 
                 // Tự động làm mới danh sách gợi ý khi quay lại màn hình Dashboard
-                if (viewModel == _dashboardVm)
+                if (viewModel is DashboardViewModel dbVm)
                 {
-                    _dashboardVm.LoadInitialDataAsync().FireAndForgetSafe(ex => 
+                    dbVm.LoadInitialDataAsync().FireAndForgetSafe(ex => 
                         _notificationService.LogError(ex, "Lỗi làm mới dữ liệu Dashboard"));
                 }
             }

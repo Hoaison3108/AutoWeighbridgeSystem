@@ -170,6 +170,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="1.5*"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,5,0">
@@ -192,7 +193,11 @@
                                                 <TextBlock Text="Watchdog (s):" Style="{StaticResource LabelStyle}"/>
                                                 <TextBox Text="{Binding ScaleWatchdog}"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Column="5" Margin="15,0,0,0" VerticalAlignment="Bottom">
+                                            <StackPanel Grid.Column="5" Margin="5,0,5,0">
+                                                <TextBlock Text="Độ ổn định (kg):" Style="{StaticResource LabelStyle}"/>
+                                                <TextBox Text="{Binding ScaleStabilityDelta}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="6" Margin="15,0,0,0" VerticalAlignment="Bottom">
                                                 <CheckBox Content="Mặc định AUTO" IsChecked="{Binding DefaultToAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
                                                 <CheckBox Content="Mặc định Cân 1 Lần" IsChecked="{Binding DefaultToOnePassMode}" Foreground="#00E676" FontWeight="Bold"/>
                                             </StackPanel>
@@ -363,6 +368,26 @@
 
                                     </WrapPanel>
                                 </Expander>
+
+                                <Expander Header="💻 CHẾ ĐỘ VẬN HÀNH - HỆ THỐNG" IsExpanded="True" Margin="0,0,0,10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <CheckBox Content="CHẾ ĐỘ VĂN PHÒNG (Chỉ xem dữ liệu, không kết nối phần cứng)" 
+                                                      IsChecked="{Binding IsOfficeMode}" 
+                                                      Foreground="#FFC107" FontWeight="Bold" FontSize="14" VerticalContentAlignment="Center"/>
+                                            <TextBlock Text=" - Dùng cho máy tính không trực tiếp kết nối bàn cân." 
+                                                       Foreground="Gray" FontStyle="Italic" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <TextBlock Text="Thư mục Backup:" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <TextBox Text="{Binding BackupFolderPath}" Width="300"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Expander>
                             </StackPanel>
                         </ScrollViewer>
 
@@ -402,6 +427,130 @@
                             </StackPanel>
                         </Border>
                     </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="🔌 KẾT NỐI DATABASE">
+                <Border Background="#1E1E1E" CornerRadius="12" Padding="20" Margin="0,15,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="CẤU HÌNH KẾT NỐI MÁY CHỦ DỮ LIỆU" FontSize="18" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,20"/>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="400"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left Panel: Discovery -->
+                            <GroupBox Header="1. TÌM KIẾM MÁY CHỦ (SCAN)" Margin="0,0,20,0">
+                                <Grid Margin="10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Button Command="{Binding DiscoverServersCommand}" Content="🔍 BẮT ĐẦU QUÉT MẠNG LAN" 
+                                            Background="#3F51B5" Foreground="White" Height="40" Margin="0,0,0,10"/>
+
+                                    <ListBox Grid.Row="1" ItemsSource="{Binding DiscoveredServers}" 
+                                             SelectedItem="{Binding DbServerName}"
+                                             Background="#121212" Foreground="White" BorderBrush="#444"
+                                             FontSize="14">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="5">
+                                                    <TextBlock Text="🖥️" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+
+                                    <TextBlock Grid.Row="2" Text="* Chọn máy chủ từ danh sách để tự điền vào mục cấu hình thủ công." 
+                                               Foreground="#888" FontSize="11" FontStyle="Italic" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                                </Grid>
+                            </GroupBox>
+
+                            <!-- Right Panel: Manual Configuration -->
+                            <GroupBox Grid.Column="1" Header="2. CẤU HÌNH KẾT NỐI THỦ CÔNG (MANUAL)">
+                                <StackPanel Margin="15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Margin="0,0,10,0">
+                                            <TextBlock Text="Địa chỉ Server (IP hoặc Hostname):" Style="{StaticResource LabelStyle}"/>
+                                            <TextBox Text="{Binding DbServerName}" Height="35"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                            <TextBlock Text="Tên Cơ sở dữ liệu (Database):" Style="{StaticResource LabelStyle}"/>
+                                            <TextBox Text="{Binding DbName}" Height="35"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,15,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Margin="0,0,10,0">
+                                            <TextBlock Text="Tên đăng nhập (User Id):" Style="{StaticResource LabelStyle}"/>
+                                            <TextBox Text="{Binding DbUser}" Height="35"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                            <TextBlock Text="Mật khẩu (Password):" Style="{StaticResource LabelStyle}"/>
+                                            <TextBox Text="{Binding DbPassword}" Height="35"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <StackPanel Margin="0,20,0,0">
+                                        <TextBlock Text="Chuỗi kết nối hiện tại (Connection String):" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox Text="{Binding DbConnectionString}" Height="60" TextWrapping="Wrap" IsReadOnly="True" Opacity="0.7"/>
+                                    </StackPanel>
+
+                                    <UniformGrid Columns="2" Margin="0,20,0,0">
+                                        <Button Command="{Binding TestConnectionCommand}" Content="⚡ KIỂM TRA KẾT NỐI" 
+                                                Background="#00C853" Foreground="White" Margin="0,0,10,0"/>
+                                        <Button Command="{Binding BuildConnectionStringCommand}" Content="🔗 TỔNG HỢP CHUỖI KẾT NỐI" 
+                                                Background="#FF9800" Foreground="Black" Margin="10,0,0,0"/>
+                                    </UniformGrid>
+                                    
+                                    <TextBlock Text="* Sau khi nhấn 'Tổng hợp', bạn cần nhấn nút 'LƯU TOÀN BỘ' ở tab Thiết bị để ghi vào file hệ thống." 
+                                               Foreground="#2196F3" FontWeight="SemiBold" FontSize="12" Margin="0,15,0,0" TextAlignment="Center"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </Grid>
+                        
+                        <!-- Overlay khóa khi không phải Admin -->
+                        <Grid Background="#CC121212" Grid.RowSpan="2">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAdmin}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsAdmin}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Border Background="#1A1A2E" CornerRadius="12" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="40,30">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="🔒" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                                    <TextBlock Text="KHÔNG CÓ QUYỀN TRUY CẬP" FontSize="20" FontWeight="Bold" Foreground="#F44336" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Thay đổi cấu hình Server yêu cầu quyền Admin." Foreground="#AAA" Margin="0,10,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
                     </Grid>
                 </Border>
             </TabItem>
