@@ -66,6 +66,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanManualSave))]
+        [NotifyPropertyChangedFor(nameof(IsManualMode))]
         private bool _isAutoMode = true;
         [ObservableProperty] private bool _isOnePassMode = false;
 
@@ -263,22 +264,72 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             if (IsAutoMode) { _notificationService.ShowWarning(UiText.Messages.ManualModeDisableAuto); return; }
             if (string.IsNullOrWhiteSpace(LicensePlate)) { _notificationService.ShowWarning(UiText.Messages.EnterLicensePlate); return; }
-            if (!IsWeightLocked || LockedWeight <= 0) { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave); return; }
 
-            if (!VehicleAutocomplete.Items.Any(plate => plate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
+            // Chống spam click
+            if (IsSaving) return;
+
+            try
             {
-                var existingVehicle = await _dashboardDataService.GetVehicleByPlateAsync(LicensePlate);
-                if (existingVehicle != null) await LoadInitialDataAsync();
-                else
+                IsSaving = true;
+
+                // Tính năng mới: Tự động chốt khi nhấn Lưu
+                if (!IsWeightLocked)
                 {
-                    var vm = _quickRegisterVmFactory(LicensePlate);
-                    var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
-                    window.ShowDialog();
-                    if (!vm.IsRegisteredAndSaved) return;
-                    await LoadInitialDataAsync();
+                    // Chờ cân ổn định vô hạn định
+                    if (!IsScaleStable)
+                    {
+                        ShowCameraMessage("⏳ ĐANG CHỜ CÂN ỔN ĐỊNH ĐỂ LƯU...", false);
+                        while (!IsScaleStable)
+                        {
+                            if (IsAutoMode) return;
+                            if (string.IsNullOrWhiteSpace(LicensePlate)) return; // Bị hủy bằng nút Làm mới
+                            
+                            // Thoát chờ nếu xe lùi ra khỏi cân
+                            if (_scaleService.CurrentWeight < _coordinator.MinWeightThreshold)
+                            {
+                                ShowCameraMessage("⚠️ XE ĐÃ RỜI CÂN. HỦY CHỜ", true);
+                                _notificationService.ShowWarning("Xe đã rời khỏi cân trước khi ổn định. Hệ thống đã hủy lệnh lưu.");
+                                return;
+                            }
+
+                            await Task.Delay(200);
+                        }
+                    }
+                    
+                    if (_scaleService.CurrentWeight < _coordinator.MinWeightThreshold) 
+                    {
+                        _notificationService.ShowWarning($"Trọng lượng quá nhỏ (dưới mức tối thiểu {_coordinator.MinWeightThreshold} kg).");
+                        ShowCameraMessage("", true);
+                        return;
+                    }
+
+                    LockedWeight = _scaleService.CurrentWeight;
+                    IsWeightLocked = true;
+                    ShowCameraMessage($"🔒 ĐÃ CHỐT: {LockedWeight:N0} KG", false);
                 }
+
+                if (LockedWeight <= 0) { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave); return; }
+
+                if (!VehicleAutocomplete.Items.Any(plate => plate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var existingVehicle = await _dashboardDataService.GetVehicleByPlateAsync(LicensePlate);
+                    if (existingVehicle != null) await LoadInitialDataAsync();
+                    else
+                    {
+                        var vm = _quickRegisterVmFactory(LicensePlate);
+                        var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
+                        window.ShowDialog();
+                        if (!vm.IsRegisteredAndSaved) return;
+                        await LoadInitialDataAsync();
+                    }
+                }
+                
+                await ProcessAndSaveWeighingAsync(LockedWeight);
             }
-            await ProcessAndSaveWeighingAsync(LockedWeight);
+            finally
+            {
+                IsSaving = false;
+            }
         }
 
         [RelayCommand]

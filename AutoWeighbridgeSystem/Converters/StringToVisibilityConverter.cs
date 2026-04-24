@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -9,9 +9,12 @@ namespace AutoWeighbridgeSystem.Converters // Namespace phải khớp 100% với
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string status && !string.IsNullOrEmpty(status)
-                && status != "Camera Online (FFME 4.4.350)")
+            if (value is string status && !string.IsNullOrWhiteSpace(status))
             {
+                // Ẩn overlay nếu status là các chuỗi báo Online bình thường
+                if (status.StartsWith("Camera Online", StringComparison.OrdinalIgnoreCase))
+                    return Visibility.Collapsed;
+                    
                 return Visibility.Visible;
             }
             return Visibility.Collapsed;

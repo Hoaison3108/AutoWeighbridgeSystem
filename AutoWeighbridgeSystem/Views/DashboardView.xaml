@@ -302,8 +302,8 @@
                                     <ColumnDefinition Width="6*"/>
                                     <ColumnDefinition Width="4*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}" 
-                     IsReadOnly="{Binding IsAutoMode}" 
+                                <TextBox x:Name="VehicleTextBox" Grid.Column="0" Text="{Binding LicensePlate, UpdateSourceTrigger=PropertyChanged}" 
+                     IsReadOnly="{Binding IsAutoMode}" PreviewKeyDown="VehicleInput_PreviewKeyDown"
                      Height="45" FontSize="18" Background="#2D2D2D" Foreground="#2196F3" 
                      VerticalContentAlignment="Center" Padding="10,0" FontWeight="Bold" Margin="0,0,5,0"/>
                                 <!-- IsEnabled=IsManualMode: chỉ cho phép dùng ComboBox khi ở chế độ Manual -->
@@ -316,6 +316,7 @@
                                           IsEnabled="{Binding IsManualMode}"
                                           Height="45" FontSize="18"
                                           TextBoxBase.TextChanged="VehicleComboBox_TextChanged"
+                                          PreviewKeyDown="VehicleInput_PreviewKeyDown"
                                           ToolTip="Gõ để lọc danh sách xe — chỉ khả dụng ở chế độ Manual"/>
                                           
                                 <!-- Phép thuật phủ nút to gấp 3 lần nút mặc định của WPF -->
@@ -331,8 +332,8 @@
                                     <ColumnDefinition Width="6*"/>
                                     <ColumnDefinition Width="4*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}" 
-                     IsReadOnly="{Binding IsAutoMode}" 
+                                <TextBox x:Name="CustomerTextBox" Grid.Column="0" Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}" 
+                     IsReadOnly="{Binding IsAutoMode}" PreviewKeyDown="CustomerInput_PreviewKeyDown"
                      Height="45" Background="#2D2D2D" Foreground="White" 
                      VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="16"/>
                                 <ComboBox x:Name="CustomerComboBox"
@@ -343,6 +344,7 @@
                                           IsEnabled="{Binding IsManualMode}"
                                           Height="45" FontSize="16"
                                           TextBoxBase.TextChanged="CustomerComboBox_TextChanged"
+                                          PreviewKeyDown="CustomerInput_PreviewKeyDown"
                                           ToolTip="Gõ để lọc danh sách khách hàng — chỉ khả dụng ở chế độ Manual"/>
                                           
                                 <ToggleButton Grid.Column="1" 
@@ -357,8 +359,8 @@
                                     <ColumnDefinition Width="6*"/>
                                     <ColumnDefinition Width="4*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" 
-                     IsReadOnly="{Binding IsAutoMode}" 
+                                <TextBox x:Name="ProductTextBox" Grid.Column="0" Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" 
+                     IsReadOnly="{Binding IsAutoMode}" PreviewKeyDown="ProductInput_PreviewKeyDown"
                      Height="45" Background="#2D2D2D" Foreground="White" 
                      VerticalContentAlignment="Center" Padding="10,0" Margin="0,0,5,0" FontSize="16"/>
                                 <ComboBox x:Name="ProductComboBox"
@@ -369,6 +371,7 @@
                                           IsEnabled="{Binding IsManualMode}"
                                           Height="45" FontSize="16"
                                           TextBoxBase.TextChanged="ProductComboBox_TextChanged"
+                                          PreviewKeyDown="ProductInput_PreviewKeyDown"
                                           ToolTip="Gõ để lọc danh sách hàng hóa — chỉ khả dụng ở chế độ Manual"/>
                                           
                                 <ToggleButton Grid.Column="1" 
