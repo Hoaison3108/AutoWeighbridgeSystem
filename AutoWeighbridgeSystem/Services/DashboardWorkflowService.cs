@@ -29,6 +29,7 @@ namespace AutoWeighbridgeSystem.Services
         private string _pendingCustomerName;
         private string _pendingProductName;
         private int _pendingVehicleId;
+        private bool _pendingIsOnePassMode;
 
         /// <summary>Ngưỡng trọng lượng tối thiểu (kg) để cân được coi là hợp lệ (mặc định 200kg).</summary>
         public decimal MinWeightThreshold { get; private set; } = 200;
@@ -87,7 +88,8 @@ namespace AutoWeighbridgeSystem.Services
                     _pendingLicensePlate,
                     _pendingCustomerName,
                     _pendingProductName,
-                    _pendingVehicleId);
+                    _pendingVehicleId,
+                    _pendingIsOnePassMode);
             }
         }
 
@@ -131,13 +133,15 @@ namespace AutoWeighbridgeSystem.Services
                         _pendingLicensePlate,
                         _pendingCustomerName,
                         _pendingProductName,
-                        _pendingVehicleId);
+                        _pendingVehicleId,
+                        _pendingIsOnePassMode);
 
                     // Xóa dữ liệu sau khi đã lấy snapshot
                     _pendingLicensePlate = null;
                     _pendingCustomerName = null;
                     _pendingProductName  = null;
                     _pendingVehicleId    = 0;
+                    _pendingIsOnePassMode = false;
                     HasPendingVehicle    = false;
 
                     return ScaleWorkflowDecision.SaveWithPending(weight, pending);
@@ -161,7 +165,8 @@ namespace AutoWeighbridgeSystem.Services
         /// <param name="isAutoMode">Chế độ tự động hay thủ công.</param>
         /// <param name="isScaleStable">Cân đang ổn định hay không.</param>
         /// <param name="currentWeight">Trọng lượng hiện tại (kg).</param>
-        public async Task<RfidWorkflowDecision> EvaluateRfidEventAsync(string cardId, string selectedProductName, bool isAutoMode, bool isScaleStable, decimal currentWeight)
+        /// <param name="isOnePassMode">Chế độ cân một lần hay hai lần.</param>
+        public async Task<RfidWorkflowDecision> EvaluateRfidEventAsync(string cardId, string selectedProductName, bool isAutoMode, bool isScaleStable, decimal currentWeight, bool isOnePassMode)
         {
             if (!isAutoMode) return RfidWorkflowDecision.Message("CHẾ ĐỘ TAY - BỎ QUA THẺ!");
 
@@ -178,6 +183,7 @@ namespace AutoWeighbridgeSystem.Services
                 _pendingCustomerName = vehicle.Customer?.CustomerName ?? "Khách lẻ";
                 _pendingProductName  = selectedProductName ?? "Hàng hóa";
                 _pendingVehicleId    = vehicle.VehicleId;
+                _pendingIsOnePassMode = isOnePassMode;
                 HasPendingVehicle    = true;
 
                 if (isScaleStable && currentWeight >= MinWeightThreshold)
@@ -186,13 +192,15 @@ namespace AutoWeighbridgeSystem.Services
                         _pendingLicensePlate,
                         _pendingCustomerName,
                         _pendingProductName,
-                        _pendingVehicleId);
+                        _pendingVehicleId,
+                        _pendingIsOnePassMode);
 
                     // Reset ngay lập tức vì lệnh lưu phiếu sẽ được thực thi
                     _pendingLicensePlate = null;
                     _pendingCustomerName = null;
                     _pendingProductName  = null;
                     _pendingVehicleId    = 0;
+                    _pendingIsOnePassMode = false;
                     HasPendingVehicle    = false;
 
                     return RfidWorkflowDecision.SaveNow(currentWeight, pending);
@@ -208,7 +216,7 @@ namespace AutoWeighbridgeSystem.Services
     // =========================================================================
 
     /// <summary>Dữ liệu xe đang chờ cân (snapshot tại thời điểm RFID quét).</summary>
-    public sealed record PendingVehicleData(string LicensePlate, string CustomerName, string ProductName, int VehicleId);
+    public sealed record PendingVehicleData(string LicensePlate, string CustomerName, string ProductName, int VehicleId, bool IsOnePassMode);
 
     /// <summary>
     /// Kết quả quyết định từ <see cref="DashboardWorkflowService.EvaluateScaleEvent"/>.

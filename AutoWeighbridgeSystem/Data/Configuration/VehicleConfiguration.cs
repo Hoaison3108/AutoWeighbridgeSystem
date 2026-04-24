@@ -16,8 +16,9 @@ namespace AutoWeighbridgeSystem.Data.Configuration
         {
             builder.HasKey(v => v.VehicleId);
 
-            // Đánh Index để tra cứu nhanh biển số
+            // Đánh Index để tra cứu nhanh biển số và khách hàng
             builder.HasIndex(v => v.LicensePlate);
+            builder.HasIndex(v => v.CustomerId);
 
             // Chống trùng lặp RFID (Chỉ tính trên những xe chưa xóa và có thẻ)
             builder.HasIndex(v => v.RfidCardId).IsUnique().HasFilter("[IsDeleted] = 0 AND [RfidCardId] IS NOT NULL");

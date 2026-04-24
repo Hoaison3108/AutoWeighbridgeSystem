@@ -36,6 +36,9 @@ namespace AutoWeighbridgeSystem.Data.Configuration
             builder.HasIndex(t => t.CustomerName)
                    .HasDatabaseName("IX_WeighingTickets_CustomerName");
 
+            builder.HasIndex(t => t.VehicleId)
+                   .HasDatabaseName("IX_WeighingTickets_VehicleId");
+
             // Lưu ý: TicketID là PRIMARY KEY (clustered index) — không cần index riêng.
             // Query WHERE TicketID LIKE '260417%' sử dụng clustered index range scan — O(log n).
 

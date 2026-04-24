@@ -418,7 +418,7 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                     <Setter Property="Background" Value="#2196F3"/>
                                     <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="IsEnabled" Value="{Binding IsManualMode}"/>
+                                    <Setter Property="IsEnabled" Value="{Binding CanManualSave}"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsEnabled" Value="False">
                                             <Setter Property="Opacity" Value="0.3"/>

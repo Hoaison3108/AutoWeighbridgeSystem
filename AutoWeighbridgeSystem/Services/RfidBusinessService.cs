@@ -65,5 +65,38 @@ namespace AutoWeighbridgeSystem.Services
 
             return result;
         }
+        /// <summary>
+        /// Cập nhật khối lượng thân vỏ (Tare Weight) cho một xe và tất cả các xe có cùng biển số (nếu có).
+        /// </summary>
+        public async Task<bool> UpdateVehicleTareWeightAsync(int vehicleId, decimal newWeight)
+        {
+            try
+            {
+                using var db = _dbContextFactory.CreateDbContext();
+                var vehicle = await db.Vehicles.FindAsync(vehicleId);
+                if (vehicle == null) return false;
+
+                string plate = vehicle.LicensePlate;
+                
+                // Đồng bộ khối lượng bì cho tất cả các bản ghi có chung Biển số xe
+                var sameLicensePlateVehicles = await db.Vehicles
+                    .Where(v => v.LicensePlate == plate)
+                    .ToListAsync();
+
+                foreach (var v in sameLicensePlateVehicles)
+                {
+                    v.TareWeight = newWeight;
+                    db.Vehicles.Update(v);
+                }
+
+                await db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Lỗi khi cập nhật bì tự động cho xe ID {Id}", vehicleId);
+                return false;
+            }
+        }
     }
 }

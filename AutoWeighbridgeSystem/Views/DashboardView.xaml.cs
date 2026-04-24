@@ -1,163 +1,150 @@
 using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.ViewModels;
+using AutoWeighbridgeSystem.Services;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using LibVLCSharp.Shared;
-using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoWeighbridgeSystem.Views
 {
+    /// <summary>
+    /// DashboardView hiện là Persistent View (Singleton).
+    /// Hỗ trợ cơ chế hiển thị trạng thái Camera và Tự động kết nối lại.
+    /// </summary>
     public partial class DashboardView : UserControl
     {
+        private CameraService _cameraService;
+        private DashboardViewModel _viewModel;
+        private bool _isInitialized = false;
+
         public DashboardView()
         {
             InitializeComponent();
-
-            // Đảm bảo khi DataContext thay đổi (do DI bơm vào), ta cũng gán VideoPlayer
-            this.DataContextChanged += DashboardView_DataContextChanged;
+            this.Loaded += DashboardView_Loaded;
         }
 
-        private void DashboardView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void DashboardView_Loaded(object sender, RoutedEventArgs e)
         {
-            SetupCameraBinding();
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            SetupCameraBinding();
-        }
-
-        private LibVLC _libVLC;
-        private MediaPlayer _mediaPlayer;
-        private bool _isReconnecting = false;
-
-        /// <summary>
-        /// Gắn kết Camera giữa View và ViewModel và ra lệnh mở luồng.
-        /// </summary>
-        private void SetupCameraBinding()
-        {
-            if (this.DataContext is DashboardViewModel vm)
+            if (!_isInitialized)
             {
-                if (vm.CameraUri != null)
-                {
-                    InitializeVLCAndPlay(vm.CameraUri);
-                }
+                InitializeCameraOnce();
+                _isInitialized = true;
             }
         }
 
-        private void InitializeVLCAndPlay(Uri cameraUri)
+        private void InitializeCameraOnce()
         {
-                // Cấu hình VLC: Bộ đệm 800ms để cân bằng giữa Low Latency và sự ổn định (trước đây là 200ms - quá thấp gây mất kết nối)
-                // Ép RTSP xài TCP (chống rác hình/giật lag do mất gói), tắt âm thanh
-                _libVLC = new LibVLC("--network-caching=800", "--rtsp-tcp", "--no-audio", "--drop-late-frames", "--live-caching=800");
-                _mediaPlayer = new MediaPlayer(_libVLC);
-                
-                this.CameraPlayer.MediaPlayer = _mediaPlayer;
+            _viewModel = this.DataContext as DashboardViewModel;
+            if (_viewModel == null) return;
 
-                // Bind events
-                _mediaPlayer.Playing += MediaPlayer_Playing;
-                _mediaPlayer.EncounteredError += MediaPlayer_EncounteredError;
-                _mediaPlayer.EndReached += MediaPlayer_EncounteredError; // Khi luồng kết thúc đột ngột cũng kích hoạt reconnect
+            try
+            {
+                _cameraService = App.ServiceProvider.GetRequiredService<CameraService>();
+
+                // Liên kết MediaPlayer vào UI
+                this.CameraPlayer.MediaPlayer = _cameraService.MediaPlayer;
+
+                // Đăng ký sự kiện từ MediaPlayer
+                _cameraService.MediaPlayer.Playing += OnMediaPlayerPlaying;
+                _cameraService.MediaPlayer.EncounteredError += OnMediaPlayerError;
+
+                // Đăng ký sự kiện Tự phục hồi từ Service
+                _cameraService.Reconnecting += OnCameraReconnecting;
+                _cameraService.Reconnected += OnCameraReconnected;
+
+                // Bắt đầu luồng video ban đầu
+                if (_viewModel.CameraUri != null)
+                {
+                    _cameraService.StartStream(_viewModel.CameraUri.AbsoluteUri);
+                }
+
+                // Cập nhật trạng thái ban đầu
+                UpdateUiStatus();
             }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "[DASHBOARD] Lỗi khởi tạo Camera Persistent");
+            }
+        }
 
-            // Mỗi lần reconnect hoặc bắt đầu đều tạo Media mới để giải phóng buffer lỗi cũ
-            var media = new Media(_libVLC, cameraUri.AbsoluteUri, FromType.FromLocation);
-            media.AddOption(":rtsp-frame-buffer-size=500000"); // Tăng buffer size cho frame hình
-            _mediaPlayer.Play(media);
+        private void OnMediaPlayerPlaying(object sender, EventArgs e)
+        {
+            UpdateUiStatus();
+        }
+
+        private void OnMediaPlayerError(object sender, EventArgs e)
+        {
+            UpdateUiStatus();
+        }
+
+        private void OnCameraReconnecting(object sender, EventArgs e)
+        {
+            Dispatcher.InvokeAsync(() => {
+                if (_viewModel != null)
+                {
+                    _viewModel.CameraStatus = "🔄 ĐANG KẾT NỐI LẠI CAMERA...";
+                    _viewModel.NotifyCameraStatus(HardwareConnectionStatus.Connecting);
+                }
+            });
+        }
+
+        private void OnCameraReconnected(object sender, EventArgs e)
+        {
+            // Trạng thái sẽ tự cập nhật khi MediaPlayer phát sự kiện Playing
+        }
+
+        private void UpdateUiStatus()
+        {
+            Dispatcher.InvokeAsync(() => {
+                if (_viewModel == null || _cameraService?.MediaPlayer == null) return;
+
+                if (_cameraService.MediaPlayer.IsPlaying)
+                {
+                    _viewModel.CameraStatus = "Camera Online (Persistent)";
+                    _viewModel.NotifyCameraStatus(HardwareConnectionStatus.Online);
+                }
+                else
+                {
+                    _viewModel.CameraStatus = "⚠️ MẤT KẾT NỐI CAMERA";
+                    _viewModel.NotifyCameraStatus(HardwareConnectionStatus.Offline);
+                }
+            });
         }
 
         // =========================================================================
-        // AUTOCOMPLETE TEXT CHANGED HANDLERS
+        // AUTOCOMPLETE HANDLERS
         // =========================================================================
-
-        /// <summary>
-        /// Cập nhật VehicleFilterText trong ViewModel khi người dùng gõ vào ComboBox Biển số.
-        /// Chỉ phản ứng khi ở Manual Mode (ComboBox đang enabled).
-        /// </summary>
         private void VehicleComboBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (DataContext is DashboardViewModel vm && vm.IsManualMode)
+            if (_viewModel != null && _viewModel.IsManualMode)
             {
-                vm.VehicleAutocomplete.FilterText = VehicleComboBox.Text;
-                // Chỉ mở khi người dùng đang thao tác trực tiếp
+                _viewModel.VehicleAutocomplete.FilterText = VehicleComboBox.Text;
                 if (!string.IsNullOrEmpty(VehicleComboBox.Text) && VehicleComboBox.IsKeyboardFocusWithin)
                     VehicleComboBox.IsDropDownOpen = true;
             }
         }
 
-        /// <summary>
-        /// Cập nhật CustomerFilterText trong ViewModel khi người dùng gõ vào ComboBox Khách hàng.
-        /// </summary>
         private void CustomerComboBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (DataContext is DashboardViewModel vm && vm.IsManualMode)
+            if (_viewModel != null && _viewModel.IsManualMode)
             {
-                vm.CustomerAutocomplete.FilterText = CustomerComboBox.Text;
+                _viewModel.CustomerAutocomplete.FilterText = CustomerComboBox.Text;
                 if (!string.IsNullOrEmpty(CustomerComboBox.Text) && CustomerComboBox.IsKeyboardFocusWithin)
                     CustomerComboBox.IsDropDownOpen = true;
             }
         }
 
-        /// <summary>
-        /// Cập nhật ProductFilterText trong ViewModel khi người dùng gõ vào ComboBox Hàng hóa.
-        /// </summary>
         private void ProductComboBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (DataContext is DashboardViewModel vm && vm.IsManualMode)
+            if (_viewModel != null && _viewModel.IsManualMode)
             {
-                vm.ProductAutocomplete.FilterText = ProductComboBox.Text;
+                _viewModel.ProductAutocomplete.FilterText = ProductComboBox.Text;
                 if (!string.IsNullOrEmpty(ProductComboBox.Text) && ProductComboBox.IsKeyboardFocusWithin)
                     ProductComboBox.IsDropDownOpen = true;
             }
-        }
-
-        /// <summary>KHI CAMERA ĐÃ LÊN HÌNH</summary>
-        private void MediaPlayer_Playing(object sender, EventArgs e)
-        {
-            _isReconnecting = false;
-            // LibVLC chạy callback ở background thread. Invoke sang UI thread để báo trạng thái an toàn:
-            Dispatcher.InvokeAsync(() =>
-            {
-                if (this.DataContext is DashboardViewModel vm)
-                {
-                    vm.CameraStatus = "Camera Online (LibVLCSharp)";
-                    vm.NotifyCameraStatus(HardwareConnectionStatus.Online);
-                }
-            });
-        }
-
-        /// <summary>KHI CAMERA GẶP SỰ CỐ, MẤT KẾT NỐI / DỮ LIỆU CHẬM</summary>
-        private void MediaPlayer_EncounteredError(object sender, EventArgs e)
-        {
-            if (_isReconnecting) return;
-            _isReconnecting = true;
-            
-            Dispatcher.InvokeAsync(() =>
-            {
-                if (this.DataContext is DashboardViewModel vm)
-                {
-                    vm.CameraStatus = "⚠️ LỖI KẾT NỐI CAMERA";
-                    vm.NotifyCameraStatus(HardwareConnectionStatus.Offline);
-
-                    // Auto-retry: đợi 5 giây rồi thử mở lại như RTSP stream
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(5000);
-                        await Dispatcher.InvokeAsync(() =>
-                        {
-                            if (vm.CameraUri != null)
-                            {
-                                vm.CameraStatus = "🔄 Đang kết nối lại camera...";
-                                vm.NotifyCameraStatus(HardwareConnectionStatus.Reconnecting);
-                                InitializeVLCAndPlay(vm.CameraUri);
-                            }
-                        });
-                    });
-                }
-            });
         }
     }
 }

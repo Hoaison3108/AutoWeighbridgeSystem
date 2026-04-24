@@ -262,8 +262,8 @@ namespace AutoWeighbridgeSystem.ViewModels
                 var searchEnd = ToDate.Date.AddDays(1).AddTicks(-1);
 
                 var query = context.WeighingTickets
-                                   .IgnoreQueryFilters()
-                                   .Where(t => t.TimeIn >= searchStart && t.TimeIn <= searchEnd);
+
+                                   .Where(t => !t.IsVoid && t.TimeIn >= searchStart && t.TimeIn <= searchEnd);
 
                 if (!string.IsNullOrWhiteSpace(SearchText))
                 {

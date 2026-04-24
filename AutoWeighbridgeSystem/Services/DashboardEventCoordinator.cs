@@ -29,7 +29,7 @@ namespace AutoWeighbridgeSystem.Services
         // CẤU HÌNH (đọc từ appsettings — tách ra khỏi ViewModel)
         // =========================================================================
         private int _queueTimeoutSeconds = 45;
-        private int _hardwareWatchdogSeconds = 1800;
+        private int _hardwareWatchdogSeconds = 300;
 
         // =========================================================================
         // STATE DELEGATES — ViewModel cung cấp giá trị hiện tại qua Func<>
@@ -39,6 +39,7 @@ namespace AutoWeighbridgeSystem.Services
         private Func<bool> _getIsWeightLocked = () => false;
         private Func<bool> _getIsProcessingSave = () => false;
         private Func<string> _getSelectedProductName = () => "Hàng hóa";
+        private Func<bool> _getIsOnePassMode = () => false;
 
         /// <summary>Cờ: đã nhận được dữ liệu từ đầu cân lần đầu (port open ≠ thiết bị kết nối thật).</summary>
         private volatile bool _scaleDataReceived = false;
@@ -106,17 +107,18 @@ namespace AutoWeighbridgeSystem.Services
         /// Khởi động Coordinator: subscribe hardware events và watchdog.
         /// ViewModel gọi hàm này trong constructor, truyền vào các Func để
         /// Coordinator có thể đọc trạng thái hiện tại của ViewModel khi cần.
-        /// </summary>
         public void Start(
             Func<bool> getIsAutoMode,
             Func<bool> getIsWeightLocked,
             Func<bool> getIsProcessingSave,
-            Func<string> getSelectedProductName)
+            Func<string> getSelectedProductName,
+            Func<bool> getIsOnePassMode)
         {
             _getIsAutoMode = getIsAutoMode;
             _getIsWeightLocked = getIsWeightLocked;
             _getIsProcessingSave = getIsProcessingSave;
             _getSelectedProductName = getSelectedProductName;
+            _getIsOnePassMode = getIsOnePassMode;
 
             _scaleService.WeightChanged          += OnScaleWeightChanged;
             _rfidService.CardRead                 += OnRfidCardRead;
@@ -242,7 +244,8 @@ namespace AutoWeighbridgeSystem.Services
                         _getSelectedProductName(),
                         _getIsAutoMode(),
                         isScaleStable: _scaleService.IsScaleStable,
-                        currentWeight: _scaleService.CurrentWeight);
+                        currentWeight: _scaleService.CurrentWeight,
+                        isOnePassMode: _getIsOnePassMode());
 
                     if (decision.ShouldShowMessage)
                         CameraMessageRequested?.Invoke(decision.CameraMessage, decision.MessageAutoHide);
@@ -270,6 +273,15 @@ namespace AutoWeighbridgeSystem.Services
                     // Mất tín hiệu dữ liệu (Im lặng): 
                     // Nếu port vẫn mở thì chỉ chuyển sang màu Vàng (Standby), không báo Đỏ
                     _scaleDataReceived = false;
+                    
+                    // CHỦ ĐỘNG RECONNECT: Nếu cổng vẫn báo Open nhưng 5s không có dữ liệu,
+                    // khả năng cao là chip USB-Serial đã bị "treo" do nhiễu điện.
+                    if (_scaleService.IsConnected)
+                    {
+                        Log.Warning("[COORDINATOR] Phát hiện im lặng tín hiệu tại {Port}. Yêu cầu tái kết nối chủ động...", _scaleService.PortName);
+                        _scaleService.ForceReconnect();
+                    }
+
                     Application.Current?.Dispatcher.BeginInvoke(() =>
                     {
                         var status = _scaleService.IsConnected 
@@ -277,9 +289,6 @@ namespace AutoWeighbridgeSystem.Services
                             : HardwareConnectionStatus.Offline;
                             
                         HardwareStatusChanged?.Invoke("Scale", status);
-                        
-                        // Không hiện thông báo to trên Camera khi chỉ là trạng thái nghỉ (im lặng)
-                        // Chỉ báo đỏ nếu port thực sự bị ngắt (xử lý trong OnScaleDisconnected)
                     });
                 });
         }

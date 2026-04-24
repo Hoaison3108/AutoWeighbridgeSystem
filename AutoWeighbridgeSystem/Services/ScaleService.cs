@@ -90,6 +90,9 @@ namespace AutoWeighbridgeSystem.Services
 
         /// <summary><c>true</c> nếu đầu cân bị vô hiệu hóa (cấu hình là 'None').</summary>
         public bool IsDisabled => _portName == "None";
+ 
+        /// <summary>Tên cổng COM đang sử dụng.</summary>
+        public string PortName => _portName;
 
         // =========================================================================
         // EVENTS
@@ -321,7 +324,20 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
         // AUTO-RECONNECT
         // =========================================================================
-
+ 
+        /// <summary>
+        /// Chủ động cưỡng bức đóng port và thực hiện quy trình kết nối lại.
+        /// Dùng cho Watchdog khi phát hiện port vẫn Open nhưng không có dữ liệu đổ về.
+        /// </summary>
+        public void ForceReconnect()
+        {
+            if (_isConnected || _isReconnecting)
+            {
+                Log.Warning("[SCALE] Watchdog yêu cầu Force Reconnect tại {Port}...", _portName);
+                HandleDisconnect();
+            }
+        }
+ 
         /// <summary>
         /// Xử lý sự kiện mất kết nối: đóng port an toàn, phát event <see cref="Disconnected"/>,
         /// và bắt đầu vòng lặp thử kết nối lại.

@@ -58,9 +58,13 @@ namespace AutoWeighbridgeSystem.Services
                 {
                     while (!token.IsCancellationRequested)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(hardwareWatchdogSeconds), token);
+                        // Kiểm tra định kỳ mỗi 10 giây để đảm bảo phản ứng nhanh ngay khi đạt ngưỡng timeout
+                        await Task.Delay(TimeSpan.FromSeconds(10), token);
+                        
                         if ((DateTime.Now - _lastScaleDataReceivedTime).TotalSeconds > hardwareWatchdogSeconds)
+                        {
                             onSignalLost?.Invoke();
+                        }
                     }
                 }
                 catch (TaskCanceledException) { }

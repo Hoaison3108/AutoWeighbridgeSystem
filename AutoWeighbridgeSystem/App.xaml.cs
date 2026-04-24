@@ -83,6 +83,8 @@ namespace AutoWeighbridgeSystem
                 splashWindow.DataContext = splashVm;
                 splashWindow.ShowDialog(); 
 
+                // KHỞI CHẠY DỊCH VỤ TỰ ĐỘNG HÓA NGẦM (Bất kể View nào)
+                ServiceProvider.GetRequiredService<BackgroundAutomationService>();
                 // =======================================================
                 // 4. HIỂN THỊ MÀN HÌNH ĐĂNG NHẬP
                 // =======================================================
@@ -126,6 +128,9 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<DashboardEventCoordinator>();
             services.AddSingleton<IUserNotificationService, UserNotificationService>();
             services.AddSingleton<SystemClockService>();
+            services.AddSingleton<BackgroundAutomationService>();
+            services.AddSingleton<ViewTrackerService>();
+            services.AddSingleton<CameraService>();
 
             services.AddSingleton<ScaleService>(provider =>
             {
@@ -205,25 +210,25 @@ namespace AutoWeighbridgeSystem
             services.AddTransient<ManualTicketViewModel>();
             services.AddTransient<EditTicketViewModel>();
             services.AddTransient<SplashViewModel>();
-            services.AddTransient<LoginViewModel>();
+            services.AddSingleton<LoginViewModel>();
 
             // --- Nhóm 4: Views (Giao diện) ---
             services.AddSingleton<MainWindow>();
             services.AddTransient<SplashWindow>();
             services.AddTransient<LoginWindow>();
-            services.AddTransient<DashboardView>();
-            services.AddTransient<VehicleRegistrationView>();
-
+            services.AddSingleton<DashboardView>();
+            services.AddSingleton<VehicleRegistrationView>();
+ 
             services.AddSingleton<CustomerViewModel>();
-            services.AddTransient<CustomerView>();
+            services.AddSingleton<CustomerView>();
             services.AddSingleton<ProductViewModel>();
-            services.AddTransient<ProductView>();
+            services.AddSingleton<ProductView>();
             services.AddSingleton<SettingsViewModel>();
-            services.AddTransient<SettingsView>();
+            services.AddSingleton<SettingsView>();
             services.AddSingleton<NotificationHistoryViewModel>();
-            services.AddTransient<NotificationHistoryView>();
-            services.AddTransient<WeighingHistoryViewModel>();
-            services.AddTransient<WeighingHistoryView>();
+            services.AddSingleton<NotificationHistoryView>();
+            services.AddSingleton<WeighingHistoryViewModel>();
+            services.AddSingleton<WeighingHistoryView>();
         }
 
         protected override void OnExit(ExitEventArgs e)
