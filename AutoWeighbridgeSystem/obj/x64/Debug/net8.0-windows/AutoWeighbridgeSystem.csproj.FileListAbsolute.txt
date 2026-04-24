@@ -575,14 +575,12 @@ D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\bin\x64\Debug\net8.0-windows
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\bin\x64\Debug\net8.0-windows\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\AutoWeighbridgeSystem.csproj.AssemblyReference.cache
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\CustomerView.baml
-D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\QuickVehicleRegisterWindow.baml
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\VehicleRegistrationView.baml
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\CustomerView.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\DashboardView.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\LoginWindow.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\MainWindow.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\ProductView.g.cs
-D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\QuickVehicleRegisterWindow.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\SettingsView.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\VehicleRegistrationView.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\WeighingHistoryView.g.cs
@@ -620,3 +618,5 @@ D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\NotificationHistoryView.g.cs
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\NotificationHistoryView.baml
 D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\App.baml
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\QuickVehicleRegisterView.baml
+D:\CODE\AutoWeighbridgeSystem\AutoWeighbridgeSystem\obj\x64\Debug\net8.0-windows\Views\QuickVehicleRegisterView.g.cs

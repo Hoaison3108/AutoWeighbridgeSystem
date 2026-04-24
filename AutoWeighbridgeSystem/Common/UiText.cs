@@ -66,6 +66,8 @@ namespace AutoWeighbridgeSystem.Common
                 => $"Xác nhận xóa khách hàng: {customerName}?\n(Mã: {customerId})";
             public static string SaveTicketConfirm(string licensePlate, decimal lockedWeight)
                 => $"Lưu phiếu cho xe {licensePlate} - {lockedWeight:N0} kg?";
+            public static string AutoSaveSuccessOverlay(string licensePlate, decimal finalWeight, string serverMessage)
+                => $"🔒 ĐÃ CHỐT: {finalWeight:N0} KG\n{serverMessage}";
         }
     }
 }

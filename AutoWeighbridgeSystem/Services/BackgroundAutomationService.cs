@@ -23,8 +23,8 @@ namespace AutoWeighbridgeSystem.Services
         private readonly AlarmService _alarmService;
         private readonly ViewTrackerService _viewTracker;
 
-        /// <summary>Sự kiện báo cho các UI (Dashboard/Registration) biết cần làm mới danh sách dữ liệu.</summary>
-        public event Action? DataChanged;
+        /// <summary>Sự kiện báo cho các UI (Dashboard/Registration) biết cần làm mới danh sách dữ liệu. Có thể truyền thông báo hiển thị.</summary>
+        public event Action<string>? DataChanged;
 
         public BackgroundAutomationService(
             DashboardEventCoordinator coordinator,
@@ -84,7 +84,7 @@ namespace AutoWeighbridgeSystem.Services
                 }
                 
                 // Thông báo cho UI làm mới danh sách (vẫn làm mới kể cả đang ở tab đó để nhảy số)
-                DataChanged?.Invoke();
+                DataChanged?.Invoke(UiText.Messages.AutoSaveSuccessOverlay(pendingData.LicensePlate, result.FinalWeight, result.Message));
             }
             else
             {
@@ -136,7 +136,7 @@ namespace AutoWeighbridgeSystem.Services
                                     _notificationService.ShowInfo($"[AUTO] Đã cập nhật bì tự động cho xe {result.ExistingVehicle.LicensePlate}: {currentWeight:N0} kg");
                                 }
                                 
-                                DataChanged?.Invoke();
+                                DataChanged?.Invoke($"✔️ ĐÃ CẬP NHẬT BÌ TỰ ĐỘNG\n{result.ExistingVehicle.LicensePlate} ({currentWeight:N0} kg)");
                             }
                         }
                     }

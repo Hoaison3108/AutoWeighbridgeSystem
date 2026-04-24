@@ -43,6 +43,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly Action _updateWeightDisplayAction;
         private decimal _pendingDisplayWeight;
         private volatile bool _pendingDisplayStable;
+        private TaskCompletionSource<bool> _quickRegisterTcs;
 
         // =========================================================================
         // OBSERVABLE PROPERTIES
@@ -75,15 +76,11 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _cameraMessage = "";
         [ObservableProperty] [NotifyPropertyChangedFor(nameof(CanManualSave))] private bool _isSaving = false;
 
-        [ObservableProperty] private HardwareConnectionStatus _scaleConnectionStatus = HardwareConnectionStatus.Offline;
-        [ObservableProperty] private HardwareConnectionStatus _rfidInStatus = HardwareConnectionStatus.Offline;
-        [ObservableProperty] private HardwareConnectionStatus _rfidOutStatus = HardwareConnectionStatus.Offline;
-        [ObservableProperty] private HardwareConnectionStatus _rfidDeskStatus = HardwareConnectionStatus.Offline;
-        [ObservableProperty] private HardwareConnectionStatus _cameraConnectionStatus = HardwareConnectionStatus.Offline;
-        [ObservableProperty] private HardwareConnectionStatus _alarmStatus = HardwareConnectionStatus.Offline;
+        public HardwareStatusMonitor HardwareStatus { get; } = new();
 
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
         [ObservableProperty] private WeighingTicket _selectedRecentTicket;
+        [ObservableProperty] private QuickVehicleRegisterViewModel _quickRegisterVm;
 
         public AutocompleteProvider<string> VehicleAutocomplete { get; } = new(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
         public AutocompleteProvider<string> CustomerAutocomplete { get; } = new(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
@@ -175,33 +172,41 @@ namespace AutoWeighbridgeSystem.ViewModels
             Application.Current?.Dispatcher.BeginInvoke(_updateWeightDisplayAction, DispatcherPriority.DataBind);
         }
 
-        private void OnBackgroundDataChanged()
+        private void OnBackgroundDataChanged(string successMessage)
         {
-            _ = LoadRecentTicketsAsync();
-            
-            // Đảm bảo làm sạch form khi dịch vụ ngầm đã lưu xong phiếu (đặc biệt cho Auto Mode)
-            // Phải chạy trên UI Thread vì ResetForm thay đổi các thuộc tính Observable
-            Application.Current?.Dispatcher.InvokeAsync(() => {
-                ResetForm();
+            Application.Current?.Dispatcher.InvokeAsync(async () => {
+                await ShowSuccessAndResetFormAsync(successMessage);
             });
+        }
+
+        private async Task ShowSuccessAndResetFormAsync(string successMessage)
+        {
+            // 1. Hiện thông báo lên Overlay (đứng yên không tự ẩn)
+            if (!string.IsNullOrEmpty(successMessage))
+            {
+                ShowCameraMessage(successMessage, false);
+            }
+            
+            // 2. Tải lại danh sách vé phía dưới
+            await LoadRecentTicketsAsync();
+            
+            // 3. Chờ đúng 2 giây để người dùng đọc
+            if (!string.IsNullOrEmpty(successMessage))
+            {
+                await Task.Delay(2000);
+            }
+            
+            // 4. Dọn dẹp form (đồng thời ẩn Overlay)
+            ResetForm();
         }
 
         private void OnFormResetRequested(string message) { ResetForm(); ShowCameraMessage(message); }
         private void OnCameraMessageRequested(string message, bool autoHide) => ShowCameraMessage(message, autoHide);
         private void OnRfidCaptured(string cardId, string locationLabel) { RfidInput = cardId; RfidLocationLabel = locationLabel; }
         private void OnPendingTimeoutStartRequested() => _coordinator.RequestPendingTimeout();
-        private void OnHardwareStatusChanged(string device, HardwareConnectionStatus status)
-        {
-            switch (device)
-            {
-                case "Scale": ScaleConnectionStatus = status; break;
-                case ReaderRoles.ScaleIn: RfidInStatus = status; break;
-                case ReaderRoles.ScaleOut: RfidOutStatus = status; break;
-                case ReaderRoles.Desk: RfidDeskStatus = status; break;
-            }
-        }
-        private void OnAlarmHardwareStatusChanged(HardwareConnectionStatus status) => AlarmStatus = status;
-        public void NotifyCameraStatus(HardwareConnectionStatus status) => CameraConnectionStatus = status;
+        private void OnHardwareStatusChanged(string device, HardwareConnectionStatus status) => HardwareStatus.UpdateStatus(device, status);
+        private void OnAlarmHardwareStatusChanged(HardwareConnectionStatus status) => HardwareStatus.UpdateStatus("Alarm", status);
+        public void NotifyCameraStatus(HardwareConnectionStatus status) => HardwareStatus.UpdateStatus("Camera", status);
 
         partial void OnIsAutoModeChanged(bool value)
         {
@@ -223,12 +228,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 if (result.IsSuccess)
                 {
-                    ShowCameraMessage($"🔒 ĐÃ CHỐT: {result.FinalWeight:N0} KG\n{result.Message}", false);
-                    await LoadRecentTicketsAsync();
-                    
-                    // Giảm thời gian chờ xuống 1 giây (thay vì 2 giây) để thao tác nhanh hơn
-                    await Task.Delay(1000);
-                    ResetForm();
+                    await ShowSuccessAndResetFormAsync(UiText.Messages.AutoSaveSuccessOverlay(LicensePlate, result.FinalWeight, result.Message));
                 }
                 else
                 {
@@ -310,19 +310,8 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 if (LockedWeight <= 0) { _notificationService.ShowWarning(UiText.Messages.LockWeightBeforeSave); return; }
 
-                if (!VehicleAutocomplete.Items.Any(plate => plate.Equals(LicensePlate, StringComparison.OrdinalIgnoreCase)))
-                {
-                    var existingVehicle = await _dashboardDataService.GetVehicleByPlateAsync(LicensePlate);
-                    if (existingVehicle != null) await LoadInitialDataAsync();
-                    else
-                    {
-                        var vm = _quickRegisterVmFactory(LicensePlate);
-                        var window = new Views.QuickVehicleRegisterWindow { DataContext = vm };
-                        window.ShowDialog();
-                        if (!vm.IsRegisteredAndSaved) return;
-                        await LoadInitialDataAsync();
-                    }
-                }
+                // Kiểm tra đăng ký xe nhanh (nếu là biển số lạ)
+                if (!await EnsureVehicleRegisteredAsync(LicensePlate)) return;
                 
                 await ProcessAndSaveWeighingAsync(LockedWeight);
             }
@@ -330,6 +319,52 @@ namespace AutoWeighbridgeSystem.ViewModels
             {
                 IsSaving = false;
             }
+        }
+
+        /// <summary>
+        /// Kiểm tra xe đã tồn tại chưa, nếu chưa thì hiển thị Popup đăng ký nhanh.
+        /// Trả về true nếu xe hợp lệ để tiếp tục lưu phiếu, false nếu người dùng hủy đăng ký.
+        /// </summary>
+        private async Task<bool> EnsureVehicleRegisteredAsync(string licensePlate)
+        {
+            // 1. Nếu đã có sẵn trong danh sách Autocomplete thì hợp lệ luôn
+            if (VehicleAutocomplete.Items.Any(plate => plate.Equals(licensePlate, StringComparison.OrdinalIgnoreCase)))
+                return true;
+
+            // 2. Kiểm tra trong DB (đề phòng xe vừa được tạo từ máy khác chưa kịp đồng bộ)
+            var existingVehicle = await _dashboardDataService.GetVehicleByPlateAsync(licensePlate);
+            if (existingVehicle != null)
+            {
+                await LoadInitialDataAsync();
+                return true;
+            }
+
+            // 3. Xe chưa tồn tại => Khởi tạo ViewModel cho giao diện Overlay
+            var vm = _quickRegisterVmFactory(licensePlate);
+            
+            // Thiết lập TaskCompletionSource để tạm treo tiến trình lưu
+            _quickRegisterTcs = new TaskCompletionSource<bool>();
+            
+            // Gán hành động đóng Overlay
+            vm.CloseAction = () => {
+                _quickRegisterTcs.TrySetResult(vm.IsRegisteredAndSaved);
+            };
+            
+            // Hiển thị Overlay
+            QuickRegisterVm = vm;
+
+            // Chờ người dùng nhấn LƯU hoặc HỦY trên giao diện Overlay
+            bool isSaved = await _quickRegisterTcs.Task;
+            
+            // Ẩn Overlay
+            QuickRegisterVm = null;
+
+            if (!isSaved)
+                return false;
+
+            // Đăng ký thành công => Tải lại danh sách xe mới và cho phép tiếp tục
+            await LoadInitialDataAsync();
+            return true;
         }
 
         [RelayCommand]

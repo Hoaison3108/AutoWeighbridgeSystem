@@ -77,7 +77,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _ = LoadDataAsync();
         }
 
-        private void OnBackgroundDataChanged() => _ = LoadDataAsync();
+        private void OnBackgroundDataChanged(string message) => _ = LoadDataAsync();
 
         partial void OnSearchTextChanged(string value) => RegisteredVehiclesView.Refresh();
 

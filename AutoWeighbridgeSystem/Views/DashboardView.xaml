@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:AutoWeighbridgeSystem.Converters"
+             xmlns:views="clr-namespace:AutoWeighbridgeSystem.Views"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              Background="#121212" Foreground="White"
@@ -15,6 +16,7 @@
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:HardwareStatusToColorConverter x:Key="HardwareStatusToColorConverter"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
         <Style x:Key="StabilityLightStyle" TargetType="Ellipse">
             <Setter Property="Fill" Value="#E53935"/>
@@ -148,54 +150,54 @@
 
                         <!-- Đầu cân -->
                         <StackPanel Margin="0,0,10,0"
-                                    ToolTip="{Binding ScaleConnectionStatus, StringFormat='Đầu cân: {0}'}">
+                                    ToolTip="{Binding HardwareStatus.Scale, StringFormat='Đầu cân: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
-                                     Fill="{Binding ScaleConnectionStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                                     Fill="{Binding HardwareStatus.Scale, Converter={StaticResource HardwareStatusToColorConverter}}"/>
                             <TextBlock Text="CÂN" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
                         <!-- RFID Vào -->
                         <StackPanel Margin="0,0,10,0"
-                                    ToolTip="{Binding RfidInStatus, StringFormat='RFID Vào: {0}'}">
+                                    ToolTip="{Binding HardwareStatus.RfidIn, StringFormat='RFID Vào: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
-                                     Fill="{Binding RfidInStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                                     Fill="{Binding HardwareStatus.RfidIn, Converter={StaticResource HardwareStatusToColorConverter}}"/>
                             <TextBlock Text="RFID-V" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
                         <!-- RFID Ra -->
                         <StackPanel Margin="0,0,10,0"
-                                    ToolTip="{Binding RfidOutStatus, StringFormat='RFID Ra: {0}'}">
+                                    ToolTip="{Binding HardwareStatus.RfidOut, StringFormat='RFID Ra: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
-                                     Fill="{Binding RfidOutStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                                     Fill="{Binding HardwareStatus.RfidOut, Converter={StaticResource HardwareStatusToColorConverter}}"/>
                             <TextBlock Text="RFID-R" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
                         <!-- RFID Bàn -->
                         <StackPanel Margin="0,0,10,0"
-                                    ToolTip="{Binding RfidDeskStatus, StringFormat='RFID Bàn: {0}'}">
+                                    ToolTip="{Binding HardwareStatus.RfidDesk, StringFormat='RFID Bàn: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
-                                     Fill="{Binding RfidDeskStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                                     Fill="{Binding HardwareStatus.RfidDesk, Converter={StaticResource HardwareStatusToColorConverter}}"/>
                             <TextBlock Text="BÀN" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
                         <!-- Camera -->
                         <StackPanel Margin="0,0,10,0"
-                                    ToolTip="{Binding CameraConnectionStatus, StringFormat='Camera: {0}'}">
+                                    ToolTip="{Binding HardwareStatus.Camera, StringFormat='Camera: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
-                                     Fill="{Binding CameraConnectionStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                                     Fill="{Binding HardwareStatus.Camera, Converter={StaticResource HardwareStatusToColorConverter}}"/>
                             <TextBlock Text="CAM" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
                         <!-- Chuông báo -->
                         <StackPanel
-                                    ToolTip="{Binding AlarmStatus, StringFormat='Chuông báo: {0}'}">
+                                    ToolTip="{Binding HardwareStatus.Alarm, StringFormat='Chuông báo: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
-                                     Fill="{Binding AlarmStatus, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                                     Fill="{Binding HardwareStatus.Alarm, Converter={StaticResource HardwareStatusToColorConverter}}"/>
                             <TextBlock Text="B/L" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
@@ -580,5 +582,14 @@
                 </DataGrid>
             </Grid>
         </Border>
+        
+        <!-- ========================================== -->
+        <!-- OVERLAY: ĐĂNG KÝ XE NHANH                  -->
+        <!-- ========================================== -->
+        <Grid Grid.Row="0" Grid.RowSpan="3" Background="#AA000000" Panel.ZIndex="999"
+              Visibility="{Binding QuickRegisterVm, Converter={StaticResource NullToVisibilityConverter}}">
+            <views:QuickVehicleRegisterView DataContext="{Binding QuickRegisterVm}" 
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </UserControl>
