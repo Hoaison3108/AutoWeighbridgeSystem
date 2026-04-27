@@ -153,7 +153,7 @@
                                     ToolTip="{Binding HardwareStatus.Scale, StringFormat='Đầu cân: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
                                      Fill="{Binding HardwareStatus.Scale, Converter={StaticResource HardwareStatusToColorConverter}}"/>
-                            <TextBlock Text="CÂN" FontSize="8" FontWeight="Bold"
+                            <TextBlock Text="SCALE" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
@@ -162,7 +162,7 @@
                                     ToolTip="{Binding HardwareStatus.RfidIn, StringFormat='RFID Vào: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
                                      Fill="{Binding HardwareStatus.RfidIn, Converter={StaticResource HardwareStatusToColorConverter}}"/>
-                            <TextBlock Text="RFID-V" FontSize="8" FontWeight="Bold"
+                            <TextBlock Text="RFID-I" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
@@ -171,7 +171,7 @@
                                     ToolTip="{Binding HardwareStatus.RfidOut, StringFormat='RFID Ra: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
                                      Fill="{Binding HardwareStatus.RfidOut, Converter={StaticResource HardwareStatusToColorConverter}}"/>
-                            <TextBlock Text="RFID-R" FontSize="8" FontWeight="Bold"
+                            <TextBlock Text="RFID-O" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
@@ -180,7 +180,7 @@
                                     ToolTip="{Binding HardwareStatus.RfidDesk, StringFormat='RFID Bàn: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
                                      Fill="{Binding HardwareStatus.RfidDesk, Converter={StaticResource HardwareStatusToColorConverter}}"/>
-                            <TextBlock Text="BÀN" FontSize="8" FontWeight="Bold"
+                            <TextBlock Text="DESK" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
 
@@ -194,11 +194,20 @@
                         </StackPanel>
 
                         <!-- Chuông báo -->
-                        <StackPanel
+                        <StackPanel Margin="0,0,10,0"
                                     ToolTip="{Binding HardwareStatus.Alarm, StringFormat='Chuông báo: {0}'}">
                             <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
                                      Fill="{Binding HardwareStatus.Alarm, Converter={StaticResource HardwareStatusToColorConverter}}"/>
-                            <TextBlock Text="B/L" FontSize="8" FontWeight="Bold"
+                            <TextBlock Text="BELL" FontSize="8" FontWeight="Bold"
+                                       Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- Đèn tín hiệu -->
+                        <StackPanel
+                                    ToolTip="{Binding HardwareStatus.SignalLight, StringFormat='Đèn tín hiệu: {0}'}">
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Center"
+                                     Fill="{Binding HardwareStatus.SignalLight, Converter={StaticResource HardwareStatusToColorConverter}}"/>
+                            <TextBlock Text="LIGHT" FontSize="8" FontWeight="Bold"
                                        Foreground="#666" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
                     </StackPanel>

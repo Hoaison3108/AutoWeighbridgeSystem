@@ -30,6 +30,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly WeighingBusinessService _weighingBusiness;
         private readonly IUserNotificationService _notificationService;
         private readonly AlarmService _alarmService;
+        private readonly SignalLightService _signalLightService;
         private readonly AppSession _appSession;
         private readonly BackgroundAutomationService _automationService;
         
@@ -101,6 +102,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             WeighingBusinessService weighingBusiness,
             IUserNotificationService notificationService,
             AlarmService alarmService,
+            SignalLightService signalLightService,
             AppSession appSession,
             SystemClockService clock,
             BackgroundAutomationService automationService,
@@ -114,6 +116,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _weighingBusiness = weighingBusiness;
             _notificationService = notificationService;
             _alarmService = alarmService;
+            _signalLightService = signalLightService;
             _appSession = appSession;
             Clock = clock;
             _automationService = automationService;
@@ -150,6 +153,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _ = LoadInitialDataAsync();
             _ = LoadRecentTicketsAsync();
             _alarmService.Initialize();
+            _signalLightService.Initialize();
         }
 
         private void LoadUiConfiguration()

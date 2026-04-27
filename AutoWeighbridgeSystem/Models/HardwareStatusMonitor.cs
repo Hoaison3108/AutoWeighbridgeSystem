@@ -11,6 +11,7 @@ namespace AutoWeighbridgeSystem.Models
         [ObservableProperty] private HardwareConnectionStatus _rfidDesk = HardwareConnectionStatus.Offline;
         [ObservableProperty] private HardwareConnectionStatus _camera = HardwareConnectionStatus.Offline;
         [ObservableProperty] private HardwareConnectionStatus _alarm = HardwareConnectionStatus.Offline;
+        [ObservableProperty] private HardwareConnectionStatus _signalLight = HardwareConnectionStatus.Offline;
 
         public void UpdateStatus(string device, HardwareConnectionStatus status)
         {
@@ -33,6 +34,9 @@ namespace AutoWeighbridgeSystem.Models
                     break;
                 case "Alarm": 
                     Alarm = status; 
+                    break;
+                case "SignalLight":
+                    SignalLight = status;
                     break;
             }
         }

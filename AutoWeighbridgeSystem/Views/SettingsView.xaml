@@ -199,8 +199,8 @@
                                             </StackPanel>
                                             <StackPanel Grid.Column="6" Margin="15,0,0,0" VerticalAlignment="Bottom">
                                                 <CheckBox Content="Mặc định CÂN XE AUTO" IsChecked="{Binding DefaultToAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
-                                                <CheckBox Content="Mặc định CÂN XE 1 LẦN" IsChecked="{Binding DefaultToOnePassMode}" Foreground="#00E676" FontWeight="Bold"/>
-                                                 <CheckBox Content="Mặc định ĐĂNG KÝ AUTO" IsChecked="{Binding RegistrationDefaultAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
+                                                <CheckBox Content="Mặc định CÂN XE 1 LẦN" IsChecked="{Binding DefaultToOnePassMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
+                                                <CheckBox Content="Mặc định ĐĂNG KÝ AUTO" IsChecked="{Binding RegistrationDefaultAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
@@ -326,7 +326,7 @@
                                             </StackPanel>
                                         </GroupBox>
 
-                                        <GroupBox Header="ĐIỀU KHIỂN RELAY" Width="385" Margin="0,0,10,10">
+                                        <GroupBox Header="ĐIỀU KHIỂN RELAY CHUÔNG" Width="385" Margin="0,0,10,10">
                                             <StackPanel Margin="5">
                                                 <UniformGrid Columns="3">
                                                     <StackPanel Margin="2">
@@ -354,6 +354,39 @@
                                                     <StackPanel Margin="2">
                                                         <TextBlock Text="Chuông (ms):" Style="{StaticResource LabelStyle}"/>
                                                         <TextBox Text="{Binding RelayAlarmDuration}"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                            </StackPanel>
+                                        </GroupBox>
+
+                                        <GroupBox Header="ĐIỀU KHIỂN RELAY ĐÈN" Width="385" Margin="0,0,10,10">
+                                            <StackPanel Margin="5">
+                                                <UniformGrid Columns="3">
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="COM:" Style="{StaticResource LabelStyle}"/>
+                                                        <ComboBox IsEditable="True" ItemsSource="{Binding AvailableComPorts}" Text="{Binding SignalLightComPort}" Height="32"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Baud:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding SignalLightBaudRate}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="DataBits:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding SignalLightDataBits}"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                                <UniformGrid Columns="3" Margin="0,5,0,0">
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Parity:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding SignalLightParity}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="StopBits:" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding SignalLightStopBits}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Margin="2">
+                                                        <TextBlock Text="Thời gian (ms):" Style="{StaticResource LabelStyle}"/>
+                                                        <TextBox Text="{Binding SignalLightDuration}"/>
                                                     </StackPanel>
                                                 </UniformGrid>
                                             </StackPanel>

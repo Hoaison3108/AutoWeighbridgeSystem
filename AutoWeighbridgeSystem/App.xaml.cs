@@ -111,7 +111,21 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddDbContextFactory<AppDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                    {
+                        // Tự động retry khi gặp lỗi SQL transient (timeout, connection reset, deadlock...)
+                        // maxRetryCount: thử lại tối đa 3 lần sau lần thất bại đầu tiên
+                        // maxRetryDelay: chờ tối đa 10 giây giữa mỗi lần retry (EF Core tự tính exponential backoff)
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorNumbersToAdd: null); // null = dùng danh sách lỗi transient mặc định của SQL Server
+
+                        // Timeout mỗi lệnh SQL tối đa 30 giây (mặc định là 30s, đặt tường minh cho rõ)
+                        sqlOptions.CommandTimeout(30);
+                    });
             });
 
             // --- Nhóm 2: Hardware & Session Services (Singleton) ---
@@ -120,6 +134,7 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<RfidBusinessService>();
             services.AddSingleton<NotificationManagerService>();
             services.AddSingleton<AlarmService>();
+            services.AddSingleton<SignalLightService>();
             services.AddSingleton<WeighingBusinessService>();
             services.AddSingleton<DashboardWorkflowService>();
             services.AddSingleton<DashboardSaveService>();
@@ -260,7 +275,14 @@ namespace AutoWeighbridgeSystem
                     if (relayService != null)
                     {
                         relayService.Close();
-                        Log.Information("[APP] Đã ngắt kết nối an toàn với mạch Relay.");
+                        Log.Information("[APP] Đã ngắt kết nối an toàn với mạch Relay (Chuông).");
+                    }
+
+                    var signalLightService = ServiceProvider.GetService<SignalLightService>();
+                    if (signalLightService != null)
+                    {
+                        signalLightService.Dispose();
+                        Log.Information("[APP] Đã giải phóng SignalLightService (Relay đèn tín hiệu).");
                     }
                 }
             }

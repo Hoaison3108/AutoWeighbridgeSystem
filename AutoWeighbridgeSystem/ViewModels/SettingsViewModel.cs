@@ -92,6 +92,14 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _relayStopBits;
         [ObservableProperty] private int _relayAlarmDuration;
 
+        // Signal Light Settings
+        [ObservableProperty] private string _signalLightComPort;
+        [ObservableProperty] private int _signalLightBaudRate;
+        [ObservableProperty] private int _signalLightDataBits;
+        [ObservableProperty] private string _signalLightParity;
+        [ObservableProperty] private string _signalLightStopBits;
+        [ObservableProperty] private int _signalLightDuration;
+
         // RFID Settings - Scale In (5 thông số)
         [ObservableProperty] private string _rfidInPort;
         [ObservableProperty] private int _rfidInBaudRate;
@@ -188,6 +196,14 @@ namespace AutoWeighbridgeSystem.ViewModels
                 RelayStopBits      = _configuration["RelaySettings:StopBits"] ?? "One";
                 RelayAlarmDuration = int.TryParse(_configuration["RelaySettings:AlarmDurationMs"], out int rad) ? rad : 1500;
 
+                // Signal Light
+                SignalLightComPort  = _configuration["SignalLightSettings:ComPort"] ?? "None";
+                SignalLightBaudRate = int.TryParse(_configuration["SignalLightSettings:BaudRate"],       out int slb)  ? slb  : 9600;
+                SignalLightDataBits = int.TryParse(_configuration["SignalLightSettings:DataBits"],       out int sldb) ? sldb : 8;
+                SignalLightParity   = _configuration["SignalLightSettings:Parity"]   ?? "None";
+                SignalLightStopBits = _configuration["SignalLightSettings:StopBits"] ?? "One";
+                SignalLightDuration = int.TryParse(_configuration["SignalLightSettings:LightDurationMs"], out int sld)  ? sld  : 2000;
+
                 // RFID Scale In
                 RfidInPort     = _configuration["RfidSettings:ScaleIn:ComPort"];
                 RfidInBaudRate = int.TryParse(_configuration["RfidSettings:ScaleIn:BaudRate"],  out int rib) ? rib : 9600;
@@ -276,6 +292,18 @@ namespace AutoWeighbridgeSystem.ViewModels
                 relay["Parity"]          = RelayParity;
                 relay["StopBits"]        = RelayStopBits;
                 relay["AlarmDurationMs"] = RelayAlarmDuration;
+
+                // ==========================================
+                // 3b. Signal Light Settings
+                // ==========================================
+                if (root["SignalLightSettings"] == null) root["SignalLightSettings"] = new JsonObject();
+                var signalLight = root["SignalLightSettings"];
+                signalLight["ComPort"]        = SignalLightComPort;
+                signalLight["BaudRate"]       = SignalLightBaudRate;
+                signalLight["DataBits"]       = SignalLightDataBits;
+                signalLight["Parity"]         = SignalLightParity;
+                signalLight["StopBits"]       = SignalLightStopBits;
+                signalLight["LightDurationMs"] = SignalLightDuration;
 
                 // ==========================================
                 // 4. RFID Settings

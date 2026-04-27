@@ -23,6 +23,7 @@ namespace AutoWeighbridgeSystem.Services
         private readonly DashboardWorkflowService _dashboardWorkflow;
         private readonly HardwareWatchdogService _hardwareWatchdog;
         private readonly AlarmService _alarmService;
+        private readonly SignalLightService _signalLightService;
         private readonly IConfiguration _configuration;
 
         // =========================================================================
@@ -79,6 +80,7 @@ namespace AutoWeighbridgeSystem.Services
             DashboardWorkflowService dashboardWorkflow,
             HardwareWatchdogService hardwareWatchdog,
             AlarmService alarmService,
+            SignalLightService signalLightService,
             IConfiguration configuration)
         {
             _scaleService = scaleService;
@@ -86,6 +88,7 @@ namespace AutoWeighbridgeSystem.Services
             _dashboardWorkflow = dashboardWorkflow;
             _hardwareWatchdog = hardwareWatchdog;
             _alarmService = alarmService;
+            _signalLightService = signalLightService;
             _configuration = configuration;
 
             LoadConfiguration(configuration);
@@ -129,6 +132,9 @@ namespace AutoWeighbridgeSystem.Services
             _scaleService.ReconnectAttempting     += OnScaleReconnectAttempting;
             _rfidService.ReaderDisconnected       += OnRfidReaderDisconnected;
             _rfidService.ReaderReconnected        += OnRfidReaderReconnected;
+            _signalLightService.HardwareStatusChanged += status =>
+                Application.Current?.Dispatcher?.BeginInvoke(() =>
+                    HardwareStatusChanged?.Invoke("SignalLight", status));
 
             if (!_scaleService.IsDisabled)
             {
@@ -225,6 +231,13 @@ namespace AutoWeighbridgeSystem.Services
             // Ghi nhận reader này đã thực sự đọc được thẻ — mới set Online (không chỉ port open)
             Application.Current?.Dispatcher.BeginInvoke(() =>
                 HardwareStatusChanged?.Invoke(readerRole, HardwareConnectionStatus.Online));
+
+            // Kích hoạt đèn tín hiệu ngay khi nhận tín hiệu từ trạm cân (ScaleIn/ScaleOut)
+            // Fire-and-forget — không block luồng nhận RFID
+            if (readerRole == ReaderRoles.ScaleIn || readerRole == ReaderRoles.ScaleOut)
+            {
+                _ = Task.Run(() => _signalLightService.TriggerLightAsync());
+            }
 
             Application.Current?.Dispatcher.InvokeAsync(async () =>
             {
