@@ -449,13 +449,22 @@
             </Border>
 
             <Border Grid.Column="1" Background="Black" CornerRadius="12" BorderBrush="#333" BorderThickness="2" ClipToBounds="True">
-                <Grid>
-                    <vlc:VideoView x:Name="CameraPlayer" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                    <Border Background="#AA000000" VerticalAlignment="Top" Padding="12" Visibility="{Binding CameraStatus, Converter={StaticResource StringToVisibilityConverter}}">
-                        <TextBlock Text="{Binding CameraStatus}" Foreground="Yellow" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <!--
+                    AIRSPACE FIX: Overlay phải là CHILD của VideoView, KHÔNG phải sibling.
+                    LibVLCSharp.WPF dùng ForegroundWindow (cửa sổ WPF trong suốt) để render
+                    content bên trong VideoView LÊN TRÊN video — giải quyết hoàn toàn vấn đề
+                    native Win32 window che WPF control trên mọi kích thước màn hình.
+                -->
+                <vlc:VideoView x:Name="CameraPlayer" Background="Black"
+                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Border Background="#CC000000" VerticalAlignment="Top" Padding="12"
+                            Visibility="{Binding CameraStatus, Converter={StaticResource StringToVisibilityConverter}}">
+                        <TextBlock Text="{Binding CameraStatus}" Foreground="Yellow"
+                                   FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
                     </Border>
-                </Grid>
+                </vlc:VideoView>
             </Border>
+
         </Grid>
 
         <Border Grid.Row="2" Background="#1E1E1E" CornerRadius="12" Padding="15" Margin="0,15,0,0" BorderBrush="#333" BorderThickness="1">

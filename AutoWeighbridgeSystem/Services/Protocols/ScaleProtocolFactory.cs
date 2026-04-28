@@ -38,7 +38,8 @@ namespace AutoWeighbridgeSystem.Services.Protocols
         private static readonly Dictionary<string, Func<IScaleProtocol>> _registry =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["VishayVT220"] = () => new VishayVT220protocol(),
+                ["VishayVT220"]    = () => new VishayVT220protocol(),
+                ["FlintecFT111D"]  = () => new FlintecFT111Dprotocol(),
 
                 // --- Thêm giao thức mới theo mẫu bên dưới ---
                 // ["Toledo8142"]  = () => new Toledo8142Protocol(),

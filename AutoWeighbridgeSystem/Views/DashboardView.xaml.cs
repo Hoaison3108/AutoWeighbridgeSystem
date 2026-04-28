@@ -1,12 +1,8 @@
-using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.ViewModels;
 using AutoWeighbridgeSystem.Services;
 using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using LibVLCSharp.Shared;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoWeighbridgeSystem.Views
 {
@@ -16,7 +12,6 @@ namespace AutoWeighbridgeSystem.Views
     /// </summary>
     public partial class DashboardView : UserControl
     {
-        private CameraService _cameraService;
         private DashboardViewModel _viewModel;
         private bool _isInitialized = false;
 
@@ -42,80 +37,22 @@ namespace AutoWeighbridgeSystem.Views
 
             try
             {
-                _cameraService = App.ServiceProvider.GetRequiredService<CameraService>();
+                // Bước 1: Gán MediaPlayer vào VideoView TRƯỚC — LibVLC cần host window sẵn sàng.
+                // Nếu StartStream() được gọi trước bước này, LibVLC sẽ tạo native window riêng.
+                this.CameraPlayer.MediaPlayer = _viewModel.CameraMediaPlayer;
 
-                // Liên kết MediaPlayer vào UI
-                this.CameraPlayer.MediaPlayer = _cameraService.MediaPlayer;
+                // Bước 2: SAU KHI đã có host, mới bắt đầu stream
+                _viewModel.StartCameraStream();
 
-                // Lắng nghe sự kiện để Auto-focus
+                // Lắng nghe PropertyChanged để Auto-focus (logic thuần UI — hợp lệ ở code-behind)
                 _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-
-                // Đăng ký sự kiện từ MediaPlayer
-                _cameraService.MediaPlayer.Playing += OnMediaPlayerPlaying;
-                _cameraService.MediaPlayer.EncounteredError += OnMediaPlayerError;
-
-                // Đăng ký sự kiện Tự phục hồi từ Service
-                _cameraService.Reconnecting += OnCameraReconnecting;
-                _cameraService.Reconnected += OnCameraReconnected;
-
-                // Bắt đầu luồng video ban đầu
-                if (_viewModel.CameraUri != null)
-                {
-                    _cameraService.StartStream(_viewModel.CameraUri.AbsoluteUri);
-                }
-
-                // Cập nhật trạng thái ban đầu
-                UpdateUiStatus();
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex, "[DASHBOARD] Lỗi khởi tạo Camera Persistent");
+                Serilog.Log.Error(ex, "[DASHBOARD] Lỗi gán MediaPlayer cho CameraPlayer");
             }
         }
 
-        private void OnMediaPlayerPlaying(object sender, EventArgs e)
-        {
-            UpdateUiStatus();
-        }
-
-        private void OnMediaPlayerError(object sender, EventArgs e)
-        {
-            UpdateUiStatus();
-        }
-
-        private void OnCameraReconnecting(object sender, EventArgs e)
-        {
-            Dispatcher.InvokeAsync(() => {
-                if (_viewModel != null)
-                {
-                    _viewModel.CameraStatus = "🔄 ĐANG KẾT NỐI LẠI CAMERA...";
-                    _viewModel.NotifyCameraStatus(HardwareConnectionStatus.Connecting);
-                }
-            });
-        }
-
-        private void OnCameraReconnected(object sender, EventArgs e)
-        {
-            // Trạng thái sẽ tự cập nhật khi MediaPlayer phát sự kiện Playing
-        }
-
-        private void UpdateUiStatus()
-        {
-            Dispatcher.InvokeAsync(() => {
-                if (_viewModel == null || _cameraService?.MediaPlayer == null) return;
-
-                if (_cameraService.MediaPlayer.IsPlaying)
-                {
-                    _viewModel.CameraStatus = "Camera Online (Persistent)";
-                    _viewModel.NotifyCameraStatus(HardwareConnectionStatus.Online);
-                }
-                else
-                {
-                    _viewModel.CameraStatus = "⚠️ MẤT KẾT NỐI CAMERA";
-                    _viewModel.NotifyCameraStatus(HardwareConnectionStatus.Offline);
-                }
-            });
-        }
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {

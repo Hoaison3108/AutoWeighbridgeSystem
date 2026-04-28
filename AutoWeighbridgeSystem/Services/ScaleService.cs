@@ -273,8 +273,12 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
 
         /// <summary>
-        /// Thuật toán lai (Hybrid Stability): ưu tiên tín hiệu ổn định từ phần cứng (P+),
-        /// fallback sang bộ đệm phần mềm 10 mẫu khi cân báo dao động (@+).
+        /// Thuật toán kiểm tra tính ổn định (Strict Stability Validation):
+        /// <list type="bullet">
+        ///   <item>Khi phần cứng báo DAO ĐỘNG (@+): Ghi nhận chưa ổn định ngay lập tức và xóa bộ đệm.</item>
+        ///   <item>Khi phần cứng báo ỔN ĐỊNH (P+): Bắt đầu đưa vào bộ đệm phần mềm đếm 10 mẫu liên tiếp.
+        ///   Chỉ xác nhận <c>IsScaleStable = true</c> khi đủ 10 mẫu và biên độ dao động (Max-Min) &lt;= 50kg.</item>
+        /// </list>
         /// Áp dụng throttling 40ms trước khi phát <see cref="WeightChanged"/>.
         /// </summary>
         private void ProcessWeightStability(decimal weight, bool isHardwareStable)
@@ -286,20 +290,32 @@ namespace AutoWeighbridgeSystem.Services
 
             if (weight > _minWeightThreshold)
             {
-                if (isHardwareStable)
+                if (!isHardwareStable)
                 {
-                    IsScaleStable = true;
-                    if (_weightBuffer.Count > 0) _weightBuffer.Clear();
+                    // Cân báo dao động (@+) -> Hủy ngay, không chốt
+                    IsScaleStable = false;
+                    lock (_weightBuffer)
+                    {
+                        if (_weightBuffer.Count > 0) _weightBuffer.Clear();
+                    }
                 }
                 else
                 {
+                    // Cân báo ổn định (P+) -> Bắt đầu đếm 10 frame xác nhận
                     lock (_weightBuffer)
                     {
                         _weightBuffer.Enqueue(weight);
                         if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
 
-                        decimal delta = _weightBuffer.Count > 0 ? _weightBuffer.Max() - _weightBuffer.Min() : 0;
-                        IsScaleStable = (_weightBuffer.Count >= BufferSize) && (delta <= _stabilityDelta);
+                        if (_weightBuffer.Count < BufferSize)
+                        {
+                            IsScaleStable = false; // Chưa đủ 10 frame -> Chưa chốt
+                        }
+                        else
+                        {
+                            decimal delta = _weightBuffer.Max() - _weightBuffer.Min();
+                            IsScaleStable = (delta <= _stabilityDelta);
+                        }
                     }
                 }
             }

@@ -40,26 +40,48 @@ namespace AutoWeighbridgeSystem.ViewModels
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     
                     UpdateStatus("Đang kiểm tra kết nối CSDL...", 15);
-                    
+
+                    // Timeout 15 giây: tránh treo màn hình khi SQL Server chưa start
+                    using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(15));
+
                     try 
                     {
-                        // MigrateAsync sẽ tự động tạo Database nếu chưa tồn tại
-                        // và cập nhật cấu trúc bảng nếu đã có.
-                        await db.Database.MigrateAsync();
+                        // Kiểm tra nhanh kết nối trước — báo lỗi trong ~3 giây thay vì treo 30+ giây
+                        bool canConnect = await db.Database.CanConnectAsync(cts.Token);
+                        if (!canConnect)
+                        {
+                            throw new Exception("SQL Server không phản hồi.");
+                        }
+
+                        UpdateStatus("Đang khởi tạo / cập nhật cơ sở dữ liệu...", 25);
+
+                        // MigrateAsync: tự động tạo DB nếu chưa có, cập nhật schema nếu cần
+                        await db.Database.MigrateAsync(cts.Token);
                         UpdateStatus("Cơ sở dữ liệu đã sẵn sàng.", 40);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw new Exception(
+                            "Quá thời gian chờ kết nối SQL Server (15 giây).\n\n" +
+                            "HƯỚNG DẪN KHẮC PHỤC:\n" +
+                            "1. Mở 'Services' (services.msc) → tìm 'SQL Server (SQLEXPRESS)' → nhấn Start.\n" +
+                            "2. Đợi 10-15 giây rồi mở lại phần mềm.\n" +
+                            "3. Nếu không có SQL Server, cài đặt 'SQL Server Express' từ Microsoft.");
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "[Splash] Lỗi khởi tạo Database");
-                        throw new Exception("Không thể kết nối hoặc khởi tạo CSDL.\n\n" +
+                        throw new Exception(
+                            "Không thể kết nối hoặc khởi tạo CSDL.\n\n" +
                             "HƯỚNG DẪN KHẮC PHỤC:\n" +
                             "1. Kiểm tra dịch vụ 'SQL Server (SQLEXPRESS)' đã được Chạy (Start) chưa.\n" +
                             "2. Đảm bảo SQL Server đã được cài đặt đúng phiên bản.\n" +
-                            "3. Kiểm tra tài khoản và mật khẩu trong file appsettings.json.");
+                            "3. Kiểm tra tài khoản và mật khẩu trong file appsettings.json.\n\n" +
+                            $"Chi tiết lỗi: {ex.Message}");
                     }
                 });
 
-                // Bước 1: Kiểm tra và khởi tạo Database
+                // Bước 1: Chờ database sẵn sàng
                 await dbTask;
 
                 UpdateStatus("Hệ thống đã sẵn sàng!", 100);
@@ -77,6 +99,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 Application.Current?.Shutdown();
             }
         }
+
 
         private void UpdateStatus(string msg, int progress)
         {

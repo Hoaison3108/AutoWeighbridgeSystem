@@ -14,6 +14,7 @@ using AutoWeighbridgeSystem.Models;
 using AutoWeighbridgeSystem.Services;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using LibVLCSharp.Shared;
 
 namespace AutoWeighbridgeSystem.ViewModels
 {
@@ -33,6 +34,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly SignalLightService _signalLightService;
         private readonly AppSession _appSession;
         private readonly BackgroundAutomationService _automationService;
+        private readonly CameraService _cameraService;
         
         public SystemClockService Clock { get; }
         private readonly Func<string, QuickVehicleRegisterViewModel> _quickRegisterVmFactory;
@@ -77,6 +79,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private string _cameraMessage = "";
         [ObservableProperty] [NotifyPropertyChangedFor(nameof(CanManualSave))] private bool _isSaving = false;
 
+        /// <summary>Expose MediaPlayer cho View gán vào VideoView — đây là dòng DUY NHẤT LibVLC bắt buộc ở code-behind.</summary>
+        public MediaPlayer CameraMediaPlayer => _cameraService.MediaPlayer;
+
         public HardwareStatusMonitor HardwareStatus { get; } = new();
 
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
@@ -106,6 +111,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             AppSession appSession,
             SystemClockService clock,
             BackgroundAutomationService automationService,
+            CameraService cameraService,
             Func<string, QuickVehicleRegisterViewModel> quickRegisterVmFactory)
         {
             _configuration = configuration;
@@ -120,6 +126,7 @@ namespace AutoWeighbridgeSystem.ViewModels
             _appSession = appSession;
             Clock = clock;
             _automationService = automationService;
+            _cameraService = cameraService;
             _quickRegisterVmFactory = quickRegisterVmFactory;
 
             _updateWeightDisplayAction = () => {
@@ -129,7 +136,17 @@ namespace AutoWeighbridgeSystem.ViewModels
 
             LoadUiConfiguration();
             InitializeCamera();
-            
+
+            // Subscribe camera events tập trung tại ViewModel (không dùng App.ServiceProvider ở View)
+            _cameraService.Reconnecting                 += OnCameraReconnecting;
+            _cameraService.Reconnected                  += OnCameraReconnected;
+            _cameraService.MediaPlayer.Playing          += OnMediaPlayerPlaying;
+            _cameraService.MediaPlayer.EncounteredError += OnMediaPlayerError;
+
+            // KHÔNG gọi StartStream ở đây!
+            // LibVLC sẽ tạo native window riêng nếu MediaPlayer chưa được gán vào VideoView.
+            // View sẽ gọi StartCameraStream() SAU KHI đã gán CameraPlayer.MediaPlayer.
+
             _scaleService.WeightChanged += OnScaleWeightChangedUiUpdate;
             
             // Subscribe events từ Coordinator
@@ -166,6 +183,53 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             string url = _configuration["CameraSettings:RtspUrl"];
             if (!string.IsNullOrEmpty(url)) CameraUri = new Uri(url);
+        }
+
+        // =========================================================================
+        // CAMERA EVENT HANDLERS (chuyển từ DashboardView.xaml.cs — đúng vị trí MVVM)
+        // =========================================================================
+
+        /// <summary>
+        /// Gọi từ code-behind View, SAU KHI đã gán <c>VideoView.MediaPlayer = CameraMediaPlayer</c>.
+        /// Tránh LibVLC tạo native window riêng khi MediaPlayer chưa có host.
+        /// </summary>
+        public void StartCameraStream()
+        {
+            if (CameraUri != null)
+                _cameraService.StartStream(CameraUri.AbsoluteUri);
+        }
+
+        private void OnCameraReconnecting(object sender, EventArgs e)
+        {
+            Application.Current?.Dispatcher.InvokeAsync(() => {
+                CameraStatus = "🔄 ĐANG KẾT NỐI LẠI CAMERA...";
+                NotifyCameraStatus(HardwareConnectionStatus.Connecting);
+            });
+        }
+
+        private void OnCameraReconnected(object sender, EventArgs e)
+        {
+            // Trạng thái sẽ tự cập nhật khi MediaPlayer phát sự kiện Playing
+        }
+
+        private void OnMediaPlayerPlaying(object sender, EventArgs e) => UpdateCameraUiStatus();
+        private void OnMediaPlayerError(object sender, EventArgs e)   => UpdateCameraUiStatus();
+
+        private void UpdateCameraUiStatus()
+        {
+            Application.Current?.Dispatcher.InvokeAsync(() => {
+                if (_cameraService?.MediaPlayer == null) return;
+                if (_cameraService.MediaPlayer.IsPlaying)
+                {
+                    CameraStatus = "Camera Online (Persistent)";
+                    NotifyCameraStatus(HardwareConnectionStatus.Online);
+                }
+                else
+                {
+                    CameraStatus = "⚠️ MẤT KẾT NỐI CAMERA";
+                    NotifyCameraStatus(HardwareConnectionStatus.Offline);
+                }
+            });
         }
 
         private void OnScaleWeightChangedUiUpdate(decimal weight, bool isStable)
@@ -432,6 +496,10 @@ namespace AutoWeighbridgeSystem.ViewModels
             _coordinator.HardwareStatusChanged -= OnHardwareStatusChanged;
             _alarmService.HardwareStatusChanged -= OnAlarmHardwareStatusChanged;
             _automationService.DataChanged -= OnBackgroundDataChanged;
+            _cameraService.Reconnecting                 -= OnCameraReconnecting;
+            _cameraService.Reconnected                  -= OnCameraReconnected;
+            _cameraService.MediaPlayer.Playing          -= OnMediaPlayerPlaying;
+            _cameraService.MediaPlayer.EncounteredError -= OnMediaPlayerError;
             _saveLock.Dispose();
         }
     }
