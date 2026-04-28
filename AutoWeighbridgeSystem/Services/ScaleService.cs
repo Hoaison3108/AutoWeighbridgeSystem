@@ -273,12 +273,10 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
 
         /// <summary>
-        /// Thuật toán kiểm tra tính ổn định (Strict Stability Validation):
-        /// <list type="bullet">
-        ///   <item>Khi phần cứng báo DAO ĐỘNG (@+): Ghi nhận chưa ổn định ngay lập tức và xóa bộ đệm.</item>
-        ///   <item>Khi phần cứng báo ỔN ĐỊNH (P+): Bắt đầu đưa vào bộ đệm phần mềm đếm 10 mẫu liên tiếp.
-        ///   Chỉ xác nhận <c>IsScaleStable = true</c> khi đủ 10 mẫu và biên độ dao động (Max-Min) &lt;= 50kg.</item>
-        /// </list>
+        /// Thuật toán ổn định theo yêu cầu gốc:
+        /// 1. Chỉ tin tưởng và bắt đầu đếm khi đầu cân gửi cờ ỔN ĐỊNH (P+ hoặc i00).
+        /// 2. Dù đầu cân báo ỔN ĐỊNH, vẫn phải thu thập đủ 10 mẫu và dao động &lt;= 50kg thì mới chốt (chống chốt non).
+        /// 3. Bất cứ khi nào đầu cân báo DAO ĐỘNG (@+ hoặc i80), lập tức hủy bộ đếm và báo chưa ổn định.
         /// Áp dụng throttling 40ms trước khi phát <see cref="WeightChanged"/>.
         /// </summary>
         private void ProcessWeightStability(decimal weight, bool isHardwareStable)
@@ -292,7 +290,7 @@ namespace AutoWeighbridgeSystem.Services
             {
                 if (!isHardwareStable)
                 {
-                    // Cân báo dao động (@+) -> Hủy ngay, không chốt
+                    // Khi cân báo dao động (@+) -> KHÔNG đếm, báo chưa ổn định, xóa bộ đệm
                     IsScaleStable = false;
                     lock (_weightBuffer)
                     {
@@ -301,7 +299,7 @@ namespace AutoWeighbridgeSystem.Services
                 }
                 else
                 {
-                    // Cân báo ổn định (P+) -> Bắt đầu đếm 10 frame xác nhận
+                    // Khi cân báo ổn định (P+) -> Mới bắt đầu gom 10 frame để chốt
                     lock (_weightBuffer)
                     {
                         _weightBuffer.Enqueue(weight);
@@ -309,7 +307,7 @@ namespace AutoWeighbridgeSystem.Services
 
                         if (_weightBuffer.Count < BufferSize)
                         {
-                            IsScaleStable = false; // Chưa đủ 10 frame -> Chưa chốt
+                            IsScaleStable = false; // Chưa đủ 10 mẫu -> chưa chốt
                         }
                         else
                         {

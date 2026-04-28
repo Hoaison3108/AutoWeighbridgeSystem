@@ -59,8 +59,7 @@ namespace AutoWeighbridgeSystem.Services.Protocols
         /// <list type="number">
         ///   <item>Quét ngược từ cuối buffer, tìm 'i' đứng đầu dòng.</item>
         ///   <item>Parse thủ công status byte và trọng lượng.</item>
-        ///   <item>Đưa kết quả qua <see cref="EvaluateSoftwareStability"/> (bộ đệm 10 mẫu).</item>
-        ///   <item>Chỉ trả <c>IsHardwareStable = true</c> khi đủ 10 mẫu i00 liên tiếp với delta nhỏ.</item>
+        ///   <item>Trả về kết quả hwStableFlag trực tiếp cho ScaleService xử lý đệm.</item>
         /// </list>
         /// </remarks>
         public (decimal Weight, bool IsHardwareStable, string Remainder)? TryExtractFrame(string buffer)
