@@ -1,0 +1,121 @@
+using Microsoft.Extensions.Configuration;
+using Serilog;
+using System;
+using System.IO.Ports;
+using System.Threading.Tasks;
+using AutoWeighbridgeSystem.Models;
+
+namespace AutoWeighbridgeSystem.Services
+{
+    /// <summary>
+    /// Dịch vụ điều khiển còi báo hiệu (alarm) thông qua <see cref="RelayService"/>.
+    /// Phiên bản tối ưu cho LCRelay, giữ kết nối duy trì và chống nhiễu.
+    /// </summary>
+    public class AlarmService
+    {
+        private readonly RelayService _relayService;
+        private readonly IConfiguration _configuration;
+        private readonly IUserNotificationService _notificationService;
+        private volatile bool _isRinging = false; // Chống spam chuông
+
+        /// <summary>Sự kiện báo trạng thái kết nối phần cứng chuông.</summary>
+        public event Action<HardwareConnectionStatus>? HardwareStatusChanged;
+
+        public AlarmService(RelayService relayService, IConfiguration configuration, IUserNotificationService notificationService)
+        {
+            _relayService = relayService;
+            _configuration = configuration;
+            _notificationService = notificationService;
+        }
+
+        /// <summary>
+        /// Kiểm tra và khởi tạo kết nối tới cổng COM lúc khởi động để giữ kết nối duy trì.
+        /// Chạy bất đồng bộ để tránh làm treo UI Thread khi khởi tạo Dashboard.
+        /// </summary>
+        public void Initialize()
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var settings = GetRelaySettings();
+                    if (string.IsNullOrEmpty(settings.Port) || settings.Port == "None")
+                    {
+                        HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Disabled);
+                        return;
+                    }
+
+                    // Thử mở kết nối duy trì (Persistent) - Không dùng .GetResult() để tránh block UI
+                    bool success = await _relayService.OpenAsync(
+                        settings.Port, 
+                        settings.Baud, 
+                        settings.Parity, 
+                        settings.DataBits, 
+                        settings.StopBits);
+                    
+                    HardwareStatusChanged?.Invoke(success ? HardwareConnectionStatus.Online : HardwareConnectionStatus.Offline);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "[ALARM] Lỗi khi khởi tạo kết nối Relay");
+                    HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Offline);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Kích hoạt chuông báo hiệu khi cân thành công.
+        /// </summary>
+        public async Task TriggerAlarmAsync()
+        {
+            if (_isRinging) return;
+            _isRinging = true;
+
+            try
+            {
+                var settings = GetRelaySettings();
+                if (string.IsNullOrEmpty(settings.Port) || settings.Port == "None")
+                {
+                    Log.Debug("[ALARM] Bỏ qua kích chuông vì cổng Relay là 'None'.");
+                    return;
+                }
+                
+                await _relayService.TriggerBellAsync(
+                    settings.Port, 
+                    settings.Baud, 
+                    settings.Parity, 
+                    settings.DataBits, 
+                    settings.StopBits, 
+                    settings.BellDur);
+                
+                Log.Information("[ALARM] Đã kích chuông thành công qua cổng {Port}", settings.Port);
+                HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Online);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "[ALARM] Lỗi kích chuông");
+                HardwareStatusChanged?.Invoke(HardwareConnectionStatus.Offline);
+                
+                // HƯỚNG 1: Xử lý JIT (Just-In-Time). Đẩy lỗi văng lên UI ngay lập tức khi phát hiện xịt chuông
+                _notificationService.ShowError("LỖI MẠCH RELAY: Không thể kích chuông báo!\nVui lòng kiểm tra cáp cắm hoặc nguồn điện.");
+            }
+            finally
+            {
+                _isRinging = false;
+            }
+        }
+
+        private (string Port, int Baud, Parity Parity, int DataBits, StopBits StopBits, int BellDur) GetRelaySettings()
+        {
+            string port = _configuration["RelaySettings:ComPort"];
+            int baud = int.TryParse(_configuration["RelaySettings:BaudRate"], out int br) ? br : 9600;
+            int data = int.TryParse(_configuration["RelaySettings:DataBits"], out int db) ? db : 8;
+            int bDur = int.TryParse(_configuration["RelaySettings:AlarmDurationMs"], out int ad) ? ad : 1500;
+
+            Enum.TryParse(_configuration["RelaySettings:Parity"], true, out Parity parity);
+            Enum.TryParse(_configuration["RelaySettings:StopBits"], true, out StopBits stopBits);
+
+            return (port, baud, parity, data, stopBits, bDur);
+        }
+    }
+}

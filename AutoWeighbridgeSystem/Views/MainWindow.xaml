@@ -1,0 +1,254 @@
+<Window x:Class="AutoWeighbridgeSystem.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AutoWeighbridgeSystem.ViewModels"
+        xmlns:views="clr-namespace:AutoWeighbridgeSystem.Views"
+        xmlns:conv="clr-namespace:AutoWeighbridgeSystem.Converters"
+        Title="Hệ Thống Trạm Cân Tự Động - Khoáng Sản Rạng Đông" Height="900" Width="1400"
+        WindowStartupLocation="CenterScreen" Background="#121212" Foreground="White">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:TypeToVisibilityConverter x:Key="TypeToVis" />
+
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bg" Background="{TemplateBinding Background}" CornerRadius="5" Margin="5,0">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#2D2D2D"/>
+                                <Setter Property="Foreground" Value="#2196F3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border x:Name="SideBarBorder" 
+                Grid.Column="0" 
+                Background="#1A1A1A" 
+                BorderBrush="#333" 
+                BorderThickness="0,0,1,0"
+                Width="260">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width" To="70" Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width" To="260" Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Button Command="{Binding ToggleSidebarCommand}" 
+                        HorizontalAlignment="Right" 
+                        Width="40" Height="40" Margin="10" 
+                        Style="{StaticResource MenuButtonStyle}">
+                    <TextBlock Text="🔙" FontSize="24" HorizontalAlignment="Center"/>
+                </Button>
+
+                <StackPanel Grid.Row="1">
+                    <Button Command="{Binding ShowDashboardCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="📊" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="GIÁM SÁT CÂN" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Separator Background="#333" Margin="15,5"/>
+
+                    <Button Command="{Binding ShowRegistrationCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="🚚" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="ĐĂNG KÝ XE" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Command="{Binding ShowCustomerCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="🌏" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="KHÁCH HÀNG" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Command="{Binding ShowProductCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="📦" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="SẢN PHẨM" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Command="{Binding ShowHistoryCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="📜" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="LỊCH SỬ PHIẾU CÂN" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Separator Background="#333" Margin="15,5"/>
+
+                    <Button Command="{Binding ShowNotificationHistoryCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="🔔" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="LỊCH SỬ THÔNG BÁO" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Command="{Binding ShowSettingsCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="⚙️" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="CÀI ĐẶT" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="❌" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="ĐĂNG XUẤT" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+                    
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                    <TextBlock Text="DESIGN BY SONK (v2.2.6)" FontSize="16" FontWeight="Bold" 
+                               Foreground="#2196F3" HorizontalAlignment="Center"
+                               Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="15">
+            <!-- ARCHITECTURE FIX: Sử dụng RelativeSource để Visibility Binding luôn trỏ về MainViewModel -->
+            <!-- Điều này cực kỳ quan trọng vì DataContext của mỗi View đã được gán riêng cho sub-ViewModel của nó -->
+            
+            <views:DashboardView 
+                DataContext="{Binding DashboardVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:DashboardViewModel}}"/>
+                
+            <views:VehicleRegistrationView 
+                DataContext="{Binding VehicleRegistrationVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:VehicleRegistrationViewModel}}"/>
+                
+            <views:CustomerView 
+                DataContext="{Binding CustomerVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:CustomerViewModel}}"/>
+                
+            <views:ProductView 
+                DataContext="{Binding ProductVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:ProductViewModel}}"/>
+                
+            <views:WeighingHistoryView 
+                DataContext="{Binding WeighingHistoryVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:WeighingHistoryViewModel}}"/>
+                
+            <views:NotificationHistoryView 
+                DataContext="{Binding NotificationHistoryVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:NotificationHistoryViewModel}}"/>
+                
+            <views:SettingsView 
+                DataContext="{Binding SettingsVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:SettingsViewModel}}"/>
+        </Grid>
+
+        <!-- LAYER OVERLAY: DANH SÁCH TOAST THÔNG BÁO -->
+        <ItemsControl Grid.Column="1" 
+                      ItemsSource="{Binding NotificationManager.ActiveToasts}"
+                      VerticalAlignment="Top" 
+                      HorizontalAlignment="Right" 
+                      Margin="0,10,10,0"
+                      Panel.ZIndex="1000">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <views:NotificationToast />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</Window>
