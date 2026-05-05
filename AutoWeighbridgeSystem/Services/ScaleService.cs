@@ -30,7 +30,7 @@ namespace AutoWeighbridgeSystem.Services
 
         private readonly Queue<decimal> _weightBuffer = new Queue<decimal>();
         private readonly StringBuilder _incomingDataBuffer = new StringBuilder();
-        private const int BufferSize = 5; // Số mẫu ổn định cần tích lũy (Giảm từ 10 xuống 5 để chốt cân nhanh hơn)
+        private const int BufferSize = 3; // Số mẫu ổn định cần tích lũy (Giảm từ 5 xuống 3 để chốt cân nhanh hơn)
 
         /// <summary>Ngưỡng kích thước (ký tự) để kích hoạt xóa buffer khi nhiễu tín hiệu.</summary>
         /// <remarks>
@@ -101,7 +101,7 @@ namespace AutoWeighbridgeSystem.Services
 
         /// <summary><c>true</c> nếu đầu cân bị vô hiệu hóa (cấu hình là 'None').</summary>
         public bool IsDisabled => _portName == "None";
- 
+
         /// <summary>Tên cổng COM đang sử dụng.</summary>
         public string? PortName => _portName;
 
@@ -354,7 +354,7 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
         // AUTO-RECONNECT
         // =========================================================================
- 
+
         /// <summary>
         /// Chủ động cưỡng bức đóng port và thực hiện quy trình kết nối lại.
         /// Dùng cho Watchdog khi phát hiện port vẫn Open nhưng không có dữ liệu đổ về.
@@ -367,7 +367,7 @@ namespace AutoWeighbridgeSystem.Services
                 HandleDisconnect();
             }
         }
- 
+
         /// <summary>
         /// Xử lý sự kiện mất kết nối: đóng port an toàn, phát event <see cref="Disconnected"/>,
         /// và bắt đầu vòng lặp thử kết nối lại.
@@ -463,7 +463,7 @@ namespace AutoWeighbridgeSystem.Services
                             _serialPort = testPort;
                             _isConnected = true;
                             _isReconnecting = false;
-                            
+
                             lock (_weightBuffer) _weightBuffer.Clear();
                             lock (_incomingDataBuffer) _incomingDataBuffer.Clear();
 
