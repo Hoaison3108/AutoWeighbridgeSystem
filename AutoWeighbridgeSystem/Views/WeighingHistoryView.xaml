@@ -84,18 +84,18 @@
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel Margin="0,0,20,0">
                                     <TextBlock Text="📅 TỪ NGÀY" Foreground="#888" FontSize="11" FontWeight="Bold" Margin="0,0,0,5"/>
-                                    <DatePicker SelectedDate="{Binding FromDate}" Width="150" Height="35" Background="#2D2D2D"/>
+                                    <DatePicker SelectedDate="{Binding FromDate}" Width="130" Height="35" Background="#2D2D2D"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,20,0">
                                     <TextBlock Text="📅 ĐẾN NGÀY" Foreground="#888" FontSize="11" FontWeight="Bold" Margin="0,0,0,5"/>
-                                    <DatePicker SelectedDate="{Binding ToDate}" Width="150" Height="35"/>
+                                    <DatePicker SelectedDate="{Binding ToDate}" Width="130" Height="35"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,20,0">
                                     <TextBlock Text="🔍 TÌM KIẾM NHANH (BIỂN SỐ / KHÁCH)" Foreground="#888" FontSize="11" FontWeight="Bold" Margin="0,0,0,5"/>
                                     <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="250" Height="35" Background="#2D2D2D" Foreground="White" 
+                                             Width="200" Height="35" Background="#2D2D2D" Foreground="White" 
                                              VerticalContentAlignment="Center" Padding="10,0" BorderThickness="1" BorderBrush="#444">
                                         <TextBox.InputBindings>
                                             <KeyBinding Key="Enter" Command="{Binding LoadHistoryCommand}"/>
