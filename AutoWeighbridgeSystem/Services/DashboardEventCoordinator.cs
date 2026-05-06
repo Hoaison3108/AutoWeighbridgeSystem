@@ -204,23 +204,21 @@ namespace AutoWeighbridgeSystem.Services
             // Kích hoạt/Tắt RFID UHF dựa trên tải trọng bàn cân
             bool isOccupiedNow = weight >= MinWeightThreshold;
             
-            // LOGIC CẢI TIẾN: Đánh thức RFID nếu cân có tải HOẶC có sự tăng tải trọng đột biến (> 500kg)
-            // (Xử lý trường hợp cân bị kẹt ở mức cao không về 0 được)
+            // Đánh thức RFID nếu:
+            // 1. Chuyển trạng thái từ Trống (_isScaleOccupied = false) -> Có tải.
+            // 2. Hoặc cân đang có tải nhưng phát hiện khối lượng tăng đột biến (> 500kg - xe mới đè thêm lên xe cũ).
             bool significantIncrease = (weight - _lastWeight) > 500; 
 
             if (isOccupiedNow && (!_isScaleOccupied || significantIncrease))
             {
-                if (!_isScaleOccupied || significantIncrease)
-                {
-                    _isScaleOccupied = true;
-                    Log.Information("[COORDINATOR] Phát hiện xe lên cân (Tải: {Weight}kg) -> Đánh thức RFID.", weight);
-                    _rfidService.SetAutoReadersActive(true);
-                }
+                _isScaleOccupied = true;
+                Log.Information("[COORDINATOR] Phát hiện xe lên cân (Tải: {Weight}kg) -> Đánh thức RFID.", weight);
+                _rfidService.SetAutoReadersActive(true);
             }
             else if (!isOccupiedNow && _isScaleOccupied)
             {
                 _isScaleOccupied = false;
-                Log.Information("[COORDINATOR] Cân trống (< {Min}kg) -> Tắt sóng RFID.", MinWeightThreshold);
+                Log.Information("[COORDINATOR] Bàn cân trống (< {Min}kg) -> Tắt sóng RFID.", MinWeightThreshold);
                 _rfidService.SetAutoReadersActive(false);
             }
 
@@ -240,11 +238,14 @@ namespace AutoWeighbridgeSystem.Services
             {
                 try
                 {
-                    if (decision.ShouldClearPendingAndReset)
-                    {
-                        FormResetRequested?.Invoke(decision.CameraMessage);
-                        return;
-                    }
+            if (decision.ShouldClearPendingAndReset)
+            {
+                // Khi xe cũ đi xuống (khối lượng giảm mạnh), ta reset trạng thái Occupied
+                // Điều này cho phép logic đánh thức RFID hoạt động cho xe tiếp theo
+                _isScaleOccupied = false; 
+                FormResetRequested?.Invoke(decision.CameraMessage);
+                return;
+            }
 
                     // Kiểm tra lại lần nữa trên UI thread trước khi save
                     if (_getIsProcessingSave() || _getIsWeightLocked()) return;
