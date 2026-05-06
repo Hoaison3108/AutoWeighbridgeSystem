@@ -93,10 +93,12 @@ namespace AutoWeighbridgeSystem.Services
             }
         }
 
+        private decimal _lastSavedWeight = 0;
+
         /// <summary>
         /// Phân tích sự kiện từ đầu cân và đưa ra quyết định:
         /// <list type="bullet">
-        ///   <item>Nếu cân trở về 0 và có xe chờ → reset hàng chờ.</item>
+        ///   <item>Nếu cân trở về 0 (hoặc giảm mạnh sau khi cân) và có xe chờ → reset hàng chờ.</item>
         ///   <item>Nếu chế độ Auto, cân ổn định, có xe chờ và không đang lưu → ra lệnh lưu phiếu.</item>
         ///   <item>Các trường hợp còn lại → không làm gì (<see cref="ScaleWorkflowDecision.None"/>).</item>
         /// </list>
@@ -110,8 +112,22 @@ namespace AutoWeighbridgeSystem.Services
         {
             lock (_stateLock)
             {
-                if (weight < MinWeightThreshold)
+                // Logic Reset: Cân về < ngưỡng HOẶC Cân giảm mạnh so với xe vừa cân xong (xe đã đi xuống nhưng cân kẹt)
+                bool isScaleReleased = weight < MinWeightThreshold;
+                
+                // Nếu xe vừa cân xong (ví dụ 15 tấn) mà giờ chỉ còn < 30% (ví dụ < 4.5 tấn) -> Coi như xe đã xuống
+                if (!isScaleReleased && _lastSavedWeight > MinWeightThreshold)
                 {
+                    if (weight < (_lastSavedWeight * 0.3m)) 
+                    {
+                        isScaleReleased = true;
+                    }
+                }
+
+                if (isScaleReleased)
+                {
+                    _lastSavedWeight = 0; // Reset bộ nhớ tải trọng cũ khi cân đã trống
+
                     if (HasPendingVehicle && !isWeightLocked)
                     {
                         // Reset trực tiếp trong lock
@@ -121,12 +137,12 @@ namespace AutoWeighbridgeSystem.Services
                         _pendingVehicleId    = 0;
                         HasPendingVehicle    = false;
                         
-                        return ScaleWorkflowDecision.ClearPendingAndReset("CÂN VỀ KHÔNG - HỦY LỆNH CHỜ");
+                        return ScaleWorkflowDecision.ClearPendingAndReset("XE ĐÃ XUỐNG CÂN - HỦY LỆNH CHỜ");
                     }
-
+ 
                     return ScaleWorkflowDecision.None();
                 }
-
+ 
                 if (isAutoMode && isStable && HasPendingVehicle && !isProcessingSave && !isWeightLocked)
                 {
                     var pending = new PendingVehicleData(
@@ -135,6 +151,9 @@ namespace AutoWeighbridgeSystem.Services
                         _pendingProductName,
                         _pendingVehicleId,
                         _pendingIsOnePassMode);
+ 
+                    // Lưu lại tải trọng xe này để làm mốc reset cho xe sau nếu cân bị kẹt
+                    _lastSavedWeight = weight;
 
                     // Xóa dữ liệu sau khi đã lấy snapshot
                     _pendingLicensePlate = null;
@@ -143,11 +162,11 @@ namespace AutoWeighbridgeSystem.Services
                     _pendingVehicleId    = 0;
                     _pendingIsOnePassMode = false;
                     HasPendingVehicle    = false;
-
+ 
                     return ScaleWorkflowDecision.SaveWithPending(weight, pending);
                 }
             }
-
+ 
             return ScaleWorkflowDecision.None();
         }
 

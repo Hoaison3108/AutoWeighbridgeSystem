@@ -133,7 +133,7 @@
                                     </StackPanel>
                                 </Expander>
 
-                                <Expander Header="📏 THAM SỐ ĐẦU CÂN (WEIGHING SCALE)" IsExpanded="True">
+                                <Expander Header="📏 THAM SỐ CẤU HÌNH CÂN (WEIGHING SCALE)" IsExpanded="True">
                                     <StackPanel>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -178,6 +178,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="1.5*"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,5,0">
@@ -204,7 +205,11 @@
                                                 <TextBlock Text="Độ ổn định (kg):" Style="{StaticResource LabelStyle}"/>
                                                 <TextBox Text="{Binding ScaleStabilityDelta}"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Column="6" Margin="15,0,0,0" VerticalAlignment="Bottom">
+                                            <StackPanel Grid.Column="6" Margin="5,0,5,0">
+                                                <TextBlock Text="Mẫu ổn định:" Style="{StaticResource LabelStyle}"/>
+                                                <TextBox Text="{Binding ScaleBufferSize}" ToolTip="Số gói tin liên tiếp để xác nhận ổn định (Mặc định: 3)"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="7" Margin="15,0,0,0" VerticalAlignment="Bottom">
                                                 <CheckBox Content="Mặc định CÂN XE AUTO" IsChecked="{Binding DefaultToAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
                                                 <CheckBox Content="Mặc định CÂN XE 1 LẦN" IsChecked="{Binding DefaultToOnePassMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>
                                                 <CheckBox Content="Mặc định ĐĂNG KÝ AUTO" IsChecked="{Binding RegistrationDefaultAutoMode}" Foreground="#00E676" Margin="0,0,0,4" FontWeight="Bold"/>

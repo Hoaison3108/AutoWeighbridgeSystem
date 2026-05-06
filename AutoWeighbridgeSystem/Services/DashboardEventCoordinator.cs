@@ -187,11 +187,12 @@ namespace AutoWeighbridgeSystem.Services
         // HARDWARE EVENT HANDLERS (tách ra khỏi ViewModel)
         // =========================================================================
 
+        private decimal _lastWeight = 0;
         private void OnScaleWeightChanged(decimal weight, bool isStable)
         {
             // Thông báo watchdog vẫn nhận được tín hiệu
             _hardwareWatchdog.NotifyScaleDataReceived();
-
+ 
             // Chỉ set Online khi dữ liệu thực tế chạy vào — port open không đảm bảo thiết bị kết nối
             if (!_scaleDataReceived)
             {
@@ -199,21 +200,31 @@ namespace AutoWeighbridgeSystem.Services
                 Application.Current?.Dispatcher?.BeginInvoke(() =>
                     HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Online));
             }
-
-            // Kích hoạt/Tắt RFID UHF dựa trên tải trọng bàn cân (giúp UHF ngủ khi không có xe)
+ 
+            // Kích hoạt/Tắt RFID UHF dựa trên tải trọng bàn cân
             bool isOccupiedNow = weight >= MinWeightThreshold;
-            if (isOccupiedNow && !_isScaleOccupied)
+            
+            // LOGIC CẢI TIẾN: Đánh thức RFID nếu cân có tải HOẶC có sự tăng tải trọng đột biến (> 500kg)
+            // (Xử lý trường hợp cân bị kẹt ở mức cao không về 0 được)
+            bool significantIncrease = (weight - _lastWeight) > 500; 
+
+            if (isOccupiedNow && (!_isScaleOccupied || significantIncrease))
             {
-                _isScaleOccupied = true;
-                Log.Information("[COORDINATOR] Cân có tải (> {Min}kg) -> Đánh thức các đầu đọc RFID tự động.", MinWeightThreshold);
-                _rfidService.SetAutoReadersActive(true);
+                if (!_isScaleOccupied || significantIncrease)
+                {
+                    _isScaleOccupied = true;
+                    Log.Information("[COORDINATOR] Phát hiện xe lên cân (Tải: {Weight}kg) -> Đánh thức RFID.", weight);
+                    _rfidService.SetAutoReadersActive(true);
+                }
             }
             else if (!isOccupiedNow && _isScaleOccupied)
             {
                 _isScaleOccupied = false;
-                Log.Information("[COORDINATOR] Cân trống (< {Min}kg) -> Tắt sóng các đầu đọc RFID tự động.", MinWeightThreshold);
+                Log.Information("[COORDINATOR] Cân trống (< {Min}kg) -> Tắt sóng RFID.", MinWeightThreshold);
                 _rfidService.SetAutoReadersActive(false);
             }
+
+            _lastWeight = weight;
 
             var decision = _dashboardWorkflow.EvaluateScaleEvent(
                 weight,

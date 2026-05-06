@@ -30,9 +30,9 @@ namespace AutoWeighbridgeSystem.Services
 
         private sealed class RfidReaderEntry
         {
-            public string   RoleName  { get; }
-            public string   ComPort   { get; }
-            public int      BaudRate  { get; }
+            public string RoleName { get; }
+            public string ComPort { get; }
+            public int BaudRate { get; }
 
             public IRfidReaderDriver? Driver { get; set; }
             public volatile bool IsReconnecting;
@@ -41,7 +41,7 @@ namespace AutoWeighbridgeSystem.Services
             public RfidReaderEntry(string roleName, string comPort, int baudRate)
             {
                 RoleName = roleName;
-                ComPort  = comPort;
+                ComPort = comPort;
                 BaudRate = baudRate;
             }
         }
@@ -50,8 +50,8 @@ namespace AutoWeighbridgeSystem.Services
         // STATE
         // =========================================================================
 
-        private readonly List<RfidReaderEntry>  _readers       = new();
-        private readonly RfidDriverFactory      _driverFactory = new();
+        private readonly List<RfidReaderEntry> _readers = new();
+        private readonly RfidDriverFactory _driverFactory = new();
         private string _driverType = "SerialHf";
 
         /// <summary>Trạng thái hiện tại: Các đầu đọc tự động (ScaleIn/ScaleOut) có đang được kích hoạt quét hay không.</summary>
@@ -90,7 +90,7 @@ namespace AutoWeighbridgeSystem.Services
         /// Tham số: <c>(readerRole, cleanCardId)</c>.
         /// </summary>
         public event Action<string, string>? CardRead;
-        
+
         /// <summary>Phát ra khi một đầu đọc mất kết nối. Tham số: roleName.</summary>
         public event Action<string>? ReaderDisconnected;
 
@@ -157,18 +157,18 @@ namespace AutoWeighbridgeSystem.Services
         /// </para>
         /// </summary>
         public void ReinitializeReaders(
-            string? inPort,   int inBaud,
-            string? outPort,  int outBaud,
+            string? inPort, int inBaud,
+            string? outPort, int outBaud,
             string? deskPort, int deskBaud,
-            string  driverType = "SerialHf")
+            string driverType = "SerialHf")
         {
             Log.Information("[RFID] Reinitialize với driver '{Type}'...", driverType);
             _driverType = driverType;
             CloseAll();
 
-            if (!string.IsNullOrEmpty(deskPort) && deskPort != "None") AddReader(Models.ReaderRoles.Desk,    deskPort, deskBaud);
-            if (!string.IsNullOrEmpty(inPort)   && inPort   != "None") AddReader(Models.ReaderRoles.ScaleIn, inPort,   inBaud);
-            if (!string.IsNullOrEmpty(outPort)  && outPort  != "None") AddReader(Models.ReaderRoles.ScaleOut,outPort,  outBaud);
+            if (!string.IsNullOrEmpty(deskPort) && deskPort != "None") AddReader(Models.ReaderRoles.Desk, deskPort, deskBaud);
+            if (!string.IsNullOrEmpty(inPort) && inPort != "None") AddReader(Models.ReaderRoles.ScaleIn, inPort, inBaud);
+            if (!string.IsNullOrEmpty(outPort) && outPort != "None") AddReader(Models.ReaderRoles.ScaleOut, outPort, outBaud);
 
             Log.Information("[RFID] Hoàn tất — {Count} đầu đọc ({Type}).", _readers.Count, driverType);
         }
@@ -186,14 +186,18 @@ namespace AutoWeighbridgeSystem.Services
                 var driver = _driverFactory.Create(_driverType);
 
                 // Subscribe events trước khi Open để không miss event
-                driver.CardDetected  += cardId => CardRead?.Invoke(entry.RoleName, cardId);
-                driver.Disconnected  += ()      => HandleDriverDisconnect(entry);
+                driver.CardDetected += cardId => CardRead?.Invoke(entry.RoleName, cardId);
+                driver.Disconnected += () => HandleDriverDisconnect(entry);
 
                 driver.Open(entry.ComPort, entry.BaudRate);
                 entry.Driver = driver;
 
-                // Cả 3 làn (In/Out/Desk) đều quét theo trạng thái chung (phụ thuộc vào cân có tải hay không)
-                if (IsAutoReadersActive)
+                // Áp dụng trạng thái thức/ngủ tương ứng với từng loại đầu đọc
+                bool shouldResume = (entry.RoleName == Models.ReaderRoles.Desk) 
+                    ? _isDeskReaderRequestedActive 
+                    : IsAutoReadersActive;
+
+                if (shouldResume)
                     driver.ResumeReading();
                 else
                     driver.PauseReading();
@@ -228,16 +232,21 @@ namespace AutoWeighbridgeSystem.Services
         /// nhận thẻ ngay cả khi cân không có xe.
         /// </para>
         /// </summary>
+        private bool _isDeskReaderRequestedActive = true;
+
+        /// <summary>
+        /// Bật/Tắt chế độ quét của các đầu đọc ngoài trạm cân (ScaleIn, ScaleOut).
+        /// </summary>
         public void SetAutoReadersActive(bool isActive)
         {
             if (IsAutoReadersActive == isActive) return;
             IsAutoReadersActive = isActive;
-
+ 
             AutoReadersStateChanged?.Invoke(isActive);
-
+ 
             lock (_readers)
             {
-                // Chỉ điều khiển ScaleIn và ScaleOut — Desk được quản lý riêng
+                // Chỉ điều khiển ScaleIn và ScaleOut
                 foreach (var entry in _readers.Where(r =>
                     r.Driver != null && r.RoleName != Models.ReaderRoles.Desk))
                 {
@@ -248,39 +257,24 @@ namespace AutoWeighbridgeSystem.Services
                 }
             }
         }
-
+ 
         /// <summary>
         /// Bật/Tắt riêng đầu đọc Desk (bàn điều hành / vị trí tài xế quẹt thẻ).
-        /// <para>
-        /// Desk luôn phát sóng độc lập với bàn cân để phục vụ 2 nghiệp vụ:<br/>
-        /// - <b>Manual Mode:</b> Gán thẻ / cập nhật thông tin xe khi không có xe trên cân.<br/>
-        /// - <b>Auto Mode:</b> Tài xế tự quẹt thẻ trên cân để cập nhật bì tự động.
-        /// </para>
         /// </summary>
-        /// <param name="isActive">True = bật sóng, False = ngừng phát sóng.</param>
         public void SetDeskReaderActive(bool isActive)
         {
+            _isDeskReaderRequestedActive = isActive;
             lock (_readers)
             {
                 var desk = _readers.FirstOrDefault(r =>
                     r.RoleName == Models.ReaderRoles.Desk && r.Driver != null);
-
-                if (desk == null)
-                {
-                    Log.Debug("[RFID] SetDeskReaderActive({Active}): Không tìm thấy Desk reader.", isActive);
-                    return;
-                }
-
+ 
+                if (desk == null) return;
+ 
                 if (isActive)
-                {
                     desk.Driver!.ResumeReading();
-                    Log.Information("[RFID] Desk reader ĐÃ BẬT SÓNG (độc lập).");
-                }
                 else
-                {
                     desk.Driver!.PauseReading();
-                    Log.Information("[RFID] Desk reader ĐÃ TẮT SÓNG.");
-                }
             }
         }
 
@@ -327,13 +321,18 @@ namespace AutoWeighbridgeSystem.Services
                     {
                         var driver = _driverFactory.Create(_driverType);
                         driver.CardDetected += cardId => CardRead?.Invoke(entry.RoleName, cardId);
-                        driver.Disconnected += ()     => HandleDriverDisconnect(entry);
+                        driver.Disconnected += () => HandleDriverDisconnect(entry);
 
                         driver.Open(entry.ComPort, entry.BaudRate);
-                        entry.Driver         = driver;
+                        entry.Driver = driver;
                         entry.IsReconnecting = false;
 
-                        if (IsAutoReadersActive)
+                        // Áp dụng trạng thái thức/ngủ tương ứng với từng loại đầu đọc
+                        bool shouldResume = (entry.RoleName == Models.ReaderRoles.Desk) 
+                            ? _isDeskReaderRequestedActive 
+                            : IsAutoReadersActive;
+
+                        if (shouldResume)
                             driver.ResumeReading();
                         else
                             driver.PauseReading();

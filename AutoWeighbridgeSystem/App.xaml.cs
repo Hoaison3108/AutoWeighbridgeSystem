@@ -176,8 +176,9 @@ namespace AutoWeighbridgeSystem
 
                         decimal minWeight = decimal.TryParse(section["MinWeightThreshold"], out decimal mw) ? mw : 50;
                         decimal stableDelta = decimal.TryParse(section["StabilityDelta"], out decimal sd) ? sd : 50;
+                        int bufferSize = int.TryParse(section["BufferSize"], out int bs) ? bs : 3;
 
-                        scaleService.Initialize(port, baud, dataBits, parity, stopBits, selectedProtocol, minWeight, stableDelta);
+                        scaleService.Initialize(port, baud, dataBits, parity, stopBits, selectedProtocol, minWeight, stableDelta, bufferSize);
                     }
                 }
                 catch (Exception ex)

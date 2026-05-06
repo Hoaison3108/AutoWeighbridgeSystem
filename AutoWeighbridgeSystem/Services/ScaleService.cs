@@ -30,7 +30,7 @@ namespace AutoWeighbridgeSystem.Services
 
         private readonly Queue<decimal> _weightBuffer = new Queue<decimal>();
         private readonly StringBuilder _incomingDataBuffer = new StringBuilder();
-        private const int BufferSize = 3; // Số mẫu ổn định cần tích lũy (Giảm từ 5 xuống 3 để chốt cân nhanh hơn)
+        private int _bufferSize = 3; // Số mẫu ổn định cần tích lũy (Lấy từ cấu hình)
 
         /// <summary>Ngưỡng kích thước (ký tự) để kích hoạt xóa buffer khi nhiễu tín hiệu.</summary>
         /// <remarks>
@@ -150,7 +150,7 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         public void Initialize(string portName, int baudRate, int dataBits,
                                Parity parity, StopBits stopBits, IScaleProtocol protocol,
-                               decimal minWeightThreshold = 50, decimal stabilityDelta = 50)
+                               decimal minWeightThreshold = 50, decimal stabilityDelta = 50, int bufferSize = 3)
         {
             // Lưu lại thông số để dùng khi reconnect
             _portName = portName;
@@ -161,6 +161,7 @@ namespace AutoWeighbridgeSystem.Services
             _protocol = protocol;
             _minWeightThreshold = minWeightThreshold;
             _stabilityDelta = stabilityDelta;
+            _bufferSize = bufferSize;
 
             if (string.IsNullOrEmpty(portName) || portName == "None")
             {
@@ -302,33 +303,31 @@ namespace AutoWeighbridgeSystem.Services
 
             if (weight > _minWeightThreshold)
             {
-                if (isHardwareStable)
+                lock (_weightBuffer)
                 {
-                    // CÁCH NHANH NHẤT: Nếu đầu cân báo P+, chốt ngay lập tức!
-                    IsScaleStable = true;
-                    lock (_weightBuffer)
-                    {
-                        if (_weightBuffer.Count > 0) _weightBuffer.Clear();
-                    }
-                }
-                else
-                {
-                    // Nếu đầu cân báo @+: Vẫn cho phép chốt "non" nếu dao động trong ngưỡng 50kg
-                    lock (_weightBuffer)
-                    {
-                        _weightBuffer.Enqueue(weight);
-                        if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
+                    _weightBuffer.Enqueue(weight);
+                    if (_weightBuffer.Count > _bufferSize) _weightBuffer.Dequeue();
 
-                        // Nếu đã đủ 3 mẫu và độ lệch Max-Min <= 50kg -> Chốt luôn không bắt xe đứng yên
-                        if (_weightBuffer.Count >= BufferSize)
+                    if (_weightBuffer.Count >= _bufferSize)
+                    {
+                        // Kiểm tra độ lệch Delta thực tế trong bộ đệm
+                        decimal delta = _weightBuffer.Max() - _weightBuffer.Min();
+
+                        if (isHardwareStable)
                         {
-                            decimal delta = _weightBuffer.Max() - _weightBuffer.Min();
-                            IsScaleStable = (delta <= _stabilityDelta); 
+                            // Nếu đầu cân báo P+: Chốt ngay (vì phần cứng đã bảo đảm)
+                            IsScaleStable = true;
                         }
                         else
                         {
-                            IsScaleStable = false;
+                            // Nếu đầu cân báo @+ (do xe nổ máy rung nhẹ): 
+                            // Vẫn cho phép chốt nếu dao động nằm trong ngưỡng cho phép (StabilityDelta)
+                            IsScaleStable = (delta <= _stabilityDelta);
                         }
+                    }
+                    else
+                    {
+                        IsScaleStable = false;
                     }
                 }
             }
@@ -511,11 +510,11 @@ namespace AutoWeighbridgeSystem.Services
         /// </summary>
         public void Reinitialize(string portName, int baudRate, int dataBits,
                                  Parity parity, StopBits stopBits, IScaleProtocol protocol,
-                                 decimal minWeightThreshold = 50, decimal stabilityDelta = 50)
+                                 decimal minWeightThreshold = 50, decimal stabilityDelta = 50, int bufferSize = 3)
         {
             Log.Information("[SCALE] Đang khởi động lại với cổng {Port} ({Baud} bps)...", portName, baudRate);
             Close();   // Hủy reconnect loop cũ + đóng port hiện tại
-            Initialize(portName, baudRate, dataBits, parity, stopBits, protocol, minWeightThreshold, stabilityDelta);
+            Initialize(portName, baudRate, dataBits, parity, stopBits, protocol, minWeightThreshold, stabilityDelta, bufferSize);
             Log.Information("[SCALE] Khởi động lại hoàn tất.");
         }
 

@@ -82,6 +82,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private int _scaleRfidCooldown;
         [ObservableProperty] private int _scaleQueueTimeout;
         [ObservableProperty] private int _scaleWatchdog;
+        [ObservableProperty] private int _scaleBufferSize;
         [ObservableProperty] private bool _defaultToAutoMode;
         [ObservableProperty] private bool _defaultToOnePassMode;
         [ObservableProperty] private bool _registrationDefaultAutoMode;
@@ -201,6 +202,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 ScaleRfidCooldown   = int.TryParse(_configuration["ScaleSettings:RfidCooldownSeconds"],  out int src) ? src : 3;
                 ScaleQueueTimeout   = int.TryParse(_configuration["ScaleSettings:QueueTimeoutSeconds"],  out int sqt) ? sqt : 45;
                 ScaleWatchdog       = int.TryParse(_configuration["ScaleSettings:HardwareWatchdogSeconds"], out int swd) ? swd : 60;
+                ScaleBufferSize     = int.TryParse(_configuration["ScaleSettings:BufferSize"],           out int sbs) ? sbs : 3;
                 DefaultToAutoMode   = bool.TryParse(_configuration["ScaleSettings:DefaultToAutoMode"],   out bool am) ? am  : true;
                 DefaultToOnePassMode= bool.TryParse(_configuration["ScaleSettings:DefaultToOnePassMode"], out bool op) ? op  : true;
                 RegistrationDefaultAutoMode = bool.TryParse(_configuration["ScaleSettings:RegistrationDefaultAutoMode"], out bool ram) ? ram : true;
@@ -308,6 +310,7 @@ namespace AutoWeighbridgeSystem.ViewModels
                 scale["RfidCooldownSeconds"]  = ScaleRfidCooldown;
                 scale["QueueTimeoutSeconds"]  = ScaleQueueTimeout;
                 scale["HardwareWatchdogSeconds"] = ScaleWatchdog;
+                scale["BufferSize"]           = ScaleBufferSize;
                 scale["DefaultToAutoMode"]    = DefaultToAutoMode;
                 scale["DefaultToOnePassMode"] = DefaultToOnePassMode;
                 scale["RegistrationDefaultAutoMode"] = RegistrationDefaultAutoMode;
@@ -448,9 +451,9 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                             IScaleProtocol protocol = _protocolFactory.Create(ScaleProtocol);
 
-                            _scaleService.Reinitialize(
+                             _scaleService.Reinitialize(
                                 ScaleComPort, ScaleBaudRate, ScaleDataBits,
-                                parity, stopBits, protocol, ScaleMinWeight, ScaleStabilityDelta);
+                                parity, stopBits, protocol, ScaleMinWeight, ScaleStabilityDelta, ScaleBufferSize);
                             scaleOk = true;
                         }
                 }
