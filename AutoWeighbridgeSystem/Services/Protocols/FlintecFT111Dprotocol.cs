@@ -89,16 +89,13 @@ namespace AutoWeighbridgeSystem.Services.Protocols
 
             // Giải mã trạng thái (Status Byte): Bit 7 = 0 là ổn định
             int statusVal = (HexVal(s1) << 4) | HexVal(s2);
-            bool hwStableFlag = (statusVal & 0x80) == 0; // 00 -> true, 80 -> false
+            
+            // i00 -> Ổn định (Stable), i80 -> Dao động (Motion)
+            bool hwStableFlag = (statusVal & 0x80) == 0; 
 
             // Phần dư: Dữ liệu chưa xử lý nằm sau frame 15 ký tự
-            int frameEnd = iPos + 15;
+            string remainder = buffer.Substring(iPos + 15);
             
-            // Bỏ qua luôn các ký tự CRLF nếu có ngay sau frame để buffer luôn sạch
-            while (frameEnd < buffer.Length && (buffer[frameEnd] == '\r' || buffer[frameEnd] == '\n'))
-                frameEnd++;
-
-            string remainder = buffer.Substring(frameEnd);
             return (weight, hwStableFlag, remainder);
         }
 

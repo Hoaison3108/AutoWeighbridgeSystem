@@ -28,13 +28,13 @@ namespace AutoWeighbridgeSystem.ViewModels
             IUserNotificationService notificationService,
             WeighingBusinessService weighingBusiness)
         {
-            _contextFactory      = contextFactory;
-            _exportService       = exportService;
+            _contextFactory = contextFactory;
+            _exportService = exportService;
             _notificationService = notificationService;
-            _weighingBusiness    = weighingBusiness;
+            _weighingBusiness = weighingBusiness;
 
             _fromDate = DateTime.Today;
-            _toDate   = DateTime.Today.AddDays(1).AddSeconds(-1);
+            _toDate = DateTime.Today.AddDays(1).AddSeconds(-1);
 
             // Initialize Manual Ticket VM for the second tab
             ManualTicketVM = App.ServiceProvider.GetRequiredService<ManualTicketViewModel>();
@@ -56,7 +56,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [ObservableProperty] private DateTime _fromDate;
         [ObservableProperty] private DateTime _toDate;
         [ObservableProperty] private string _searchText;
-        
+
         // Pagination
         private int _currentPage = 0;
         private const int PageSize = 50;
@@ -66,7 +66,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         // =========================================================================
         // THỐNG KÊ
         // =========================================================================
-        [ObservableProperty] private int     _totalVehicles;
+        [ObservableProperty] private int _totalVehicles;
         [ObservableProperty] private decimal _totalGross;
         [ObservableProperty] private decimal _totalTare;
         [ObservableProperty] private decimal _totalNet;
@@ -86,7 +86,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         public async Task LoadHistoryAsync()
         {
             if (IsLoading) return;
-            
+
             try
             {
                 IsLoading = true;
@@ -94,20 +94,20 @@ namespace AutoWeighbridgeSystem.ViewModels
                 HasMoreData = true;
 
                 using var context = _contextFactory.CreateDbContext();
-                
+
                 // 1. QUERY CƠ SỞ (Base Query) dùng chung logic lọc
                 var baseQuery = GetFilteredQuery(context);
 
                 // 2. TÍNH TOÁN THỐNG KÊ TẠI DATABASE (Tối ưu nhất cho Pentium G5400)
                 // Thay vì tải hàng vạn dòng về RAM để Sum, ta chỉ lấy đúng 4 con số tổng.
                 var statsQuery = baseQuery.Where(t => !t.IsVoid && t.TimeOut.HasValue);
-                
+
                 TotalVehicles = await statsQuery.CountAsync();
                 if (TotalVehicles > 0)
                 {
                     TotalGross = await statsQuery.SumAsync(t => t.GrossWeight);
-                    TotalTare  = await statsQuery.SumAsync(t => t.TareWeight);
-                    TotalNet   = await statsQuery.SumAsync(t => t.NetWeight);
+                    TotalTare = await statsQuery.SumAsync(t => t.TareWeight);
+                    TotalNet = await statsQuery.SumAsync(t => t.NetWeight);
                 }
                 else
                 {
@@ -248,7 +248,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 // Sắp xếp lại danh sách (thường báo cáo Excel cần từ cũ đến mới)
                 var validTickets = allTickets.OrderBy(t => t.TimeIn).ToList();
-                
+
                 await _exportService.ExportTicketsToExcelAsync(validTickets, "BÁO CÁO CHI TIẾT SẢN LƯỢNG TRẠM CÂN");
             }
             catch (Exception ex)
@@ -267,23 +267,31 @@ namespace AutoWeighbridgeSystem.ViewModels
             try
             {
                 IsLoading = true;
-                
+
                 // Lấy Service từ DI container
                 var googleSheetsExportService = App.ServiceProvider.GetRequiredService<GoogleSheetsExportService>();
-                
+
                 using var context = await _contextFactory.CreateDbContextAsync();
-                
-                // Lấy phiếu hợp lệ trong ngày hôm nay
+
+                // Lấy phiếu hoàn thành trong ngày hôm nay (Dựa trên giờ ra)
                 var today = DateTime.Today;
                 var tickets = await context.WeighingTickets
                     .AsNoTracking()
-                    .Where(t => t.TimeIn.Date == today && t.TimeOut != null && !t.IsVoid)
+                    .Where(t => t.TimeOut != null && 
+                                t.TimeOut.Value.Date == today && 
+                                !t.IsVoid)
                     .OrderBy(t => t.TimeIn)
                     .ToListAsync();
-                    
+
+                if (tickets.Count == 0)
+                {
+                    _notificationService.ShowWarning("Không tìm thấy phiếu cân nào hoàn thành trong ngày hôm nay để đồng bộ.", "KHÔNG CÓ DỮ LIỆU");
+                    return;
+                }
+
                 await googleSheetsExportService.SyncDailyTicketsAsync(tickets);
-                
-                _notificationService.ShowInfo("Đã đồng bộ thành công dữ liệu ngày hôm nay lên Google Sheets!", "ĐỒNG BỘ THÀNH CÔNG");
+
+                _notificationService.ShowInfo($"Đã đồng bộ thành công {tickets.Count} phiếu của ngày hôm nay lên Google Sheets!", "ĐỒNG BỘ THÀNH CÔNG");
             }
             catch (Exception ex)
             {
@@ -303,9 +311,9 @@ namespace AutoWeighbridgeSystem.ViewModels
         {
             var validTickets = data.Where(t => !t.IsVoid && t.TimeOut.HasValue).ToList();
             TotalVehicles = validTickets.Count;
-            TotalGross    = validTickets.Sum(t => t.GrossWeight);
-            TotalTare     = validTickets.Sum(t => t.TareWeight);
-            TotalNet      = validTickets.Sum(t => t.NetWeight);
+            TotalGross = validTickets.Sum(t => t.GrossWeight);
+            TotalTare = validTickets.Sum(t => t.TareWeight);
+            TotalNet = validTickets.Sum(t => t.NetWeight);
         }
 
         /// <summary>

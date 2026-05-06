@@ -289,11 +289,9 @@ namespace AutoWeighbridgeSystem.Services
         // =========================================================================
 
         /// <summary>
-        /// Thuật toán ổn định theo yêu cầu gốc:
-        /// 1. Chỉ tin tưởng và bắt đầu đếm khi đầu cân gửi cờ ỔN ĐỊNH (P+ hoặc i00).
-        /// 2. Dù đầu cân báo ỔN ĐỊNH, vẫn phải thu thập đủ 10 mẫu và dao động &lt;= 50kg thì mới chốt (chống chốt non).
-        /// 3. Bất cứ khi nào đầu cân báo DAO ĐỘNG (@+ hoặc i80), lập tức hủy bộ đếm và báo chưa ổn định.
-        /// Áp dụng throttling 40ms trước khi phát <see cref="WeightChanged"/>.
+        /// Thuật toán chốt cân siêu tốc (Instant Lock):
+        /// 1. Nếu đầu cân báo ỔN ĐỊNH (P+): Chốt ngay lập tức, không qua bộ đệm.
+        /// 2. Nếu đầu cân báo DAO ĐỘNG (@+): Gom 3 mẫu để tự chốt sớm nếu dao động cực nhỏ.
         /// </summary>
         private void ProcessWeightStability(decimal weight, bool isHardwareStable)
         {
@@ -304,10 +302,10 @@ namespace AutoWeighbridgeSystem.Services
 
             if (weight > _minWeightThreshold)
             {
-                if (!isHardwareStable)
+                if (isHardwareStable)
                 {
-                    // Khi cân báo dao động (@+) -> KHÔNG đếm, báo chưa ổn định, xóa bộ đệm
-                    IsScaleStable = false;
+                    // CÁCH NHANH NHẤT: Nếu đầu cân báo P+, chốt ngay lập tức!
+                    IsScaleStable = true;
                     lock (_weightBuffer)
                     {
                         if (_weightBuffer.Count > 0) _weightBuffer.Clear();
@@ -315,20 +313,21 @@ namespace AutoWeighbridgeSystem.Services
                 }
                 else
                 {
-                    // Khi cân báo ổn định (P+) -> Mới bắt đầu gom 10 frame để chốt
+                    // Nếu đầu cân báo @+: Vẫn cho phép chốt "non" nếu dao động trong ngưỡng 50kg
                     lock (_weightBuffer)
                     {
                         _weightBuffer.Enqueue(weight);
                         if (_weightBuffer.Count > BufferSize) _weightBuffer.Dequeue();
 
-                        if (_weightBuffer.Count < BufferSize)
+                        // Nếu đã đủ 3 mẫu và độ lệch Max-Min <= 50kg -> Chốt luôn không bắt xe đứng yên
+                        if (_weightBuffer.Count >= BufferSize)
                         {
-                            IsScaleStable = false; // Chưa đủ 10 mẫu -> chưa chốt
+                            decimal delta = _weightBuffer.Max() - _weightBuffer.Min();
+                            IsScaleStable = (delta <= _stabilityDelta); 
                         }
                         else
                         {
-                            decimal delta = _weightBuffer.Max() - _weightBuffer.Min();
-                            IsScaleStable = (delta <= _stabilityDelta);
+                            IsScaleStable = false;
                         }
                     }
                 }
@@ -402,7 +401,7 @@ namespace AutoWeighbridgeSystem.Services
                         _serialPort.ErrorReceived -= SerialPort_ErrorReceived;
                         if (_serialPort.IsOpen) _serialPort.Close();
                         _serialPort.Dispose();
-                        _serialPort = null!;
+                        _serialPort = null;
                     }
                 }
                 catch { /* Bỏ qua — port có thể đã ở trạng thái lỗi */ }

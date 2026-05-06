@@ -80,9 +80,11 @@ namespace AutoWeighbridgeSystem.Services
 
             try
             {
+                // Đảm bảo tên Sheet được bọc trong dấu nháy đơn để xử lý được khoảng trắng/tiếng Việt
+                string quotedSheetName = $"'{sheetName}'";
+
                 // Bước 1: Clear dữ liệu cũ từ dòng 2 trở xuống (Giữ Header dòng 1)
-                // Range: "SheetName!A2:Z"
-                string clearRange = $"{sheetName}!A2:Z";
+                string clearRange = $"{quotedSheetName}!A2:Z";
                 var clearRequest = _sheetsService!.Spreadsheets.Values.Clear(new ClearValuesRequest(), spreadsheetId, clearRange);
                 await clearRequest.ExecuteAsync();
 
@@ -119,7 +121,7 @@ namespace AutoWeighbridgeSystem.Services
                 valueRange.Values = oblist;
 
                 // Bước 3: Ghi dữ liệu mới vào từ dòng 2
-                string writeRange = $"{sheetName}!A2";
+                string writeRange = $"{quotedSheetName}!A2";
                 var appendRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, spreadsheetId, writeRange);
                 appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                 
