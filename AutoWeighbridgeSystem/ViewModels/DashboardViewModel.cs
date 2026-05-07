@@ -89,6 +89,7 @@ namespace AutoWeighbridgeSystem.ViewModels
 
         [ObservableProperty] private ObservableCollection<WeighingTicket> _recentTickets = new();
         [ObservableProperty] private WeighingTicket _selectedRecentTicket;
+        [ObservableProperty] private int _todayTicketCount;
         [ObservableProperty] private QuickVehicleRegisterViewModel _quickRegisterVm;
 
         public AutocompleteProvider<string> VehicleAutocomplete { get; } = new(Array.Empty<string>(), (item, text) => item.Contains(text, StringComparison.OrdinalIgnoreCase));
@@ -482,7 +483,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         public async Task LoadRecentTicketsAsync()
         {
             var tickets = await _dashboardDataService.LoadRecentTicketsAsync();
-            Application.Current?.Dispatcher?.Invoke(() => RecentTickets = new ObservableCollection<WeighingTicket>(tickets));
+            Application.Current?.Dispatcher?.Invoke(() => {
+                RecentTickets = new ObservableCollection<WeighingTicket>(tickets);
+                TodayTicketCount = tickets.Count(t => !t.IsVoid);
+            });
         }
 
         private void ResetForm()

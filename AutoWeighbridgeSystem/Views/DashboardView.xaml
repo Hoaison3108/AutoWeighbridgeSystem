@@ -512,7 +512,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="NHẬT KÝ VẬN HÀNH (DỮ LIỆU TRONG NGÀY)" FontSize="14" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,10"/>
+                <TextBlock FontSize="14" FontWeight="Bold" Foreground="#2196F3" Margin="0,0,0,10">
+                    <Run Text="NHẬT KÝ VẬN HÀNH (DỮ LIỆU TRONG NGÀY - "/>
+                    <Run Text="{Binding TodayTicketCount, Mode=OneWay}" Foreground="#00E676"/>
+                    <Run Text=" PHIẾU)"/>
+                </TextBlock>
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding RecentTickets}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
                           SelectedItem="{Binding SelectedRecentTicket}">
