@@ -231,12 +231,13 @@ namespace AutoWeighbridgeSystem
             services.AddTransient<ManualTicketViewModel>();
             services.AddTransient<EditTicketViewModel>();
             services.AddTransient<SplashViewModel>();
+            services.AddSingleton<SignalLightService>();
+            services.AddSingleton<LicenseService>();
             services.AddSingleton<LoginViewModel>();
-
-            // --- Nhóm 4: Views (Giao diện) ---
-            services.AddSingleton<MainWindow>();
+            
             services.AddTransient<SplashWindow>();
             services.AddTransient<LoginWindow>();
+            services.AddSingleton<MainWindow>();
             services.AddSingleton<DashboardView>();
             services.AddSingleton<VehicleRegistrationView>();
  
@@ -246,6 +247,8 @@ namespace AutoWeighbridgeSystem
             services.AddSingleton<ProductView>();
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<SettingsView>();
+            services.AddSingleton<LicenseViewModel>();
+            services.AddSingleton<LicenseView>();
             services.AddSingleton<NotificationHistoryViewModel>();
             services.AddSingleton<NotificationHistoryView>();
             services.AddSingleton<WeighingHistoryViewModel>();

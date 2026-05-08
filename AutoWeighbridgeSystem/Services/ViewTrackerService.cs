@@ -9,7 +9,8 @@ namespace AutoWeighbridgeSystem.Services
         VehicleRegistration,
         WeighingHistory,
         Settings,
-        Reports
+        Reports,
+        License
     }
 
     /// <summary>

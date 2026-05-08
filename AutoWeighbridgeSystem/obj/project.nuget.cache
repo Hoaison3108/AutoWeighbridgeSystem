@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "iJYlG9TGI8I=",
+  "dgSpecHash": "0s07yb6Jagw=",
   "success": true,
   "projectFilePath": "D:\\CODE\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem\\AutoWeighbridgeSystem.csproj",
   "expectedPackageFiles": [
@@ -87,7 +87,7 @@
     "C:\\Users\\SONPH\\.nuget\\packages\\serilog.sinks.file\\7.0.0\\serilog.sinks.file.7.0.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\sixlabors.fonts\\1.0.0\\sixlabors.fonts.1.0.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.clientmodel\\1.0.0\\system.clientmodel.1.0.0.nupkg.sha512",
-    "C:\\Users\\SONPH\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
+    "C:\\Users\\SONPH\\.nuget\\packages\\system.codedom\\8.0.0\\system.codedom.8.0.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.collections.immutable\\6.0.0\\system.collections.immutable.6.0.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.composition\\6.0.0\\system.composition.6.0.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.composition.attributedmodel\\6.0.0\\system.composition.attributedmodel.6.0.0.nupkg.sha512",
@@ -103,7 +103,7 @@
     "C:\\Users\\SONPH\\.nuget\\packages\\system.io.packaging\\8.0.1\\system.io.packaging.8.0.1.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.io.pipelines\\10.0.5\\system.io.pipelines.10.0.5.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.io.ports\\10.0.5\\system.io.ports.10.0.5.nupkg.sha512",
-    "C:\\Users\\SONPH\\.nuget\\packages\\system.management\\7.0.2\\system.management.7.0.2.nupkg.sha512",
+    "C:\\Users\\SONPH\\.nuget\\packages\\system.management\\8.0.0\\system.management.8.0.0.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.memory.data\\1.0.2\\system.memory.data.1.0.2.nupkg.sha512",
     "C:\\Users\\SONPH\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",

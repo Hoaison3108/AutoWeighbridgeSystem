@@ -94,7 +94,7 @@
                 </Button>
 
                 <StackPanel Grid.Row="1">
-                    <Button Command="{Binding ShowDashboardCommand}" Style="{StaticResource MenuButtonStyle}">
+                    <Button Command="{Binding ShowDashboardCommand}" Style="{StaticResource MenuButtonStyle}" IsEnabled="{Binding IsLicenseValid}">
                         <Grid Width="260" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70"/>
@@ -108,7 +108,7 @@
 
                     <Separator Background="#333" Margin="15,5"/>
 
-                    <Button Command="{Binding ShowRegistrationCommand}" Style="{StaticResource MenuButtonStyle}">
+                    <Button Command="{Binding ShowRegistrationCommand}" Style="{StaticResource MenuButtonStyle}" IsEnabled="{Binding IsLicenseValid}">
                         <Grid Width="260" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70"/>
@@ -182,6 +182,18 @@
                         </Grid>
                     </Button>
 
+                    <Button Command="{Binding ShowLicenseCommand}" Style="{StaticResource MenuButtonStyle}">
+                        <Grid Width="260" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="🔑" FontSize="20" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="BẢN QUYỀN" VerticalAlignment="Center" FontSize="14"
+                                       Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Button>
+
                     <Button Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}">
                         <Grid Width="260" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
@@ -197,7 +209,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                    <TextBlock Text="DESIGN BY SONK (v2.2.9)" FontSize="16" FontWeight="Bold" 
+                    <TextBlock Text="DESIGN BY SONK (v2.3.0)" FontSize="16" FontWeight="Bold" 
                                Foreground="#2196F3" HorizontalAlignment="Center"
                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVis}}"/>
                 </StackPanel>
@@ -235,6 +247,10 @@
             <views:SettingsView 
                 DataContext="{Binding SettingsVm}"
                 Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:SettingsViewModel}}"/>
+
+            <views:LicenseView 
+                DataContext="{Binding LicenseVm}"
+                Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TypeToVis}, ConverterParameter={x:Type vm:LicenseViewModel}}"/>
         </Grid>
 
         <!-- LAYER OVERLAY: DANH SÁCH TOAST THÔNG BÁO -->

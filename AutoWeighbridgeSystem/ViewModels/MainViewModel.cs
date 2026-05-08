@@ -20,6 +20,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         private readonly IUserNotificationService _notificationService;
         private readonly NotificationManagerService _notificationManager;
         private readonly ViewTrackerService _viewTracker;
+        private readonly LicenseService _licenseService;
 
         // --- 3. CÁC VIEWMODEL CON (Persistent - Singleton) ---
         // Giữ tham chiếu cố định để không bị khởi tạo lại hoặc Dispose khi chuyển tab
@@ -30,8 +31,10 @@ namespace AutoWeighbridgeSystem.ViewModels
         public WeighingHistoryViewModel WeighingHistoryVm { get; }
         public SettingsViewModel SettingsVm { get; }
         public NotificationHistoryViewModel NotificationHistoryVm { get; }
+        public LicenseViewModel LicenseVm { get; }
         
         public NotificationManagerService NotificationManager => _notificationManager;
+        public bool IsLicenseValid => _licenseService.CurrentStatus == LicenseStatus.Valid;
 
         // --- 4. CONSTRUCTOR ---
         public MainViewModel(
@@ -39,13 +42,15 @@ namespace AutoWeighbridgeSystem.ViewModels
             AppSession appSession,
             IUserNotificationService notificationService,
             NotificationManagerService notificationManager,
-            ViewTrackerService viewTracker)
+            ViewTrackerService viewTracker,
+            LicenseService licenseService)
         {
             _serviceProvider = serviceProvider;
             _appSession = appSession;
             _notificationService = notificationService;
             _notificationManager = notificationManager;
             _viewTracker = viewTracker;
+            _licenseService = licenseService;
 
             // Khởi tạo tham chiếu đến các Singleton ViewModels một lần duy nhất
             DashboardVm = _serviceProvider.GetRequiredService<DashboardViewModel>();
@@ -55,10 +60,24 @@ namespace AutoWeighbridgeSystem.ViewModels
             WeighingHistoryVm = _serviceProvider.GetRequiredService<WeighingHistoryViewModel>();
             SettingsVm = _serviceProvider.GetRequiredService<SettingsViewModel>();
             NotificationHistoryVm = _serviceProvider.GetRequiredService<NotificationHistoryViewModel>();
+            LicenseVm = _serviceProvider.GetRequiredService<LicenseViewModel>();
 
-            // Mặc định hiển thị Dashboard khi khởi động
-            _currentView = DashboardVm;
-            _viewTracker.CurrentView = ViewType.Dashboard;
+            // Điều hướng khởi tạo dựa trên bản quyền
+            if (IsLicenseValid)
+            {
+                _currentView = DashboardVm;
+                _viewTracker.CurrentView = ViewType.Dashboard;
+            }
+            else
+            {
+                _currentView = LicenseVm;
+                _viewTracker.CurrentView = ViewType.License; // Cần thêm ViewType.License nếu chưa có
+            }
+
+            // ĐĂNG KÝ SỰ KIỆN THAY ĐỔI BẢN QUYỀN
+            _licenseService.LicenseStatusChanged += () => {
+                OnPropertyChanged(nameof(IsLicenseValid));
+            };
         }
 
         // --- 5. CÁC LỆNH ĐIỀU HƯỚNG ---
@@ -69,6 +88,7 @@ namespace AutoWeighbridgeSystem.ViewModels
         [RelayCommand] private void ShowHistory() => Navigate(WeighingHistoryVm);
         [RelayCommand] private void ShowSettings() => Navigate(SettingsVm);
         [RelayCommand] private void ShowNotificationHistory() => Navigate(NotificationHistoryVm);
+        [RelayCommand] private void ShowLicense() => Navigate(LicenseVm);
 
         [RelayCommand] private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
 

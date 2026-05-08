@@ -5,5 +5,7 @@
              xmlns:converters="clr-namespace:AutoWeighbridgeSystem.Converters">
     <Application.Resources>
         <converters:DateTimeStringConverter x:Key="DateTimeStringConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <converters:StringToVisibilityConverter x:Key="StringToVis" />
     </Application.Resources>
 </Application>
