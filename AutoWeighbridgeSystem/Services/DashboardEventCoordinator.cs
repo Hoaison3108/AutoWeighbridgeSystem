@@ -175,9 +175,23 @@ namespace AutoWeighbridgeSystem.Services
         }
 
         /// <summary>Xóa dữ liệu xe đang chờ trong workflow.</summary>
-        public void ClearPendingData()
+        public void ClearPendingData() => _dashboardWorkflow.ClearPendingData();
+
+        /// <summary>
+        /// Đồng bộ trạng thái sau khi lưu phiếu thành công và đánh thức RFID ngay cho xe tiếp theo.
+        /// Đây là logic "Chớp mắt" (Blink) để phục vụ nghiệp vụ CÂN NỐI ĐUÔI THÔNG MINH.
+        /// </summary>
+        public void MarkAsSaved(string? tagId, decimal weight)
         {
-            _dashboardWorkflow.ClearPendingData();
+            // 1. Ghi nhận vào bộ não Workflow (để chốt chặn và chuẩn bị cho xe tiếp theo)
+            _dashboardWorkflow.MarkAsSaved(tagId, weight);
+            
+            // 2. Đánh thức RFID ngay lập tức nếu bàn cân vẫn còn tải trọng (xe sau đã chờ sẵn)
+            if (_scaleService.CurrentWeight >= MinWeightThreshold)
+            {
+                Log.Information("[COORDINATOR] Lưu phiếu xong và bàn cân còn tải -> Đánh thức RFID cho xe nối đuôi.");
+                _rfidService.SetAutoReadersActive(true);
+            }
         }
 
         /// <summary>Ngưỡng trọng lượng tối thiểu để xử lý (đọc từ DashboardWorkflowService).</summary>
@@ -201,12 +215,12 @@ namespace AutoWeighbridgeSystem.Services
                     HardwareStatusChanged?.Invoke("Scale", HardwareConnectionStatus.Online));
             }
  
-            // Kích hoạt/Tắt RFID UHF dựa trên tải trọng bàn cân
+            // 3. ĐIỀU KHIỂN SÓNG RFID UHF (TIẾT KIỆM VÀ CHỐT CHẶN)
             bool isOccupiedNow = weight >= MinWeightThreshold;
             
             // Đánh thức RFID nếu:
-            // 1. Chuyển trạng thái từ Trống (_isScaleOccupied = false) -> Có tải.
-            // 2. Hoặc cân đang có tải nhưng phát hiện khối lượng tăng đột biến (> 500kg - xe mới đè thêm lên xe cũ).
+            // 1. Bàn cân chuyển từ Trống (False) sang Có tải (True).
+            // 2. Hoặc đang có tải nhưng cân tăng vọt (> 500kg) -> Dấu hiệu xe B đè thêm lên xe A (nối đuôi).
             bool significantIncrease = (weight - _lastWeight) > 500; 
 
             if (isOccupiedNow && (!_isScaleOccupied || significantIncrease))
@@ -217,6 +231,7 @@ namespace AutoWeighbridgeSystem.Services
             }
             else if (!isOccupiedNow && _isScaleOccupied)
             {
+                // Tắt sóng khi bàn cân đã trống hoàn toàn để tránh đọc nhầm thẻ ở xa
                 _isScaleOccupied = false;
                 Log.Information("[COORDINATOR] Bàn cân trống (< {Min}kg) -> Tắt sóng RFID.", MinWeightThreshold);
                 _rfidService.SetAutoReadersActive(false);

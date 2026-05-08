@@ -307,6 +307,9 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 if (result.IsSuccess)
                 {
+                    // Ghi nhận trạng thái để phục vụ cân nối đuôi
+                    _coordinator.MarkAsSaved(RfidInput, result.FinalWeight);
+                    
                     await ShowSuccessAndResetFormAsync(UiText.Messages.AutoSaveSuccessOverlay(LicensePlate, result.FinalWeight, result.Message));
                 }
                 else

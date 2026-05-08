@@ -37,6 +37,9 @@ namespace AutoWeighbridgeSystem.Services
         /// <summary><c>true</c> khi có xe đã quét RFID thành công và đang chờ cân.</summary>
         public bool HasPendingVehicle { get; private set; }
 
+        private string? _lastSavedTagId; // Lưu mã thẻ của xe vừa cân xong để phục vụ nghiệp vụ CÂN NỐI ĐUÔI THÔNG MINH
+        private bool _wasUnstableSinceLastSave = false; // Đánh dấu khoảng hở (rung động) vật lý giữa 2 xe nối đuôi
+
         public DashboardWorkflowService(IConfiguration configuration, RfidBusinessService rfidBusiness)
         {
             _rfidBusiness = rfidBusiness;
@@ -112,10 +115,12 @@ namespace AutoWeighbridgeSystem.Services
         {
             lock (_stateLock)
             {
-                // Logic Reset: Cân về < ngưỡng HOẶC Cân giảm mạnh so với xe vừa cân xong (xe đã đi xuống nhưng cân kẹt)
+                // 1. KIỂM TRA GIẢI PHÓNG BÀN CÂN (XE ĐÃ XUỐNG)
+                // Điều kiện A: Trọng lượng về dưới ngưỡng tối thiểu (ví dụ < 200kg)
                 bool isScaleReleased = weight < MinWeightThreshold;
                 
-                // Nếu xe vừa cân xong (ví dụ 15 tấn) mà giờ chỉ còn < 30% (ví dụ < 4.5 tấn) -> Coi như xe đã xuống
+                // Điều kiện B (Chống kẹt cân): Nếu xe vừa cân xong rất nặng, nhưng khi xuống cân vẫn kẹt một lượng lớn.
+                // Nếu cân hiện tại giảm xuống dưới 30% tải trọng xe trước -> Coi như xe đã xuống.
                 if (!isScaleReleased && _lastSavedWeight > MinWeightThreshold)
                 {
                     if (weight < (_lastSavedWeight * 0.3m)) 
@@ -126,21 +131,24 @@ namespace AutoWeighbridgeSystem.Services
 
                 if (isScaleReleased)
                 {
-                    _lastSavedWeight = 0; // Reset bộ nhớ tải trọng cũ khi cân đã trống
+                    _lastSavedWeight = 0; // Reset bộ nhớ tải trọng
+                    _lastSavedTagId = null; // Xóa mã thẻ cũ để sẵn sàng cho chu kỳ CÂN NỐI ĐUÔI tiếp theo
+                    _wasUnstableSinceLastSave = true; // Bàn cân trống hoàn toàn
 
                     if (HasPendingVehicle && !isWeightLocked)
                     {
-                        // Reset trực tiếp trong lock
-                        _pendingLicensePlate = null;
-                        _pendingCustomerName = null;
-                        _pendingProductName  = null;
-                        _pendingVehicleId    = 0;
-                        HasPendingVehicle    = false;
-                        
+                        ClearPendingData();
                         return ScaleWorkflowDecision.ClearPendingAndReset("XE ĐÃ XUỐNG CÂN - HỦY LỆNH CHỜ");
                     }
  
                     return ScaleWorkflowDecision.None();
+                }
+
+                // 2. THEO DÕI BIẾN ĐỘNG VẬT LÝ (GAP DETECTION)
+                // Nếu cân đang rung động -> Dấu hiệu xe cũ đang ra hoặc xe mới đang vào (Khoảng hở nối đuôi).
+                if (!isStable)
+                {
+                    _wasUnstableSinceLastSave = true;
                 }
  
                 if (isAutoMode && isStable && HasPendingVehicle && !isProcessingSave && !isWeightLocked)
@@ -165,9 +173,24 @@ namespace AutoWeighbridgeSystem.Services
  
                     return ScaleWorkflowDecision.SaveWithPending(weight, pending);
                 }
-            }
  
-            return ScaleWorkflowDecision.None();
+                return ScaleWorkflowDecision.None();
+            }
+        }
+
+        /// <summary>
+        /// Gọi hàm này sau khi phiếu cân đã được lưu thành công vào Database.
+        /// Giúp hệ thống ghi nhớ trạng thái để phục vụ cân nối đuôi.
+        /// </summary>
+        public void MarkAsSaved(string? tagId, decimal weight)
+        {
+            lock (_stateLock)
+            {
+                _lastSavedTagId = tagId;
+                _lastSavedWeight = weight;
+                _wasUnstableSinceLastSave = false; // Bắt đầu theo dõi rung động cho xe tiếp theo
+                ClearPendingData();
+            }
         }
 
         /// <summary>
@@ -197,6 +220,30 @@ namespace AutoWeighbridgeSystem.Services
 
             lock (_stateLock)
             {
+                var tagId = rfidResult.CleanCardId;
+
+                // 3. LOGIC CÂN NỐI ĐUÔI THÔNG MINH (Xử lý khi bàn cân vẫn đang có tải trọng)
+                if (currentWeight >= MinWeightThreshold)
+                {
+                    // A. Chống cân lặp: Nếu mã thẻ vừa quẹt trùng với xe vừa cân xong -> Từ chối xử lý
+                    if (tagId == _lastSavedTagId)
+                    {
+                        return RfidWorkflowDecision.Message("THẺ VỪA CÂN XONG - YÊU CẦU XE RA KHỎI CÂN!");
+                    }
+
+                    // B. Kiểm tra khoảng hở vật lý: Phải có nhịp rung động (unstable) thì mới coi là xe mới
+                    if (!_wasUnstableSinceLastSave)
+                    {
+                        return RfidWorkflowDecision.Message("CHƯA CÓ KHOẢNG HỞ - YÊU CẦU XE TÁCH NHAU RA!");
+                    }
+                }
+
+                // C. Kiểm tra trạng thái đang chờ: Nếu đang có xe đã quẹt thẻ nhưng chưa cân xong -> Chặn xe khác quẹt đè
+                if (HasPendingVehicle)
+                {
+                    return RfidWorkflowDecision.Message("ĐANG CÓ XE CHỜ TRÊN BÀN CÂN!");
+                }
+
                 var vehicle = rfidResult.ExistingVehicle;
                 _pendingLicensePlate = vehicle.LicensePlate;
                 _pendingCustomerName = vehicle.Customer?.CustomerName ?? "Khách lẻ";
