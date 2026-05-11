@@ -1,0 +1,37 @@
+Để hệ thống có thể kết nối âm thầm vào Google Sheets mà không cần bật trình duyệt hỏi mật khẩu mỗi sáng, chúng ta sẽ tạo một "Tài khoản Robot" (Service Account) từ Google. Tài khoản này sẽ được cấp một chìa khóa bí mật (file credentials.json).
+
+Dưới đây là 4 bước chi tiết để bạn tự tay tạo tài khoản Robot này:
+
+Bước 1: Bật tính năng Google Sheets API
+Truy cập vào trang quản trị Google Cloud: https://console.cloud.google.com/ (Hãy đăng nhập bằng Gmail của bạn).
+Nhìn lên thanh Menu trên cùng (cạnh chữ Google Cloud), bấm vào nút "Select a project" (Chọn một dự án) -> Bấm "New Project" (Dự án mới).
+Đặt tên dự án (Ví dụ: AutoWeighbridge) và bấm Create (Tạo). Chờ vài giây để dự án được tạo xong, sau đó bấm chọn dự án vừa tạo.
+Ở thanh Menu bên trái màn hình, tìm đến mục APIs & Services -> Chọn Library (Thư viện).
+Trong ô tìm kiếm, gõ "Google Sheets API".
+Bấm vào kết quả hiện ra và nhấn nút màu xanh Enable (Kích hoạt).
+Bước 2: Tạo Tài khoản Robot (Service Account)
+Vẫn ở trong menu APIs & Services, chọn tab Credentials (Thông tin xác thực) ở cột bên trái.
+Bấm vào nút + CREATE CREDENTIALS (Tạo thông tin xác thực) ở mép trên cùng màn hình.
+Chọn dòng Service account.
+Điền thông tin:
+Service account name: Đặt tên bất kỳ cho Robot (Ví dụ: weighbridge-bot).
+Bấm Create and Continue (Tạo và tiếp tục).
+Tại mục "Select a role", chọn Basic -> Editor (Người chỉnh sửa).
+Bấm Continue rồi bấm Done (Hoàn tất).
+Bước 3: Tải chìa khóa bí mật (credentials.json)
+Trở về danh sách Credentials, bạn sẽ thấy con Robot vừa tạo ở dưới cùng (nó có dạng một địa chỉ email, ví dụ: weighbridge-bot@autoweighbridge-xxxx.iam.gserviceaccount.com).
+Hãy Copy địa chỉ email này lại để dùng cho Bước 4.
+Bấm trực tiếp vào địa chỉ email đó để vào phần cài đặt chi tiết.
+Chuyển sang tab KEYS (Khóa) ở thanh ngang phía trên.
+Bấm ADD KEY -> Create new key.
+Chọn định dạng JSON và bấm Create.
+Một file có tên khá dài (dạng autoweighbridge-xxxx.json) sẽ tự động tải xuống máy tính của bạn.
+QUAN TRỌNG: Hãy đổi tên file bạn vừa tải về thành credentials.json. Sau đó, copy file này thả vào chung thư mục chứa file chạy .exe của phần mềm cân (hoặc thả vào thư mục Source Code nếu bạn đang chạy trên Visual Studio).
+Bước 4: Cho phép Robot truy cập vào file Excel của bạn
+Mở Google Drive của bạn lên, tạo một file Google Sheets mới (hoặc mở file bạn định dùng để lưu dữ liệu).
+Lưu ý địa chỉ URL trên trình duyệt. Ví dụ: https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+Dãy ký tự lộn xộn nằm ở giữa chính là Spreadsheet ID (Trong ví dụ này là 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms). Hãy copy dãy này và dán vào ô Spreadsheet ID trong màn hình Cài đặt của phần mềm.
+Bấm vào nút Share (Chia sẻ) màu xanh lá cây góc trên cùng bên phải của file Google Sheet.
+Dán Địa chỉ Email của Robot mà bạn đã copy ở Bước 3 vào.
+Đảm bảo cấp quyền cho nó là Editor (Người chỉnh sửa). Bỏ dấu tick ở ô "Notify people" (Thông báo cho mọi người) đi vì nó là Robot không cần nhận mail. Cuối cùng bấm Share (Chia sẻ).
+Làm xong 4 bước này, mỗi khi đến giờ, phần mềm sẽ dùng chìa khóa credentials.json để hóa thân thành con Robot đó, âm thầm mở file Google Sheet của bạn ra và chép dữ liệu vào mà không cần hỏi han gì thêm! Bạn hãy thử thao tác nhé.

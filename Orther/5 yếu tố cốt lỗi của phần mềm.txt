@@ -1,0 +1,7 @@
+Đây là một yêu cầu rất lớn và quan trọng. Để thực hiện một cuộc Review chuyên sâu (Deep Technical Audit), tôi sẽ phân tích phần mềm của anh qua 5 "lăng kính" kỹ thuật cốt lõi:
+
+1. Kiến trúc Hệ thống (Architecture & Design Patterns): Kiểm tra tính tách biệt (Separation of Concerns) và khả năng mở rộng.
+2. Logic Nghiệp vụ (Core Domain Logic): Kiểm tra quy trình cân, đăng ký xe, và tính toàn vẹn của dữ liệu (Data Integrity).
+3. Tương tác Phần cứng (Hardware I/O & Concurrency): Kiểm tra tính đa luồng, chống treo (Deadlock) và khả năng chịu lỗi.
+4. Hiệu năng & Tài nguyên (Performance & Resource Management): Kiểm tra Database, RAM, GPU và CPU.
+5. Giao diện & Trải nghiệm (UI/UX & Threading): Kiểm tra độ phản hồi và tính trực quan.

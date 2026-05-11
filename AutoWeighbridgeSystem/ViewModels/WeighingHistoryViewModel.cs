@@ -273,25 +273,27 @@ namespace AutoWeighbridgeSystem.ViewModels
 
                 using var context = await _contextFactory.CreateDbContextAsync();
 
-                // Lấy phiếu hoàn thành trong ngày hôm nay (Dựa trên giờ ra)
-                var today = DateTime.Today;
-                var tickets = await context.WeighingTickets
-                    .AsNoTracking()
-                    .Where(t => t.TimeOut != null && 
-                                t.TimeOut.Value.Date == today && 
-                                !t.IsVoid)
+                // Dùng lại GetFilteredQuery để lấy đúng dải ngày & từ khóa đang lọc trên màn hình,
+                // sau đó thêm 2 ràng buộc bắt buộc: phiếu phải hoàn thành và không bị hủy.
+                var tickets = await GetFilteredQuery(context)
+                    .Where(t => t.TimeOut != null && !t.IsVoid)
                     .OrderBy(t => t.TimeIn)
+                    .AsNoTracking()
                     .ToListAsync();
 
                 if (tickets.Count == 0)
                 {
-                    _notificationService.ShowWarning("Không tìm thấy phiếu cân nào hoàn thành trong ngày hôm nay để đồng bộ.", "KHÔNG CÓ DỮ LIỆU");
+                    _notificationService.ShowWarning(
+                        $"Không tìm thấy phiếu cân nào hoàn thành từ {FromDate:dd/MM/yyyy} đến {ToDate:dd/MM/yyyy} để đồng bộ.",
+                        "KHÔNG CÓ DỮ LIỆU");
                     return;
                 }
 
                 await googleSheetsExportService.SyncDailyTicketsAsync(tickets);
 
-                _notificationService.ShowInfo($"Đã đồng bộ thành công {tickets.Count} phiếu của ngày hôm nay lên Google Sheets!", "ĐỒNG BỘ THÀNH CÔNG");
+                _notificationService.ShowInfo(
+                    $"Đã đồng bộ thành công {tickets.Count} phiếu từ {FromDate:dd/MM/yyyy} đến {ToDate:dd/MM/yyyy} lên Google Sheets!",
+                    "ĐỒNG BỘ THÀNH CÔNG");
             }
             catch (Exception ex)
             {

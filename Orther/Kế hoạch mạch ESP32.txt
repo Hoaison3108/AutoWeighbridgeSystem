@@ -1,0 +1,46 @@
+<planning_mode> Chào bạn, ý tưởng sử dụng ESP32 để điều khiển đa kênh (Đèn + Chuông) là một hướng đi rất chuyên nghiệp và linh hoạt. ESP32 mạnh hơn nhiều so với mạch LC-Relay đơn giản, cho phép chúng ta tự định nghĩa "ngôn ngữ" giao tiếp riêng để phần mềm điều khiển chính xác từng Rơ-le.
+
+Dưới đây là bản kế hoạch chi tiết để bạn chuẩn bị phần cứng và tích hợp vào phần mềm cân.
+
+Phase 1: Research & Preparation
+1. Chuẩn bị phần cứng (Hardware)
+Vi điều khiển: 1 mạch ESP32 (loại nào cũng được, ví dụ NodeMCU-32S).
+Module Relay: 1 module 2-Relay (có cách ly quang Optocoupler là tốt nhất để tránh nhiễu như lỗi cũ).
+Kết nối:
+GPIO 18 -> Relay 1 (Chuông).
+GPIO 19 -> Relay 2 (Đèn).
+VCC/GND nối nguồn 5V ổn định.
+2. Ngôn ngữ giao tiếp (Protocol)
+Để đơn giản và ổn định, tôi đề xuất sử dụng giao tiếp Serial (UART) qua cổng USB với các ký tự lệnh đơn giản:
+
+Gửi ký tự 'B' (Bell): ESP32 sẽ kích Relay 1 kêu chuông trong 1.5s rồi tự ngắt.
+Gửi ký tự 'L' (Light): ESP32 sẽ kích Relay 2 sáng đèn trong 2s rồi tự ngắt.
+Phase 2: Implementation Plan
+1. Nạp Code cho ESP32 (Firmware)
+Tôi sẽ cung cấp đoạn code Arduino/C++ để bạn nạp vào ESP32. Code này sẽ làm nhiệm vụ lắng nghe cổng Serial và điều khiển Rơ-le theo chế độ "xung" (Pulse).
+
+2. Tầng Dịch vụ: 
+
+RelayService.cs
+Cải tiến để không chỉ gửi mã Hex cứng nhắc mà có thể gửi các lệnh 'B' hoặc 'L'.
+Vẫn duy trì cơ chế Persistent Connection (giữ cổng luôn mở) để đảm bảo tốc độ phản hồi tức thì.
+3. Tầng Nghiệp vụ: 
+
+AlarmService.cs
+Thêm phương thức TriggerRfidLightAsync(): Được gọi khi quẹt thẻ thành công.
+Giữ nguyên TriggerAlarmAsync(): Được gọi khi lưu phiếu thành công.
+4. Điều phối sự kiện: 
+
+DashboardEventCoordinator.cs
+Chèn lệnh gọi TriggerRfidLightAsync() vào hàm OnRfidCardRead ngay sau khi thẻ được xác nhận hợp lệ.
+Phase 3: Open Questions
+Trước khi tôi bắt đầu chuẩn bị code chi tiết, bạn vui lòng xác nhận:
+
+Bạn đã có phần mềm nạp code cho ESP32 (Arduino IDE hoặc PlatformIO) chưa?
+Bạn muốn Đèn sáng trong bao lâu khi quẹt thẻ thành công? (Ví dụ: 2 giây rồi tự tắt).
+Bạn muốn khi quẹt thẻ lỗi (người lạ quẹt) có báo hiệu gì khác không hay chỉ báo khi thành công?
+<ask_question>
+
+Bạn đã sẵn sàng với Arduino IDE để nạp code cho ESP32 chưa?
+Thời gian sáng đèn khi quẹt thẻ (ví dụ 2 giây) như tôi đề xuất có phù hợp không?
+Bạn định sử dụng 2 Relay trên cùng một module nối chung với ESP32 đúng không? </ask_question></planning_mode>
