@@ -61,8 +61,8 @@ namespace AutoWeighbridgeSystem.Services
                         bool.TryParse(enableStr, out enableAutoSync);
                     }
 
-                    // Chỉ đồng bộ trong khoảng thời gian làm việc (Ví dụ: 7:00 đến 17:00) và khi tính năng bật
-                    if (enableAutoSync && now.TimeOfDay >= new TimeSpan(7, 0, 0) && now.TimeOfDay <= new TimeSpan(17, 00, 0))
+                    // Chỉ đồng bộ từ 7:00 sáng trở đi, không giới hạn giờ kết thúc và khi tính năng bật
+                    if (enableAutoSync && now.TimeOfDay >= new TimeSpan(7, 0, 0))
                     {
                         // Kiểm tra phút thứ 00 hoặc 30
                         if (now.Minute == 0 || now.Minute == 30)
