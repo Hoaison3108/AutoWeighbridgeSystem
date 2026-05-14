@@ -1,5 +1,6 @@
 using AutoWeighbridgeSystem.Data;
 using AutoWeighbridgeSystem.Models;
+using AutoWeighbridgeSystem.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
@@ -19,6 +20,7 @@ namespace AutoWeighbridgeSystem.Services
         private readonly GoogleSheetsExportService _exportService;
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly SystemClockService _systemClock;
+        private readonly IUserNotificationService _notificationService;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private CancellationTokenSource? _cts;
         private Task? _backgroundTask;
@@ -27,11 +29,13 @@ namespace AutoWeighbridgeSystem.Services
             GoogleSheetsExportService exportService,
             IDbContextFactory<AppDbContext> dbContextFactory,
             SystemClockService systemClock,
+            IUserNotificationService notificationService,
             Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _exportService = exportService;
             _dbContextFactory = dbContextFactory;
             _systemClock = systemClock;
+            _notificationService = notificationService;
             _configuration = configuration;
         }
 
@@ -106,12 +110,25 @@ namespace AutoWeighbridgeSystem.Services
                     .OrderBy(t => t.TimeIn)
                     .ToListAsync();
 
-                // Đẩy sang Google Sheets Export Service
-                await _exportService.SyncDailyTicketsAsync(tickets);
+                // Kiểm tra kết quả trả về — thất bại thì thông báo rõ ràng lên UI
+                bool syncSuccess = await _exportService.SyncDailyTicketsAsync(tickets);
+                if (!syncSuccess)
+                {
+                    Log.Warning("[GOOGLE_SHEETS_WORKER] Đồng bộ tự động thất bại lúc {Time}.", targetDate.ToString("HH:mm dd/MM/yyyy"));
+                    _notificationService.ShowError(
+                        $"Đồng bộ tự động Google Sheets lúc {DateTime.Now:HH:mm} thất bại!\n" +
+                        "• Kiểm tra file credentials.json\n" +
+                        "• Kiểm tra kết nối Internet\n" +
+                        "Chi tiết xem trong file log.",
+                        "ĐỒNG BỘ TỰ ĐỘNG THẤT BẠI");
+                }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "[GOOGLE_SHEETS_WORKER] Lỗi khi trích xuất dữ liệu Database để đồng bộ.");
+                _notificationService.ShowError(
+                    $"Lỗi đồng bộ tự động Google Sheets: {ex.Message}",
+                    "LỖI HỆ THỐNG");
             }
         }
 

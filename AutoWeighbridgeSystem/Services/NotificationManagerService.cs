@@ -44,32 +44,25 @@ namespace AutoWeighbridgeSystem.Services
                 Type = type
             };
 
-            // Thực hiện trên UI Thread
-            Application.Current.Dispatcher.Invoke(() =>
+            // Dùng InvokeAsync (Fire & Forget) để background thread không bị chặn,
+            // đảm bảo true auto — gửi xong là đi tiếp, không chờ UI thread xử lý.
+            Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                // Thêm vào hàng đầu của lịch sử
                 History.Insert(0, notification);
-
-                // Thêm vào danh sách hiển thị
                 ActiveToasts.Add(notification);
 
-                // Giới hạn số lượng Toast hiển thị cùng lúc (nếu muốn)
                 if (ActiveToasts.Count > 5)
-                {
                     ActiveToasts.RemoveAt(0);
-                }
             });
 
-            // Tự động đóng sau X giây
+            // Tự động đóng sau X giây — cũng dùng InvokeAsync
             _ = Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(AutoHideSeconds));
-                Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     if (ActiveToasts.Contains(notification))
-                    {
                         ActiveToasts.Remove(notification);
-                    }
                 });
             });
         }

@@ -289,11 +289,24 @@ namespace AutoWeighbridgeSystem.ViewModels
                     return;
                 }
 
-                await googleSheetsExportService.SyncDailyTicketsAsync(tickets);
+                bool syncSuccess = await googleSheetsExportService.SyncDailyTicketsAsync(tickets);
 
-                _notificationService.ShowInfo(
-                    $"Đã đồng bộ thành công {tickets.Count} phiếu từ {FromDate:dd/MM/yyyy} đến {ToDate:dd/MM/yyyy} lên Google Sheets!",
-                    "ĐỒNG BỘ THÀNH CÔNG");
+                if (syncSuccess)
+                {
+                    _notificationService.ShowInfo(
+                        $"Đã đồng bộ thành công {tickets.Count} phiếu từ {FromDate:dd/MM/yyyy} đến {ToDate:dd/MM/yyyy} lên Google Sheets!",
+                        "ĐỒNG BỘ THÀNH CÔNG");
+                }
+                else
+                {
+                    _notificationService.ShowError(
+                        "Đồng bộ thất bại! Vui lòng kiểm tra:\n" +
+                        "• File credentials.json có tồn tại không\n" +
+                        "• SpreadsheetId và SheetName trong cấu hình\n" +
+                        "• Kết nối Internet\n" +
+                        "Chi tiết lỗi xem trong file log.",
+                        "ĐỒNG BỘ THẤT BẠI");
+                }
             }
             catch (Exception ex)
             {
